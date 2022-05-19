@@ -1,7 +1,7 @@
-name: hmmer
+name: findmysequence
 channels:
   - bioconda
-
-name: pytorch
-channel:
+  - pytorch
+dependencies:
+  - hmmer
   - pytorch
