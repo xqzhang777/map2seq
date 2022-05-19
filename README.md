@@ -3,8 +3,7 @@
 ## Description
 A web app based on: 
 
-Streamlit (https://streamlit.io/)
-findMySequence(https://gitlab.com/gchojnowski/findmysequence)
+Streamlit (https://streamlit.io/) and findMySequence(https://gitlab.com/gchojnowski/findmysequence)
 
 ```
 findMySequence: a neural-network-based approach for identification of unknown proteins in X-ray crystallography and cryo-EM
