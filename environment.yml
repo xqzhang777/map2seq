@@ -4,6 +4,7 @@ channels:
   - pytorch
   - gchojnowski
 dependencies:
+  - python=3.9
   - hmmer
   - pytorch
   - findmysequence
