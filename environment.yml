@@ -2,6 +2,9 @@ name: findmysequence
 channels:
   - bioconda
   - pytorch
+  - gchojnowski
 dependencies:
   - hmmer
   - pytorch
+  - findmysequence
+  
