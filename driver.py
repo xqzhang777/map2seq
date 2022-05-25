@@ -16,6 +16,7 @@ import streamlit as st
 import numpy as np
 import re
 import os
+from shutil import which
 
 tmpdir = "tempDir"
 tmpdir = os.path.abspath(tmpdir)
@@ -133,7 +134,7 @@ def main():
     if pdb is None: return
 
     with col2:
-        st.subheader("findMySequence Graph")
+        st.subheader(which('hmmsearch'))
         graph_success = False
         with st.spinner("Processing..."):
             remove_old_graph_log()
