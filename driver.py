@@ -134,7 +134,8 @@ def main():
     if pdb is None: return
 
     with col2:
-        st.subheader(which('hmmsearch'))
+        print(which('hmmsearch'))
+        st.subheader("Result Plot")
         graph_success = False
         with st.spinner("Processing..."):
             remove_old_graph_log()
