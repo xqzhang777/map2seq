@@ -129,12 +129,12 @@ def main():
         
         print(pdb)
         print(mrc)
+        print(which('hmmsearch'))
         print('-')
     if mrc is None: return
     if pdb is None: return
 
     with col2:
-        print(which('hmmsearch'))
         st.subheader("Result Plot")
         graph_success = False
         with st.spinner("Processing..."):
