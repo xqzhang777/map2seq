@@ -16,3 +16,4 @@ dependencies:
     - torch
     - scitbx
     - scikit-learn
+    - statsmodels
