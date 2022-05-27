@@ -1,1 +1,6 @@
-
+name: findmysequence
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - pip
