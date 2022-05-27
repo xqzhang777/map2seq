@@ -17,6 +17,10 @@ import numpy as np
 import re
 import os
 from shutil import which
+from findmysequence_lib.findmysequence import fms_main
+import pickle
+from bokeh.plotting import ColumnDataSource, figure
+from bokeh.models import Label
 
 tmpdir = "tempDir"
 tmpdir = os.path.abspath(tmpdir)
@@ -110,8 +114,8 @@ def main():
         #----------------------------------------------------------------------------------------------------------------------------------------
 
         #pdb input
-        # input_modes_model = {0:"upload", 1:"PDB ID"}
-        input_modes_model = {0:"upload"}
+        input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
+        #input_modes_model = {0:"upload"}
         help_model = None
         input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=0, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
@@ -126,6 +130,28 @@ def main():
                     f.write(fileobj.getbuffer())
                 pdb = tmpdir + "/" + fileobj.name
                 # pdb = get_model_from_uploaded_file(fileobj)
+        
+        elif input_mode_model == 1: # "url":
+            help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
+            url = st.text_input(label="Input the url of a PDB model:", help=help, key="url")
+            if url:
+                with st.spinner(f'Downloading {url.strip()}'):
+                    filepath = get_3d_map_from_url(url.strip())
+                    pdb = filepath
+                st.write("Done.")
+        
+        elif input_mode_model == 2: # "PDB ID":
+            help = None
+            # if max_map_size>0: help = warning_map_size
+            label = "Input an PDB ID (for example: 4hhb):"
+            pdb_id = st.text_input(label=label, key='pdb_id', help=help)
+            pdb_id = pdb_id.lower()
+            if pdb_id:
+                pdb_url=get_pdb_url(pdb_id)
+                with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
+                    filepath = get_3d_map_from_url(pdb_url)
+                    pdb = filepath
+                st.write("Done.")
         
         print(pdb)
         print(mrc)
@@ -149,9 +175,31 @@ def main():
                 if "Success" in first_line:
                     graph_success = True
         if graph_success:
-            from PIL import Image
-            image = Image.open(os.path.join(tmpdir, 'fms.png'))
-            st.image(image, caption='Temp Title')
+            #from PIL import Image
+            #image = Image.open(os.path.join(tmpdir, 'fms.png'))
+            #st.image(image, caption='Temp Title')
+            with open(os.path.join(tmpdir, 'fms.png_x.pkl'),'rb') as inf:
+                xs = pickle.load(inf)
+            with open(os.path.join(tmpdir, 'fms.png_y.pkl'),'rb') as inf:
+                ys = pickle.load(inf)
+            
+            #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
+            
+            source = ColumnDataSource(data=dict(x=range(len(xs)),y=ys,ID=xs))
+            top_source = ColumnDataSource(data=dict(x=[0],y=[ys[0]],ID=[xs[0]]))
+            label = Label(x=0, y=ys[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+  
+            TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+   
+            p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
+            p.circle('x','y',source=source)
+            p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+            p.yaxis.axis_label = 'E-values'
+            p.xaxis.axis_label = 'Rank Order'
+            p.y_range.flipped = True
+            p.add_layout(label)
+            
+            st.bokeh_chart(p, use_container_width=True)
         else:
             st.text('Failed')
 
@@ -256,6 +304,10 @@ def get_emdb_map_url(emdid):
     url = f"{server}/emdb/structures/EMD-{emdid_number}/map/emd_{emdid_number}.map.gz"
     return url
 
+def get_pdb_url(protid):
+	server = "https://files.rcsb.org/download"
+	return f"{server}/{protid}.pdb.gz"
+	
 @st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
 def get_emdb_map(emdid):
     url = get_emdb_map_url(emdid)

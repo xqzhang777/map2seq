@@ -1,0 +1,129 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+5HP      5HP '5-Hydroxyproline                    ' L-peptide          14   8 .
+#
+data_comp_5HP
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ 5HP           N      N    N         0.000
+ 5HP           CA     C    CH1       0.000
+ 5HP           HA     H    HCH1      0.000
+ 5HP           CB     C    CH2       0.000
+ 5HP           HB1    H    HCH2      0.000
+ 5HP           HB2    H    HCH2      0.000
+ 5HP           CG     C    CH2       0.000
+ 5HP           HG1    H    HCH2      0.000
+ 5HP           HG2    H    HCH2      0.000
+ 5HP           CD     C    CH1       0.000
+ 5HP           HD     H    HCH1      0.000
+ 5HP           OD     O    O         0.000
+ 5HP           C      C    C         0.000
+ 5HP           O      O    O         0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ 5HP      N      n/a    CA     START
+ 5HP      CA     N      C      .
+ 5HP      HA     CA     .      .
+ 5HP      CB     CA     CG     .
+ 5HP      HB1    CB     .      .
+ 5HP      HB2    CB     .      .
+ 5HP      CG     CB     CD     .
+ 5HP      HG1    CG     .      .
+ 5HP      HG2    CG     .      .
+ 5HP      CD     CG     OD     .
+ 5HP      HD     CD     .      .
+ 5HP      OD     CD     .      .
+ 5HP      C      CA     .      END
+ 5HP      O      C      .      .
+ 5HP      N      CD     .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ 5HP      CA     N         coval       1.450    0.020
+ 5HP      CB     CA        coval       1.524    0.020
+ 5HP      CG     CB        coval       1.524    0.020
+ 5HP      OD     CD        coval       1.410    0.020
+ 5HP      CD     CG        coval       1.524    0.020
+ 5HP      C      CA        coval       1.530    0.020
+ 5HP      O      C         coval       1.230    0.020
+ 5HP      HA     CA        coval       1.090    0.020
+ 5HP      HB1    CB        coval       1.090    0.020
+ 5HP      HB2    CB        coval       1.090    0.020
+ 5HP      HG1    CG        coval       1.090    0.020
+ 5HP      HG2    CG        coval       1.090    0.020
+ 5HP      HD     CD        coval       1.090    0.020
+ 5HP      N      CD        coval       1.470    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ 5HP      CA     N      CD      112.000    3.000
+ 5HP      N      CA     HA      109.470    3.000
+ 5HP      N      CA     CB      105.000    3.000
+ 5HP      N      CA     C       111.600    3.000
+ 5HP      HA     CA     CB      108.340    3.000
+ 5HP      CB     CA     C       109.470    3.000
+ 5HP      CA     CB     HB1     109.470    3.000
+ 5HP      CA     CB     HB2     109.470    3.000
+ 5HP      CA     CB     CG      111.000    3.000
+ 5HP      HB1    CB     HB2     107.900    3.000
+ 5HP      HB2    CB     CG      109.470    3.000
+ 5HP      CB     CG     HG1     108.340    3.000
+ 5HP      CB     CG     HG2     108.340    3.000
+ 5HP      CB     CG     CD      109.470    3.000
+ 5HP      HG1    CG     CD      108.340    3.000
+ 5HP      HG2    CG     CD      108.340    3.000
+ 5HP      HG1    CG     HG2     108.340    3.000
+ 5HP      CG     CD     OD      109.470    3.000
+ 5HP      CG     CD     HD      109.470    3.000
+ 5HP      OD     CD     HD      109.470    3.000
+ 5HP      CG     CD     N       104.000    3.000
+ 5HP      OD     CD     N       109.470    3.000
+ 5HP      HD     CD     N       109.470    3.000
+ 5HP      CA     C      O       120.500    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ 5HP      var_3    N      CA     CB     CG        30.000   20.000   1
+ 5HP      var_4    CA     CB     CG     CD       -30.000   20.000   1
+ 5HP      var_5    CB     CG     CD     N         20.000   20.000   1
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ 5HP      chir_01  CA     N      CB     C         negativ

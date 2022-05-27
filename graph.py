@@ -1,4 +1,7 @@
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+import pickle
+from bokeh.plotting import ColumnDataSource, figure, output_file, save
+from bokeh.models import Label
 import os.path
 from os import path
 
@@ -15,20 +18,48 @@ no_matches_found = "No matches found"
 
 
 def make_graph(ids, e_vals, outputFile):
-    plt.clf()
-    plt.scatter(ids, e_vals, c = "blue")
-    plt.scatter(ids[0], e_vals[0], c='red')
-    plt.gca().set_xticks(plt.gca().get_xticks()[::1000])
-    plt.gca().axes.xaxis.set_ticklabels([])
-    plt.xticks(rotation = 90) 
+    
+    #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
+
+    output_file('{}.html'.format(outputFile))
+
+    source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
+    top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
+    label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+  
+    TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+   
+    p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
+    p.circle('x','y',source=source)
+    p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+    p.yaxis.axis_label = 'E-values'
+    p.xaxis.axis_label = 'Rank Order'
+    p.y_range.flipped = True
+    p.add_layout(label)
+    
+    save(p)
+    
+    with open('{}_x.pkl'.format(outputFile),'wb') as o:
+        pickle.dump(ids,o,pickle.HIGHEST_PROTOCOL)
+    with open('{}_y.pkl'.format(outputFile),'wb') as o:
+        pickle.dump(e_vals,o,pickle.HIGHEST_PROTOCOL)
+    
+    #show(p)
+
+#    plt.clf()
+#    plt.scatter(ids, e_vals, c = "blue")
+#    plt.scatter(ids[0], e_vals[0], c='red')
+#    plt.gca().set_xticks(plt.gca().get_xticks()[::1000])
+#    plt.gca().axes.xaxis.set_ticklabels([])
+#    plt.xticks(rotation = 90) 
     # plt.gca().axes.get_xaxis().set_ticks([])
-    best_match = ids[0].split('|')
-    plt.annotate(best_match[1], (ids[0], e_vals[0]))
-    plt.ylabel("E-Values")
-    plt.yscale('log')
-    plt.title("Ranked Sequences")
-    plt.gca().invert_yaxis()
-    plt.savefig(outputFile)
+#    best_match = ids[0].split('|')
+#    plt.annotate(best_match[1], (ids[0], e_vals[0]))
+#    plt.ylabel("E-Values")
+#    plt.yscale('log')
+#    plt.title("Ranked Sequences")
+#    plt.gca().invert_yaxis()
+#    plt.savefig(outputFile)
 
 
 def parse_file(outputFile, filepath):

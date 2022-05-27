@@ -1,0 +1,509 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+NDP      .   'NADPH DIHYDRO-NICOTINAMIDE-ADENINE-D' non-polymer        78  48 .
+#
+data_comp_NDP
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ NDP           AOP1   O    OP        0.000
+ NDP           AP2*   P    P         0.000
+ NDP           AOP2   O    OP        0.000
+ NDP           AOP3   O    OP        0.000
+ NDP           AO2*   O    O2        0.000
+ NDP           AC2*   C    CH1       0.000
+ NDP           AH2*   H    HCH1      0.000
+ NDP           AC3*   C    CH1       0.000
+ NDP           AH3*   H    HCH1      0.000
+ NDP           AO3*   O    OH1       0.000
+ NDP           AHO3   H    HOH1      0.000
+ NDP           AC1*   C    CH1       0.000
+ NDP           AH1*   H    HCH1      0.000
+ NDP           AN9    N    NR5       0.000
+ NDP           AC8    C    CR15      0.000
+ NDP           AH8    H    HCR5      0.000
+ NDP           AN7    N    NR15      0.000
+ NDP           AC5    C    CR56      0.000
+ NDP           AC4    C    CR56      0.000
+ NDP           AN3    N    NR16      0.000
+ NDP           AC2    C    CR16      0.000
+ NDP           AH2    H    HCR6      0.000
+ NDP           AN1    N    NR16      0.000
+ NDP           AC6    C    CR6       0.000
+ NDP           AN6    N    NH2       0.000
+ NDP           AH62   H    HNH2      0.000
+ NDP           AH61   H    HNH2      0.000
+ NDP           AO4*   O    O2        0.000
+ NDP           AC4*   C    CH1       0.000
+ NDP           AH4*   H    HCH1      0.000
+ NDP           AC5*   C    CH2       0.000
+ NDP           AH51   H    HCH2      0.000
+ NDP           AH52   H    HCH2      0.000
+ NDP           AO5*   O    O2        0.000
+ NDP           AP     P    P         0.000
+ NDP           AO1    O    OP        0.000
+ NDP           AO2    O    OP        0.000
+ NDP           O3     O    O2        0.000
+ NDP           NP     P    P         0.000
+ NDP           NO1    O    OP        0.000
+ NDP           NO2    O    OP        0.000
+ NDP           NO5*   O    O2        0.000
+ NDP           NC5*   C    CH2       0.000
+ NDP           NH51   H    HCH2      0.000
+ NDP           NH52   H    HCH2      0.000
+ NDP           NC4*   C    CH1       0.000
+ NDP           NH4*   H    HCH1      0.000
+ NDP           NO4*   O    O2        0.000
+ NDP           NC1*   C    CH1       0.000
+ NDP           NH1*   H    HCH1      0.000
+ NDP           NC2*   C    CH1       0.000
+ NDP           NH2*   H    HCH1      0.000
+ NDP           NO2*   O    OH1       0.000
+ NDP           NHO2   H    HOH1      0.000
+ NDP           NC3*   C    CH1       0.000
+ NDP           NH3*   H    HCH1      0.000
+ NDP           NO3*   O    OH1       0.000
+ NDP           NHO3   H    HOH1      0.000
+ NDP           NN1    N    NR6       0.000
+ NDP           NC2    C    CR16      0.000
+ NDP           NH2    H    HCR6      0.000
+ NDP           NC3    C    CR6       0.000
+ NDP           NH3    H    HCR6      0.000
+ NDP           NC7    C    C         0.000
+ NDP           NN7    N    NH2       0.000
+ NDP           NH72   H    HNH2      0.000
+ NDP           NH71   H    HNH2      0.000
+ NDP           NO7    O    O         0.000
+ NDP           NC4    C    CH2       0.000
+ NDP           NH41   H    HCH2      0.000
+ NDP           NH42   H    HCH2      0.000
+ NDP           NC5    C    CR16      0.000
+ NDP           NH5    H    HCR6      0.000
+ NDP           NC6    C    CR16      0.000
+ NDP           NH6    H    HCR6      0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ NDP      AOP1   n/a    AP2*   START
+ NDP      AP2*   AOP1   AO2*   .
+ NDP      AOP2   AP2*   .      .
+ NDP      AOP3   AP2*   .      .
+ NDP      AO2*   AP2*   AC2*   .
+ NDP      AC2*   AO2*   AC1*   .
+ NDP      AH2*   AC2*   .      .
+ NDP      AC3*   AC2*   AO3*   .
+ NDP      AH3*   AC3*   .      .
+ NDP      AO3*   AC3*   AHO3   .
+ NDP      AHO3   AO3*   .      .
+ NDP      AC1*   AC2*   AO4*   .
+ NDP      AH1*   AC1*   .      .
+ NDP      AN9    AC1*   AC8    .
+ NDP      AC8    AN9    AN7    .
+ NDP      AH8    AC8    .      .
+ NDP      AN7    AC8    AC5    .
+ NDP      AC5    AN7    AC6    .
+ NDP      AC4    AC5    AN3    .
+ NDP      AN3    AC4    AC2    .
+ NDP      AC2    AN3    AN1    .
+ NDP      AH2    AC2    .      .
+ NDP      AN1    AC2    .      .
+ NDP      AC6    AC5    AN6    .
+ NDP      AN6    AC6    AH61   .
+ NDP      AH62   AN6    .      .
+ NDP      AH61   AN6    .      .
+ NDP      AO4*   AC1*   AC4*   .
+ NDP      AC4*   AO4*   AC5*   .
+ NDP      AH4*   AC4*   .      .
+ NDP      AC5*   AC4*   AO5*   .
+ NDP      AH51   AC5*   .      .
+ NDP      AH52   AC5*   .      .
+ NDP      AO5*   AC5*   AP     .
+ NDP      AP     AO5*   O3     .
+ NDP      AO1    AP     .      .
+ NDP      AO2    AP     .      .
+ NDP      O3     AP     NP     .
+ NDP      NP     O3     NO5*   .
+ NDP      NO1    NP     .      .
+ NDP      NO2    NP     .      .
+ NDP      NO5*   NP     NC5*   .
+ NDP      NC5*   NO5*   NC4*   .
+ NDP      NH51   NC5*   .      .
+ NDP      NH52   NC5*   .      .
+ NDP      NC4*   NC5*   NO4*   .
+ NDP      NH4*   NC4*   .      .
+ NDP      NO4*   NC4*   NC1*   .
+ NDP      NC1*   NO4*   NN1    .
+ NDP      NH1*   NC1*   .      .
+ NDP      NC2*   NC1*   NC3*   .
+ NDP      NH2*   NC2*   .      .
+ NDP      NO2*   NC2*   NHO2   .
+ NDP      NHO2   NO2*   .      .
+ NDP      NC3*   NC2*   NO3*   .
+ NDP      NH3*   NC3*   .      .
+ NDP      NO3*   NC3*   NHO3   .
+ NDP      NHO3   NO3*   .      .
+ NDP      NN1    NC1*   NC2    .
+ NDP      NC2    NN1    NC3    .
+ NDP      NH2    NC2    .      .
+ NDP      NC3    NC2    NC4    .
+ NDP      NH3    NC3    .      .
+ NDP      NC7    NC3    NO7    .
+ NDP      NN7    NC7    NH71   .
+ NDP      NH72   NN7    .      .
+ NDP      NH71   NN7    .      .
+ NDP      NO7    NC7    .      .
+ NDP      NC4    NC3    NC5    .
+ NDP      NH41   NC4    .      .
+ NDP      NH42   NC4    .      .
+ NDP      NC5    NC4    NC6    .
+ NDP      NH5    NC5    .      .
+ NDP      NC6    NC5    NH6    .
+ NDP      NH6    NC6    .      END
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ NDP      AP2*   AOP1      coval       1.510    0.020
+ NDP      AOP2   AP2*      coval       1.510    0.020
+ NDP      AOP3   AP2*      coval       1.510    0.020
+ NDP      AO2*   AP2*      coval       1.610    0.020
+ NDP      AC2*   AO2*      coval       1.410    0.020
+ NDP      AH2*   AC2*      coval       1.090    0.020
+ NDP      AC3*   AC2*      coval       1.524    0.020
+ NDP      AH3*   AC3*      coval       1.090    0.020
+ NDP      AO3*   AC3*      coval       1.410    0.020
+ NDP      AHO3   AO3*      coval       0.980    0.020
+ NDP      AC1*   AC2*      coval       1.524    0.020
+ NDP      AH1*   AC1*      coval       1.090    0.020
+ NDP      AN9    AC1*      coval       1.475    0.020
+ NDP      AN9    AC4       coval       1.375    0.020
+ NDP      AC8    AN9       coval       1.370    0.020
+ NDP      AH8    AC8       coval       1.090    0.020
+ NDP      AN7    AC8       coval       1.350    0.020
+ NDP      AC5    AN7       coval       1.350    0.020
+ NDP      AC4    AC5       coval       1.390    0.020
+ NDP      AN3    AC4       coval       1.355    0.020
+ NDP      AC2    AN3       coval       1.380    0.020
+ NDP      AH2    AC2       coval       1.090    0.020
+ NDP      AN1    AC2       coval       1.380    0.020
+ NDP      AC6    AC5       coval       1.390    0.020
+ NDP      AC6    AN1       coval       1.380    0.020
+ NDP      AN6    AC6       coval       1.330    0.020
+ NDP      AH62   AN6       coval       1.015    0.020
+ NDP      AH61   AN6       coval       1.015    0.020
+ NDP      AO4*   AC1*      coval       1.410    0.020
+ NDP      AC4*   AO4*      coval       1.410    0.020
+ NDP      AC4*   AC3*      coval       1.524    0.020
+ NDP      AH4*   AC4*      coval       1.090    0.020
+ NDP      AC5*   AC4*      coval       1.524    0.020
+ NDP      AH51   AC5*      coval       1.090    0.020
+ NDP      AH52   AC5*      coval       1.090    0.020
+ NDP      AO5*   AC5*      coval       1.410    0.020
+ NDP      AP     AO5*      coval       1.610    0.020
+ NDP      AO1    AP        coval       1.480    0.020
+ NDP      AO2    AP        coval       1.480    0.020
+ NDP      O3     AP        coval       1.610    0.020
+ NDP      NP     O3        coval       1.610    0.020
+ NDP      NO1    NP        coval       1.480    0.020
+ NDP      NO2    NP        coval       1.480    0.020
+ NDP      NO5*   NP        coval       1.610    0.020
+ NDP      NC5*   NO5*      coval       1.410    0.020
+ NDP      NH51   NC5*      coval       1.090    0.020
+ NDP      NH52   NC5*      coval       1.090    0.020
+ NDP      NC4*   NC5*      coval       1.524    0.020
+ NDP      NC4*   NC3*      coval       1.524    0.020
+ NDP      NH4*   NC4*      coval       1.090    0.020
+ NDP      NO4*   NC4*      coval       1.410    0.020
+ NDP      NC1*   NO4*      coval       1.410    0.020
+ NDP      NH1*   NC1*      coval       1.090    0.020
+ NDP      NC2*   NC1*      coval       1.524    0.020
+ NDP      NH2*   NC2*      coval       1.090    0.020
+ NDP      NO2*   NC2*      coval       1.410    0.020
+ NDP      NHO2   NO2*      coval       0.980    0.020
+ NDP      NC3*   NC2*      coval       1.524    0.020
+ NDP      NH3*   NC3*      coval       1.090    0.020
+ NDP      NO3*   NC3*      coval       1.410    0.020
+ NDP      NHO3   NO3*      coval       0.980    0.020
+ NDP      NN1    NC1*      coval       1.475    0.020
+ NDP      NN1    NC6       coval       1.365    0.020
+ NDP      NC2    NN1       coval       1.365    0.020
+ NDP      NH2    NC2       coval       1.090    0.020
+ NDP      NC3    NC2       coval       1.390    0.020
+ NDP      NH3    NC3       coval       0.960    0.020
+ NDP      NC7    NC3       coval       1.500    0.020
+ NDP      NN7    NC7       coval       1.332    0.020
+ NDP      NH72   NN7       coval       1.015    0.020
+ NDP      NH71   NN7       coval       1.015    0.020
+ NDP      NO7    NC7       coval       1.410    0.020
+ NDP      NC4    NC3       coval       1.511    0.020
+ NDP      NH41   NC4       coval       1.090    0.020
+ NDP      NH42   NC4       coval       1.090    0.020
+ NDP      NC5    NC4       coval       1.500    0.020
+ NDP      NH5    NC5       coval       1.090    0.020
+ NDP      NC6    NC5       coval       1.390    0.020
+ NDP      NH6    NC6       coval       1.090    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ NDP      AOP1   AP2*   AOP2    109.500    3.000
+ NDP      AOP1   AP2*   AOP3    109.500    3.000
+ NDP      AOP1   AP2*   AO2*    108.200    3.000
+ NDP      AOP2   AP2*   AOP3    109.500    3.000
+ NDP      AOP2   AP2*   AO2*    109.500    3.000
+ NDP      AOP3   AP2*   AO2*    109.500    3.000
+ NDP      AP2*   AO2*   AC2*    120.500    3.000
+ NDP      AO2*   AC2*   AH2*    109.470    3.000
+ NDP      AO2*   AC2*   AC3*    109.470    3.000
+ NDP      AO2*   AC2*   AC1*    109.470    3.000
+ NDP      AH2*   AC2*   AC3*    108.340    3.000
+ NDP      AH2*   AC2*   AC1*    108.340    3.000
+ NDP      AC3*   AC2*   AC1*    111.000    3.000
+ NDP      AC2*   AC3*   AH3*    108.340    3.000
+ NDP      AC2*   AC3*   AO3*    109.470    3.000
+ NDP      AC2*   AC3*   AC4*    111.000    3.000
+ NDP      AH3*   AC3*   AO3*    109.470    3.000
+ NDP      AH3*   AC3*   AC4*    108.340    3.000
+ NDP      AO3*   AC3*   AC4*    109.470    3.000
+ NDP      AC3*   AO3*   AHO3    109.470    3.000
+ NDP      AC2*   AC1*   AH1*    108.340    3.000
+ NDP      AC2*   AC1*   AN9     109.470    3.000
+ NDP      AC2*   AC1*   AO4*    109.470    3.000
+ NDP      AH1*   AC1*   AN9     109.470    3.000
+ NDP      AH1*   AC1*   AO4*    109.470    3.000
+ NDP      AN9    AC1*   AO4*    109.470    3.000
+ NDP      AC1*   AN9    AC8     126.000    3.000
+ NDP      AC1*   AN9    AC4     126.000    3.000
+ NDP      AC8    AN9    AC4     108.000    3.000
+ NDP      AN9    AC8    AH8     126.000    3.000
+ NDP      AN9    AC8    AN7     108.000    3.000
+ NDP      AH8    AC8    AN7     126.000    3.000
+ NDP      AC8    AN7    AC5     108.000    3.000
+ NDP      AN7    AC5    AC4     108.000    3.000
+ NDP      AN7    AC5    AC6     132.000    3.000
+ NDP      AC4    AC5    AC6     120.000    3.000
+ NDP      AC5    AC4    AN3     120.000    3.000
+ NDP      AC5    AC4    AN9     108.000    3.000
+ NDP      AN3    AC4    AN9     132.000    3.000
+ NDP      AC4    AN3    AC2     120.000    3.000
+ NDP      AN3    AC2    AH2     120.000    3.000
+ NDP      AN3    AC2    AN1     120.000    3.000
+ NDP      AH2    AC2    AN1     120.000    3.000
+ NDP      AC2    AN1    AC6     120.000    3.000
+ NDP      AC5    AC6    AN6     120.000    3.000
+ NDP      AC5    AC6    AN1     120.000    3.000
+ NDP      AN6    AC6    AN1     120.000    3.000
+ NDP      AC6    AN6    AH62    120.000    3.000
+ NDP      AC6    AN6    AH61    120.000    3.000
+ NDP      AH62   AN6    AH61    120.000    3.000
+ NDP      AC1*   AO4*   AC4*    111.800    3.000
+ NDP      AO4*   AC4*   AH4*    109.470    3.000
+ NDP      AO4*   AC4*   AC5*    109.470    3.000
+ NDP      AO4*   AC4*   AC3*    109.470    3.000
+ NDP      AH4*   AC4*   AC5*    108.340    3.000
+ NDP      AH4*   AC4*   AC3*    108.340    3.000
+ NDP      AC5*   AC4*   AC3*    111.000    3.000
+ NDP      AC4*   AC5*   AH51    109.470    3.000
+ NDP      AC4*   AC5*   AH52    109.470    3.000
+ NDP      AC4*   AC5*   AO5*    109.470    3.000
+ NDP      AH51   AC5*   AH52    107.900    3.000
+ NDP      AH51   AC5*   AO5*    109.470    3.000
+ NDP      AH52   AC5*   AO5*    109.470    3.000
+ NDP      AC5*   AO5*   AP      120.500    3.000
+ NDP      AO5*   AP     AO1     108.200    3.000
+ NDP      AO5*   AP     AO2     109.500    3.000
+ NDP      AO5*   AP     O3      102.600    3.000
+ NDP      AO1    AP     AO2     109.500    3.000
+ NDP      AO1    AP     O3      108.200    3.000
+ NDP      AO2    AP     O3      109.500    3.000
+ NDP      AP     O3     NP      120.500    3.000
+ NDP      O3     NP     NO1     108.200    3.000
+ NDP      O3     NP     NO2     108.200    3.000
+ NDP      O3     NP     NO5*    102.600    3.000
+ NDP      NO1    NP     NO2     119.900    3.000
+ NDP      NO1    NP     NO5*    108.200    3.000
+ NDP      NO2    NP     NO5*    108.200    3.000
+ NDP      NP     NO5*   NC5*    120.500    3.000
+ NDP      NO5*   NC5*   NH51    109.470    3.000
+ NDP      NO5*   NC5*   NH52    109.470    3.000
+ NDP      NO5*   NC5*   NC4*    109.470    3.000
+ NDP      NH51   NC5*   NH52    107.900    3.000
+ NDP      NH51   NC5*   NC4*    109.470    3.000
+ NDP      NH52   NC5*   NC4*    109.470    3.000
+ NDP      NC5*   NC4*   NH4*    108.340    3.000
+ NDP      NC5*   NC4*   NO4*    109.470    3.000
+ NDP      NC5*   NC4*   NC3*    111.000    3.000
+ NDP      NH4*   NC4*   NO4*    109.470    3.000
+ NDP      NH4*   NC4*   NC3*    108.340    3.000
+ NDP      NO4*   NC4*   NC3*    109.470    3.000
+ NDP      NC4*   NO4*   NC1*    111.800    3.000
+ NDP      NO4*   NC1*   NH1*    109.470    3.000
+ NDP      NO4*   NC1*   NC2*    109.470    3.000
+ NDP      NO4*   NC1*   NN1     109.470    3.000
+ NDP      NH1*   NC1*   NC2*    108.340    3.000
+ NDP      NH1*   NC1*   NN1     109.470    3.000
+ NDP      NC2*   NC1*   NN1     109.470    3.000
+ NDP      NC1*   NC2*   NH2*    108.340    3.000
+ NDP      NC1*   NC2*   NO2*    109.470    3.000
+ NDP      NC1*   NC2*   NC3*    111.000    3.000
+ NDP      NH2*   NC2*   NO2*    109.470    3.000
+ NDP      NH2*   NC2*   NC3*    108.340    3.000
+ NDP      NO2*   NC2*   NC3*    109.470    3.000
+ NDP      NC2*   NO2*   NHO2    109.470    3.000
+ NDP      NC2*   NC3*   NH3*    108.340    3.000
+ NDP      NC2*   NC3*   NO3*    109.470    3.000
+ NDP      NC2*   NC3*   NC4*    111.000    3.000
+ NDP      NH3*   NC3*   NO3*    109.470    3.000
+ NDP      NH3*   NC3*   NC4*    108.340    3.000
+ NDP      NO3*   NC3*   NC4*    109.470    3.000
+ NDP      NC3*   NO3*   NHO3    109.470    3.000
+ NDP      NC1*   NN1    NC2     120.000    3.000
+ NDP      NC1*   NN1    NC6     120.000    3.000
+ NDP      NC2    NN1    NC6     120.000    3.000
+ NDP      NN1    NC2    NH2     120.000    3.000
+ NDP      NN1    NC2    NC3     120.000    3.000
+ NDP      NH2    NC2    NC3     120.000    3.000
+ NDP      NC2    NC3    NH3     120.000    3.000
+ NDP      NC2    NC3    NC7     120.000    3.000
+ NDP      NC2    NC3    NC4     120.000    3.000
+ NDP      NH3    NC3    NC7     120.000    3.000
+ NDP      NH3    NC3    NC4     120.000    3.000
+ NDP      NC7    NC3    NC4     120.000    3.000
+ NDP      NC3    NC7    NN7     120.000    3.000
+ NDP      NC3    NC7    NO7     120.500    3.000
+ NDP      NN7    NC7    NO7     123.000    3.000
+ NDP      NC7    NN7    NH72    120.000    3.000
+ NDP      NC7    NN7    NH71    120.000    3.000
+ NDP      NH72   NN7    NH71    120.000    3.000
+ NDP      NC3    NC4    NH41    109.470    3.000
+ NDP      NC3    NC4    NH42    109.470    3.000
+ NDP      NC3    NC4    NC5     109.500    3.000
+ NDP      NH41   NC4    NH42    107.900    3.000
+ NDP      NH41   NC4    NC5     109.470    3.000
+ NDP      NH42   NC4    NC5     109.470    3.000
+ NDP      NC4    NC5    NH5     120.000    3.000
+ NDP      NC4    NC5    NC6     120.000    3.000
+ NDP      NH5    NC5    NC6     120.000    3.000
+ NDP      NC5    NC6    NH6     120.000    3.000
+ NDP      NC5    NC6    NN1     120.000    3.000
+ NDP      NH6    NC6    NN1     120.000    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ NDP      var_3    AOP1   AP2*   AO2*   AC2*    -170.405   20.000   1
+ NDP      var_4    AP2*   AO2*   AC2*   AC1*     152.858   20.000   1
+ NDP      var_5    AO2*   AC2*   AC3*   AO3*      36.603   20.000   3
+ NDP      var_6    AO2*   AC2*   AC3*   AC4*     -66.048   20.000   3
+ NDP      var_7    AC2*   AC3*   AO3*   AHO3       0.000   20.000   1
+ NDP      var_8    AO2*   AC2*   AC1*   AO4*      78.836   20.000   3
+ NDP      var_9    AC2*   AC1*   AN9    AC8     -104.568   20.000   1
+ NDP      var_10   AC2*   AC1*   AN9    AC4       82.017   20.000   1
+ NDP      CONST_1  AC1*   AN9    AC8    AN7      180.000    0.000   0
+ NDP      CONST_2  AN9    AC8    AN7    AC5        0.000    0.000   0
+ NDP      CONST_3  AC8    AN7    AC5    AC6      180.000    0.000   0
+ NDP      CONST_4  AN7    AC5    AC4    AN3      180.000    0.000   0
+ NDP      CONST_5  AN7    AC5    AC4    AN9        0.000    0.000   0
+ NDP      CONST_6  AC5    AC4    AN3    AC2        0.000    0.000   0
+ NDP      CONST_7  AC4    AN3    AC2    AN1        0.000    0.000   0
+ NDP      CONST_8  AN3    AC2    AN1    AC6        0.000    0.000   0
+ NDP      CONST_9  AN7    AC5    AC6    AN6        0.000    0.000   0
+ NDP      CONST_10 AN7    AC5    AC6    AN1      180.000    0.000   0
+ NDP      var_11   AC5    AC6    AN6    AH61       0.000   20.000   1
+ NDP      var_12   AC2*   AC1*   AO4*   AC4*      14.519   20.000   1
+ NDP      var_13   AC1*   AO4*   AC4*   AC5*     128.242   20.000   1
+ NDP      var_14   AC1*   AO4*   AC4*   AC3*      16.032   20.000   1
+ NDP      var_15   AO4*   AC4*   AC5*   AO5*      65.686   20.000   3
+ NDP      var_16   AC4*   AC5*   AO5*   AP      -149.072   20.000   1
+ NDP      var_17   AC5*   AO5*   AP     O3       -80.279   20.000   1
+ NDP      var_19   AO5*   AP     O3     NP       166.689   20.000   1
+ NDP      var_20   AP     O3     NP     NO5*      70.811   20.000   1
+ NDP      var_21   O3     NP     NO5*   NC5*      66.159   20.000   1
+ NDP      var_22   NP     NO5*   NC5*   NC4*     115.493   20.000   1
+ NDP      var_23   NO5*   NC5*   NC4*   NO4*      58.825   20.000   3
+ NDP      var_24   NO5*   NC5*   NC4*   NC3*     176.073   20.000   3
+ NDP      var_25   NC5*   NC4*   NO4*   NC1*     115.926   20.000   1
+ NDP      var_26   NC4*   NO4*   NC1*   NN1     -145.467   20.000   1
+ NDP      var_27   NO4*   NC1*   NC2*   NC3*      42.184   20.000   3
+ NDP      var_28   NC1*   NC2*   NO2*   NHO2       0.000   20.000   1
+ NDP      var_29   NC1*   NC2*   NC3*   NO3*      69.926   20.000   3
+ NDP      var_30   NC1*   NC2*   NC3*   NC4*     -44.860   20.000   3
+ NDP      var_31   NC2*   NC3*   NO3*   NHO3       0.000   20.000   1
+ NDP      var_32   NO4*   NC1*   NN1    NC2     -109.069   20.000   1
+ NDP      var_33   NO4*   NC1*   NN1    NC6       56.164   20.000   1
+ NDP      CONST_11 NC1*   NN1    NC2    NC3      180.000    0.000   0
+ NDP      CONST_12 NN1    NC2    NC3    NC4        0.000    0.000   0
+ NDP      var_34   NC2    NC3    NC7    NO7      176.143   20.000   1
+ NDP      CONST_13 NC3    NC7    NN7    NH71     180.000    0.000   0
+ NDP      var_35   NC2    NC3    NC4    NC5        3.041   20.000   2
+ NDP      var_36   NC3    NC4    NC5    NC6       -2.044   20.000   1
+ NDP      CONST_14 NC4    NC5    NC6    NN1        0.000    0.000   0
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ NDP      chir_01  AC4*   AC5*   AO4*   AC3*      negativ
+ NDP      chir_02  AC3*   AC4*   AO3*   AC2*      negativ
+ NDP      chir_03  AC2*   AC3*   AO2*   AC1*      negativ
+ NDP      chir_04  AC1*   AO4*   AC2*   AN9       positiv
+ NDP      chir_05  NC4*   NC5*   NO4*   NC3*      negativ
+ NDP      chir_06  NC3*   NC4*   NO3*   NC2*      negativ
+ NDP      chir_07  NC2*   NC3*   NO2*   NC1*      negativ
+ NDP      chir_08  NC1*   NO4*   NC2*   NN1       positiv
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ NDP      plan-1    AN9       0.020
+ NDP      plan-1    AC1*      0.020
+ NDP      plan-1    AC8       0.020
+ NDP      plan-1    AC4       0.020
+ NDP      plan-1    AN7       0.020
+ NDP      plan-1    AC5       0.020
+ NDP      plan-1    AC6       0.020
+ NDP      plan-1    AN1       0.020
+ NDP      plan-1    AC2       0.020
+ NDP      plan-1    AN3       0.020
+ NDP      plan-2    NC3       0.020
+ NDP      plan-2    NC2       0.020
+ NDP      plan-2    NC7       0.020
+ NDP      plan-2    NC4       0.020
+ NDP      plan-2    NC5       0.020
+ NDP      plan-2    NC6       0.020
+ NDP      plan-2    NN1       0.020
+ NDP      plan-3    NC7       0.020
+ NDP      plan-3    NC3       0.020
+ NDP      plan-3    NO7       0.020
+ NDP      plan-3    NN7       0.020

@@ -1,0 +1,145 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+CXM      CXM 'N-CARBOXYMETHIONINE                 ' polymer            20  11 .
+#
+data_comp_CXM
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ CXM           N      N    NH1       0.000
+ CXM           H      H    HNH1      0.000
+ CXM           CN     C    C         0.000
+ CXM           O1     O    O         0.000
+ CXM           O2     O    O         0.000
+ CXM           CA     C    CH1       0.000
+ CXM           HA     H    HCH1      0.000
+ CXM           CB     C    CH2       0.000
+ CXM           HB1    H    HCH2      0.000
+ CXM           HB2    H    HCH2      0.000
+ CXM           CG     C    CH2       0.000
+ CXM           HG1    H    HCH2      0.000
+ CXM           HG2    H    HCH2      0.000
+ CXM           SD     S    S         0.000
+ CXM           CE     C    CH3       0.000
+ CXM           HE1    H    HCH3      0.000
+ CXM           HE2    H    HCH3      0.000
+ CXM           HE3    H    HCH3      0.000
+ CXM           C      C    C         0.000
+ CXM           O      O    O         0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ CXM      N      n/a    CA     START
+ CXM      H      N      .      .
+ CXM      CN     N      O2     .
+ CXM      O1     CN     .      .
+ CXM      O2     CN     .      .
+ CXM      CA     N      CB     .
+ CXM      HA     CA     .      .
+ CXM      CB     CA     CG     .
+ CXM      HB1    CB     .      .
+ CXM      HB2    CB     .      .
+ CXM      CG     CB     SD     .
+ CXM      HG1    CG     .      .
+ CXM      HG2    CG     .      .
+ CXM      SD     CG     CE     .
+ CXM      CE     SD     HE3    .
+ CXM      HE1    CE     .      .
+ CXM      HE2    CE     .      .
+ CXM      HE3    CE     .      .
+ CXM      C      CA     .      END
+ CXM      O      C      .      .
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ CXM      N      H         coval       0.860    0.020
+ CXM      N      CA        coval       1.458    0.019
+ CXM      N      CN        coval       1.330    0.019
+ CXM      O1     CN        coval       1.240    0.019
+ CXM      O2     CN        coval       1.240    0.019
+ CXM      CA     HA        coval       0.980    0.020
+ CXM      CA     CB        coval       1.530    0.020
+ CXM      CB     HB1       coval       0.970    0.020
+ CXM      CB     HB2       coval       0.970    0.020
+ CXM      CB     CG        coval       1.520    0.030
+ CXM      CG     HG1       coval       0.970    0.020
+ CXM      CG     HG2       coval       0.970    0.020
+ CXM      CG     SD        coval       1.803    0.034
+ CXM      SD     CE        coval       1.791    0.059
+ CXM      CE     HE1       coval       0.960    0.020
+ CXM      CE     HE2       coval       0.960    0.020
+ CXM      CE     HE3       coval       0.960    0.020
+ CXM      CA     C         coval       1.525    0.021
+ CXM      C      O         coval       1.231    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ CXM      H      N      CA      114.000    3.000
+ CXM      H      N      CN      109.000    3.000
+ CXM      HA     CA     CB      109.000    3.000
+ CXM      N      CN     O1      120.000    1.900
+ CXM      N      CN     O2      120.000    1.900
+ CXM      O1     CN     O2      120.000    1.900
+ CXM      CA     N      CN      120.000    1.900
+ CXM      CB     CA     C       110.100    1.900
+ CXM      HA     CA     C       110.000    3.000
+ CXM      N      CA     HA      110.000    3.000
+ CXM      N      CA     CB      110.500    1.700
+ CXM      HB1    CB     HB2     110.000    3.000
+ CXM      HB2    CB     CG      108.000    3.000
+ CXM      HB1    CB     CG      108.000    3.000
+ CXM      CA     CB     HB1     109.000    3.000
+ CXM      CA     CB     HB2     109.000    3.000
+ CXM      CA     CB     CG      114.100    2.000
+ CXM      HG1    CG     HG2     110.000    3.000
+ CXM      HG2    CG     SD      108.000    3.000
+ CXM      HG1    CG     SD      108.000    3.000
+ CXM      CB     CG     HG1     109.000    3.000
+ CXM      CB     CG     HG2     109.000    3.000
+ CXM      CB     CG     SD      112.700    3.000
+ CXM      CG     SD     CE      100.900    2.200
+ CXM      HE1    CE     HE2     110.000    3.000
+ CXM      HE2    CE     HE3     110.000    3.000
+ CXM      HE1    CE     HE3     110.000    3.000
+ CXM      SD     CE     HE1     109.000    3.000
+ CXM      SD     CE     HE2     109.000    3.000
+ CXM      SD     CE     HE3     109.000    3.000
+ CXM      N      CA     C       111.200    2.800
+ CXM      CA     C      O       120.800    1.700
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ CXM      chi1     N      CA     CB     CG       180.000   15.000   3
+ CXM      chi2     CA     CB     CG     SD       180.000   15.000   3
+ CXM      chi3     CB     CG     SD     CE       180.000   15.000   3
+ CXM      hh       CG     SD     CE     HE3       60.000   30.000   3

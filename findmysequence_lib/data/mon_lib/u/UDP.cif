@@ -1,0 +1,271 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+UDP      .   'URIDINE-5*-DIPHOSPHATE              ' non-polymer        39  25 .
+#
+data_comp_UDP
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ UDP           O1B    O    OP        0.000
+ UDP           PB     P    P         0.000
+ UDP           O2B    O    OP        0.000
+ UDP           O3B    O    OP        0.000
+ UDP           O3A    O    O2        0.000
+ UDP           PA     P    P         0.000
+ UDP           O1A    O    OP        0.000
+ UDP           O2A    O    OP        0.000
+ UDP           O5*    O    O2        0.000
+ UDP           C5*    C    CH2       0.000
+ UDP           H5*1   H    HCH2      0.000
+ UDP           H5*2   H    HCH2      0.000
+ UDP           C4*    C    CH1       0.000
+ UDP           H4*    H    HCH1      0.000
+ UDP           O4*    O    O2        0.000
+ UDP           C3*    C    CH1       0.000
+ UDP           H3*    H    HCH1      0.000
+ UDP           O3*    O    OH1       0.000
+ UDP           HO3*   H    HOH1      0.000
+ UDP           C2*    C    CH1       0.000
+ UDP           H2*    H    HCH1      0.000
+ UDP           O2*    O    OH1       0.000
+ UDP           HO2*   H    HOH1      0.000
+ UDP           C1*    C    CH1       0.000
+ UDP           H1*    H    HCH1      0.000
+ UDP           N1     N    NR6       0.000
+ UDP           C2     C    CR6       0.000
+ UDP           O2     O    O         0.000
+ UDP           N3     N    NR16      0.000
+ UDP           HN3    H    HNR6      0.000
+ UDP           C4     C    CR6       0.000
+ UDP           O4     O    O         0.000
+ UDP           C5     C    CR16      0.000
+ UDP           H5     H    HCR6      0.000
+ UDP           C6     C    CR16      0.000
+ UDP           H6     H    HCR6      0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ UDP      O1B    n/a    PB     START
+ UDP      PB     O1B    O3A    .
+ UDP      O2B    PB     .      .
+ UDP      O3B    PB     .      .
+ UDP      O3A    PB     PA     .
+ UDP      PA     O3A    O5*    .
+ UDP      O1A    PA     .      .
+ UDP      O2A    PA     .      .
+ UDP      O5*    PA     C5*    .
+ UDP      C5*    O5*    C4*    .
+ UDP      H5*1   C5*    .      .
+ UDP      H5*2   C5*    .      .
+ UDP      C4*    C5*    C3*    .
+ UDP      H4*    C4*    .      .
+ UDP      O4*    C4*    .      .
+ UDP      C3*    C4*    C2*    .
+ UDP      H3*    C3*    .      .
+ UDP      O3*    C3*    HO3*   .
+ UDP      HO3*   O3*    .      .
+ UDP      C2*    C3*    C1*    .
+ UDP      H2*    C2*    .      .
+ UDP      O2*    C2*    HO2*   .
+ UDP      HO2*   O2*    .      .
+ UDP      C1*    C2*    N1     .
+ UDP      H1*    C1*    .      .
+ UDP      N1     C1*    C2     .
+ UDP      C2     N1     N3     .
+ UDP      O2     C2     .      .
+ UDP      N3     C2     C4     .
+ UDP      HN3    N3     .      .
+ UDP      C4     N3     C5     .
+ UDP      O4     C4     .      .
+ UDP      C5     C4     C6     .
+ UDP      H5     C5     .      .
+ UDP      C6     C5     H6     .
+ UDP      H6     C6     .      END
+ UDP      N1     C6     .    ADD
+ UDP      C1*    O4*    .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ UDP      PB     O1B       coval       1.480    0.020
+ UDP      O2B    PB        coval       1.480    0.020
+ UDP      O3B    PB        coval       1.480    0.020
+ UDP      O3A    PB        coval       1.610    0.020
+ UDP      PA     O3A       coval       1.610    0.020
+ UDP      O1A    PA        coval       1.480    0.020
+ UDP      O2A    PA        coval       1.480    0.020
+ UDP      O5*    PA        coval       1.610    0.020
+ UDP      C5*    O5*       coval       1.410    0.020
+ UDP      H5*1   C5*       coval       1.090    0.020
+ UDP      H5*2   C5*       coval       1.090    0.020
+ UDP      C4*    C5*       coval       1.524    0.020
+ UDP      H4*    C4*       coval       1.090    0.020
+ UDP      O4*    C4*       coval       1.410    0.020
+ UDP      C3*    C4*       coval       1.524    0.020
+ UDP      H3*    C3*       coval       1.090    0.020
+ UDP      O3*    C3*       coval       1.410    0.020
+ UDP      HO3*   O3*       coval       0.980    0.020
+ UDP      C2*    C3*       coval       1.524    0.020
+ UDP      H2*    C2*       coval       1.090    0.020
+ UDP      O2*    C2*       coval       1.410    0.020
+ UDP      HO2*   O2*       coval       0.980    0.020
+ UDP      C1*    C2*       coval       1.524    0.020
+ UDP      C1*    O4*       coval       1.410    0.020
+ UDP      H1*    C1*       coval       1.090    0.020
+ UDP      N1     C1*       coval       1.475    0.020
+ UDP      N1     C6        coval       1.365    0.020
+ UDP      C2     N1        coval       1.380    0.020
+ UDP      O2     C2        coval       1.230    0.020
+ UDP      N3     C2        coval       1.380    0.020
+ UDP      HN3    N3        coval       1.040    0.020
+ UDP      C4     N3        coval       1.380    0.020
+ UDP      O4     C4        coval       1.230    0.020
+ UDP      C5     C4        coval       1.390    0.020
+ UDP      H5     C5        coval       1.090    0.020
+ UDP      C6     C5        coval       1.390    0.020
+ UDP      H6     C6        coval       1.090    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ UDP      O1B    PB     O2B     109.500    3.000
+ UDP      O1B    PB     O3B     109.500    3.000
+ UDP      O1B    PB     O3A     108.200    3.000
+ UDP      O2B    PB     O3B     109.500    3.000
+ UDP      O2B    PB     O3A     109.500    3.000
+ UDP      O3B    PB     O3A     109.500    3.000
+ UDP      PB     O3A    PA      120.500    3.000
+ UDP      O3A    PA     O1A     108.200    3.000
+ UDP      O3A    PA     O2A     109.500    3.000
+ UDP      O3A    PA     O5*     102.600    3.000
+ UDP      O1A    PA     O2A     109.500    3.000
+ UDP      O1A    PA     O5*     108.200    3.000
+ UDP      O2A    PA     O5*     109.500    3.000
+ UDP      PA     O5*    C5*     120.500    3.000
+ UDP      O5*    C5*    H5*1    109.470    3.000
+ UDP      O5*    C5*    H5*2    109.470    3.000
+ UDP      O5*    C5*    C4*     109.470    3.000
+ UDP      H5*1   C5*    H5*2    107.900    3.000
+ UDP      H5*1   C5*    C4*     109.470    3.000
+ UDP      H5*2   C5*    C4*     109.470    3.000
+ UDP      C5*    C4*    H4*     108.340    3.000
+ UDP      C5*    C4*    O4*     109.470    3.000
+ UDP      C5*    C4*    C3*     111.000    3.000
+ UDP      H4*    C4*    O4*     109.470    3.000
+ UDP      H4*    C4*    C3*     108.340    3.000
+ UDP      O4*    C4*    C3*     109.470    3.000
+ UDP      C4*    O4*    C1*     111.800    3.000
+ UDP      C4*    C3*    H3*     108.340    3.000
+ UDP      C4*    C3*    O3*     109.470    3.000
+ UDP      C4*    C3*    C2*     111.000    3.000
+ UDP      H3*    C3*    O3*     109.470    3.000
+ UDP      H3*    C3*    C2*     108.340    3.000
+ UDP      O3*    C3*    C2*     109.470    3.000
+ UDP      C3*    O3*    HO3*    109.470    3.000
+ UDP      C3*    C2*    H2*     108.340    3.000
+ UDP      C3*    C2*    O2*     109.470    3.000
+ UDP      C3*    C2*    C1*     111.000    3.000
+ UDP      H2*    C2*    O2*     109.470    3.000
+ UDP      H2*    C2*    C1*     108.340    3.000
+ UDP      O2*    C2*    C1*     109.470    3.000
+ UDP      C2*    O2*    HO2*    109.470    3.000
+ UDP      C2*    C1*    H1*     108.340    3.000
+ UDP      C2*    C1*    N1      109.470    3.000
+ UDP      C2*    C1*    O4*     109.470    3.000
+ UDP      H1*    C1*    N1      109.470    3.000
+ UDP      H1*    C1*    O4*     109.470    3.000
+ UDP      N1     C1*    O4*     109.470    3.000
+ UDP      C1*    N1     C2      120.000    3.000
+ UDP      C1*    N1     C6      120.000    3.000
+ UDP      C2     N1     C6      120.000    3.000
+ UDP      N1     C2     O2      120.000    3.000
+ UDP      N1     C2     N3      120.000    3.000
+ UDP      O2     C2     N3      120.000    3.000
+ UDP      C2     N3     HN3     120.000    3.000
+ UDP      C2     N3     C4      120.000    3.000
+ UDP      HN3    N3     C4      120.000    3.000
+ UDP      N3     C4     O4      120.000    3.000
+ UDP      N3     C4     C5      120.000    3.000
+ UDP      O4     C4     C5      120.000    3.000
+ UDP      C4     C5     H5      120.000    3.000
+ UDP      C4     C5     C6      120.000    3.000
+ UDP      H5     C5     C6      120.000    3.000
+ UDP      C5     C6     H6      120.000    3.000
+ UDP      C5     C6     N1      120.000    3.000
+ UDP      H6     C6     N1      120.000    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ UDP      var_3    O1B    PB     O3A    PA       -16.517   20.000   1
+ UDP      var_4    PB     O3A    PA     O5*      107.488   20.000   1
+ UDP      var_6    O3A    PA     O5*    C5*       63.688   20.000   1
+ UDP      var_7    PA     O5*    C5*    C4*     -170.874   20.000   1
+ UDP      var_8    O5*    C5*    C4*    C3*       51.095   20.000   3
+ UDP      var_9    C5*    C4*    O4*    C1*      150.596   20.000   1
+ UDP      var_10   C5*    C4*    C3*    C2*     -161.468   20.000   3
+ UDP      var_11   C4*    C3*    O3*    HO3*       0.000   20.000   1
+ UDP      var_12   C4*    C3*    C2*    C1*       46.552   20.000   3
+ UDP      var_13   C3*    C2*    O2*    HO2*       0.000   20.000   1
+ UDP      var_14   C3*    C2*    C1*    N1        88.794   20.000   3
+ UDP      var_15   C3*    C2*    C1*    O4*      -29.090   20.000   3
+ UDP      var_16   C2*    C1*    N1     C2        92.208   20.000   1
+ UDP      var_17   C2*    C1*    N1     C6      -111.965   20.000   1
+ UDP      CONST_1  C1*    N1     C2     N3       180.000    0.000   0
+ UDP      CONST_2  N1     C2     N3     C4         0.000    0.000   0
+ UDP      CONST_3  C2     N3     C4     C5         0.000    0.000   0
+ UDP      CONST_4  N3     C4     C5     C6         0.000    0.000   0
+ UDP      CONST_5  C4     C5     C6     N1         0.000    0.000   0
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ UDP      chir_01  C1*    N1     C2*    O4*       negativ
+ UDP      chir_02  C2*    C1*    O2*    C3*       positiv
+ UDP      chir_03  C3*    C2*    C4*    O3*       negativ
+ UDP      chir_04  C4*    C3*    O4*    C5*       positiv
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ UDP      plan-1    C2        0.020
+ UDP      plan-1    N1        0.020
+ UDP      plan-1    N3        0.020
+ UDP      plan-1    O2        0.020
+ UDP      plan-1    C4        0.020
+ UDP      plan-1    N3        0.020
+ UDP      plan-1    C5        0.020
+ UDP      plan-1    O4        0.020
+ UDP      plan-1    C1*       0.020

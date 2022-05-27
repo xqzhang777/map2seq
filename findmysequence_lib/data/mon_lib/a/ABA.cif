@@ -1,0 +1,119 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+ABA      ABA 'ALPHA-AMINOBUTYRIC ACID             ' L-peptide          13   6 .
+#
+data_comp_ABA
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ ABA           N      N    NH1      -0.204
+ ABA           HN1    H    HNH1      0.204
+ ABA           CA     C    CH1       0.058
+ ABA           HA     H    HCH1      0.046
+ ABA           CB     C    CH2      -0.045
+ ABA           HB1    H    HCH2      0.041
+ ABA           HB2    H    HCH2      0.041
+ ABA           CG     C    CH3      -0.114
+ ABA           HG1    H    HCH3      0.038
+ ABA           HG2    H    HCH3      0.038
+ ABA           HG3    H    HCH3      0.038
+ ABA           C      C    C         0.318
+ ABA           O      O    O        -0.422
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ ABA      N      n/a    CA     START
+ ABA      HN1    N      .      .
+ ABA      CA     N      C      .
+ ABA      HA     CA     .      .
+ ABA      CB     CA     CG     .
+ ABA      HB1    CB     .      .
+ ABA      HB2    CB     .      .
+ ABA      CG     CB     HG3    .
+ ABA      HG1    CG     .      .
+ ABA      HG2    CG     .      .
+ ABA      HG3    CG     .      .
+ ABA      C      CA     .      END
+ ABA      O      C      .      .
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ ABA      N      HN1       coval       0.860    0.020
+ ABA      N      CA        coval       1.458    0.019
+ ABA      CA     HA        coval       0.980    0.020
+ ABA      CA     CB        coval       1.530    0.020
+ ABA      CB     HB1       coval       0.970    0.020
+ ABA      CB     HB2       coval       0.970    0.020
+ ABA      CB     CG        coval       1.520    0.025
+ ABA      CG     HG1       coval       0.960    0.020
+ ABA      CG     HG2       coval       0.960    0.020
+ ABA      CG     HG3       coval       0.960    0.020
+ ABA      CA     C         coval       1.525    0.021
+ ABA      C      O         coval       1.231    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ ABA      HN1    N      CA      114.000    3.000
+ ABA      HA     CA     CB      109.000    3.000
+ ABA      CB     CA     C       110.100    1.900
+ ABA      HA     CA     C       109.000    3.000
+ ABA      N      CA     HA      110.000    3.000
+ ABA      N      CA     CB      110.500    1.700
+ ABA      HB1    CB     HB2     110.000    3.000
+ ABA      HB2    CB     CG      108.000    3.000
+ ABA      HB1    CB     CG      108.000    3.000
+ ABA      CA     CB     HB1     109.000    3.000
+ ABA      CA     CB     HB2     109.000    3.000
+ ABA      CA     CB     CG      112.600    1.000
+ ABA      CB     CG     HG1     109.000    1.000
+ ABA      CB     CG     HG2     109.000    1.000
+ ABA      CB     CG     HG3     109.000    1.500
+ ABA      HG1    CG     HG2     110.000    3.000
+ ABA      HG1    CG     HG3     110.000    3.000
+ ABA      HG2    CG     HG3     110.000    3.000
+ ABA      N      CA     C       112.200    2.800
+ ABA      CA     C      O       120.800    1.700
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ ABA      chi1     N      CA     CB     CG       180.000   15.000   3
+ ABA      hh1      CA     CB     CG     HG3       60.000   30.000   3
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ ABA      chir_01  CA     N      CB     C         negativ

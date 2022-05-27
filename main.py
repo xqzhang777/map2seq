@@ -30,16 +30,21 @@ def main(map, pdb, db = "tempDir/human.fa.gz", dir = "tempDir", graphname1 = "fm
     #with tempfile.mkdtmp() as tmpdir:
         orig_stdout = sys.stdout
         f = open(os.path.join(dir, 'log.txt'), 'w')
-        sys.stdout = f
+        #sys.stdout = f
         tmpdir = os.path.abspath(tmpdir)
         tmpdir += '/'
         #run fms on forward pdb
+        print(map)
+        print(pdb)
+        print(db)
+        print(tmpdir)
         fms(map, pdb, db, tmpdir)
         #print('Making figure')
         #graph fms output
         #try:
         num = parse_file("{}{}.png".format(dir, graphname1), "{}{}".format(tmpdir, hmmer_out))
         #print('Done')
+        sys.stdout = f
         if num == -1:
             print("No Matches")
         elif num == 1:

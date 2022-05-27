@@ -1,0 +1,214 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+AHT      AHT '2-amino-2-hydroxyethyl-tyrosine     ' L-peptide          27  16 .
+#
+data_comp_AHT
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ AHT           N      N    NH1      -0.204
+ AHT           H      H    HNH1      0.204
+ AHT           CA     C    CH1       0.058
+ AHT           HA     H    HCH1      0.046
+ AHT           CB     C    CH2      -0.054
+ AHT           HB1    H    HCH2      0.049
+ AHT           HB2    H    HCH2      0.049
+ AHT           CG     C    CR6      -0.044
+ AHT           CD1    C    CR16     -0.053
+ AHT           HD1    H    HCR6      0.053
+ AHT           CE1    C    CR16     -0.099
+ AHT           HE1    H    HCR6      0.054
+ AHT           CZ     C    CR6       0.176
+ AHT           OH     O    OH1      -0.391
+ AHT           HH     H    HOH1      0.305
+ AHT           CE2    C    CR16     -0.099
+ AHT           HE2    H    HCR6      0.054
+ AHT           CD2    C    CR16     -0.053
+ AHT           HD2    H    HCR6      0.053
+ AHT           C      C    C         0.318
+ AHT           O      O    O        -0.422
+ AHT           C1     C    CH2       0.000
+ AHT           H11    H    HCH2      0.000
+ AHT           H12    H    HCH2      0.000
+ AHT           C2     C    C         0.000
+ AHT           O2     O    O         0.000
+ AHT           N2     N    N         0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ AHT      N      n/a    CA     START
+ AHT      H      N      .      .
+ AHT      CA     N      C      .
+ AHT      HA     CA     .      .
+ AHT      CB     CA     CG     .
+ AHT      HB1    CB     .      .
+ AHT      HB2    CB     .      .
+ AHT      CG     CB     CD1    .
+ AHT      CD1    CG     CE1    .
+ AHT      HD1    CD1    .      .
+ AHT      CE1    CD1    CZ     .
+ AHT      HE1    CE1    .      .
+ AHT      CZ     CE1    CE2    .
+ AHT      OH     CZ     HH     .
+ AHT      HH     OH     .      .
+ AHT      CE2    CZ     CD2    .
+ AHT      HE2    CE2    .      .
+ AHT      CD2    CE2    HD2    .
+ AHT      HD2    CD2    .      .
+ AHT      C      CA     .      END
+ AHT      O      C      .      .
+ AHT      C1     C      C2     .
+ AHT      H11    C1     .      .
+ AHT      H12    C1     .      .
+ AHT      C2     C1     N2     .
+ AHT      O2     C2     .      .
+ AHT      N2     C2     .      .
+ AHT      CG     CD2    .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ AHT      N      H         coval       0.860    0.020
+ AHT      N      CA        coval       1.458    0.019
+ AHT      CA     HA        coval       0.980    0.020
+ AHT      CA     CB        coval       1.530    0.020
+ AHT      CB     HB1       coval       0.970    0.020
+ AHT      CB     HB2       coval       0.970    0.020
+ AHT      CB     CG        coval       1.512    0.022
+ AHT      CG     CD2       coval       1.389    0.021
+ AHT      CG     CD1       coval       1.389    0.021
+ AHT      CD1    HD1       coval       0.930    0.020
+ AHT      CD1    CE1       coval       1.382    0.030
+ AHT      CE1    HE1       coval       0.930    0.020
+ AHT      CE1    CZ        coval       1.378    0.024
+ AHT      CZ     OH        coval       1.376    0.021
+ AHT      OH     HH        coval       0.820    0.020
+ AHT      CZ     CE2       coval       1.378    0.024
+ AHT      CE2    HE2       coval       0.930    0.020
+ AHT      CE2    CD2       coval       1.382    0.030
+ AHT      CD2    HD2       coval       0.930    0.020
+ AHT      CA     C         coval       1.525    0.021
+ AHT      C      O         coval       1.231    0.020
+ AHT      C1     C         coval       1.524    0.020
+ AHT      C2     C1        coval       1.510    0.020
+ AHT      O2     C2        coval       1.230    0.020
+ AHT      N2     C2        coval       1.330    0.020
+ AHT      H11    C1        coval       0.970    0.020
+ AHT      H12    C1        coval       0.970    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ AHT      H      N      CA      114.000    3.000
+ AHT      HA     CA     CB      109.000    3.000
+ AHT      CB     CA     C       110.100    1.900
+ AHT      HA     CA     C       109.000    3.000
+ AHT      N      CA     HA      110.000    3.000
+ AHT      N      CA     CB      110.500    1.700
+ AHT      HB1    CB     HB2     110.000    3.000
+ AHT      HB2    CB     CG      108.000    3.000
+ AHT      HB1    CB     CG      108.000    3.000
+ AHT      CA     CB     HB1     109.000    3.000
+ AHT      CA     CB     HB2     109.000    3.000
+ AHT      CA     CB     CG      113.900    1.800
+ AHT      CB     CG     CD2     120.800    1.500
+ AHT      CD1    CG     CD2     118.100    1.500
+ AHT      CB     CG     CD1     120.800    1.500
+ AHT      HD1    CD1    CE1     119.400    3.000
+ AHT      CG     CD1    HD1     119.400    3.000
+ AHT      CG     CD1    CE1     121.200    1.500
+ AHT      HD2    CD2    CE2     119.400    3.000
+ AHT      CG     CD2    HD2     119.400    3.000
+ AHT      CG     CD2    CE2     121.200    1.500
+ AHT      HE1    CE1    CZ      120.200    3.000
+ AHT      CD1    CE1    HE1     120.200    3.000
+ AHT      CD1    CE1    CZ      119.600    1.800
+ AHT      OH     CZ     CE2     120.000    3.000
+ AHT      CE1    CZ     OH      119.900    3.000
+ AHT      CZ     OH     HH      110.000    3.000
+ AHT      CE1    CZ     CE2     120.300    2.000
+ AHT      HE2    CE2    CD2     120.200    3.000
+ AHT      CZ     CE2    HE2     120.200    3.000
+ AHT      CZ     CE2    CD2     119.600    1.800
+ AHT      N      CA     C       111.200    2.800
+ AHT      CA     C      O       120.800    1.700
+ AHT      CA     C      C1      119.600    1.700
+ AHT      C1     C      O       119.600    1.700
+ AHT      C      C1     C2      109.470    3.000
+ AHT      C      C1     H11     109.470    3.000
+ AHT      C      C1     H12     109.470    3.000
+ AHT      H11    C1     H12     107.900    3.000
+ AHT      C1     C2     O2      120.500    3.000
+ AHT      C1     C2     N2      116.500    3.000
+ AHT      O2     C2     N2      123.000    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ AHT      chi1     N      CA     CB     CG       180.000   15.000   3
+ AHT      chi2     CA     CB     CG     CD1        0.000   20.000   2
+ AHT      CONST_01 CB     CG     CD1    CE1      180.000    0.000   0
+ AHT      CONST_02 CG     CD1    CE1    CZ         0.000    0.000   0
+ AHT      CONST_03 CD1    CE1    CZ     CE2        0.000    0.000   0
+ AHT      hh1      CE1    CZ     OH     HH       180.000   30.000   2
+ AHT      CONST_04 CE1    CZ     CE2    CD2        0.000    0.000   0
+ AHT      CONST_05 CZ     CE2    CD2    CG         0.000    0.000   0
+ AHT      var_1    CA     C      C1     C2       180.000   20.000   1
+ AHT      var_2    C      C1     C2     N2        -0.400   20.000   1
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ AHT      chir_01  CA     N      CB     C         negativ
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ AHT      plan      CB        0.020
+ AHT      plan      CG        0.020
+ AHT      plan      CD1       0.020
+ AHT      plan      CE1       0.020
+ AHT      plan      CZ        0.020
+ AHT      plan      CE2       0.020
+ AHT      plan      CD2       0.020
+ AHT      plan      OH        0.020
+ AHT      plan2     C2        0.020
+ AHT      plan2     C1        0.020
+ AHT      plan2     O2        0.020
+ AHT      plan2     N2        0.020
+ AHT      plan3     CA        0.020
+ AHT      plan3     C1        0.020
+ AHT      plan3     C         0.020
+ AHT      plan3     O         0.020
