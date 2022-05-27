@@ -48,6 +48,8 @@ import random
 import subprocess
 import string
 
+import numpy as np
+
 # cctbx imports
 
 from cctbx  import xray
@@ -84,9 +86,6 @@ import scitbx
 from scitbx import matrix
 from scitbx import fftpack
 from scitbx.math import superpose
-
-
-import numpy as np
 
 
 import tempfile
