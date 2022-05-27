@@ -5,7 +5,6 @@ channels:
 dependencies:
   - pip
   - cctbx-base 
-  - hmmer
   - pip:
     - setuptools
     - h5py
