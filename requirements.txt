@@ -4,6 +4,6 @@ numpy==1.21.6
 scipy
 scons
 torch
-cctbx-base==2020.8
+cctbx
 pyhmmer
 streamlit
