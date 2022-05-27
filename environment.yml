@@ -1,7 +1,6 @@
 name: findmysequence
 channels:
   - bioconda
-  - pytorch
   - conda-forge
 dependencies:
   - pip
@@ -12,4 +11,4 @@ dependencies:
     - numpy
     - scipy
     - scons
-    - pytorch
+    - torch
