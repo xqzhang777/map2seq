@@ -16,7 +16,7 @@ dependencies:
     - scipy
     - scitbx
     - streamlit
-    - tensorflow
+    - scikit-learn
     - torch
     - torchsummary
   - cctbx-base 
