@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 # Copyright (c) 2021, EMBL/Grzegorz Chojnowski (gchojnowski@embl-hamburg.de)
 # All rights reserved.
 # License: BSD 3-Clause License
