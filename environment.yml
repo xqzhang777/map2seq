@@ -12,3 +12,4 @@ dependencies:
     - scipy
     - scons
     - torch
+    - streamlit
