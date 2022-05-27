@@ -1,5 +1,4 @@
 bokeh
-cctbx
 h5py
 numpy
 onnx
