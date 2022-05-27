@@ -8,14 +8,10 @@ dependencies:
   - h5py
   - numpy
   - onnx
-  - onnx2keras
-  - onnx_tf
   - onnxruntime
   - pandas
   - scipy
-  - scitbx
   - streamlit
   - tensorflow
-  - torch
-  - torchsummary
+  - pytorch
   - hmmer
