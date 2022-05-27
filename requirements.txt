@@ -1,9 +1,9 @@
 setuptools
 h5py
-numpy
+numpy==1.21.6
 scipy
 scons
 torch
-cctbx-base
+cctbx-base==2020.8
 pyhmmer
 streamlit
