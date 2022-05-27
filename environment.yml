@@ -1,5 +1,6 @@
 name: findmysequence
 channels:
+  - intel
   - bioconda
   - conda-forge
   - pytorch
