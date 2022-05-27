@@ -4,12 +4,10 @@ channels:
   - conda-forge
 dependencies:
   - pip
-  - cctbx-base 
-  - hmmer
   - pip:
     - bokeh==2.4.2
     - h5py==3.6.0
-    - numpy==1.21.5
+    - numpy==
     - onnx==1.11.0
     - onnx2keras==0.0.24
     - onnx_tf==1.10.0
@@ -21,3 +19,5 @@ dependencies:
     - tensorflow==2.9.1
     - torch==1.11.0
     - torchsummary==1.5.1
+  - cctbx-base 
+  - hmmer
