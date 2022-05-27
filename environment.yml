@@ -5,6 +5,7 @@ channels:
 dependencies:
   - pip
   - cctbx-base 
+  - cctbx
   - hmmer
   - pip:
     - bokeh
