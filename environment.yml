@@ -1,14 +1,1 @@
-name: findmysequence
-channels:
-  - bioconda
-  - conda-forge
-dependencies:
-  - pip
-  - cctbx-base 
-  - pip:
-    - setuptools
-    - h5py
-    - numpy
-    - scipy
-    - scons
-    - streamlit
+
