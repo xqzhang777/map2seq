@@ -9,3 +9,4 @@ dependencies:
   - cctbx-base
   - scipy
   - scons
+  - numpy=1.21.6
