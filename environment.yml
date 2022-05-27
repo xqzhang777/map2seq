@@ -4,9 +4,9 @@ channels:
   - pytorch
   - conda-forge
 dependencies:
-  - numpy
-  - hmmer
-  - pytorch
-  - cctbx-base
+  - numpy=1.21.6
   - scipy
   - scons
+  - cctbx-base
+  - pytorch 
+  - hmmer
