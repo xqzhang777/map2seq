@@ -1,0 +1,299 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+TPP      .   'THIAMIN DIPHOSPHATE                 ' non-polymer        45  26 .
+#
+data_comp_TPP
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ TPP           O1B    O    OP        0.000
+ TPP           PB     P    P         0.000
+ TPP           O2B    O    OP        0.000
+ TPP           O3B    O    OP        0.000
+ TPP           O3A    O    O2        0.000
+ TPP           PA     P    P         0.000
+ TPP           O1A    O    OP        0.000
+ TPP           O2A    O    OP        0.000
+ TPP           O7     O    O2        0.000
+ TPP           C7     C    CH2       0.000
+ TPP           H71    H    HCH2      0.000
+ TPP           H72    H    HCH2      0.000
+ TPP           C6     C    CH2       0.000
+ TPP           H61    H    HCH2      0.000
+ TPP           H62    H    HCH2      0.000
+ TPP           C5     C    CR5       0.000
+ TPP           C4     C    CR5       0.000
+ TPP           CM4    C    CH3       0.000
+ TPP           HM43   H    HCH3      0.000
+ TPP           HM42   H    HCH3      0.000
+ TPP           HM41   H    HCH3      0.000
+ TPP           S1     S    S         0.000
+ TPP           C2     C    CR15      0.000
+ TPP           H2     H    HCR5      0.000
+ TPP           N3     N    NR5       0.000
+ TPP           C7'    C    CH2       0.000
+ TPP           H7'1   H    HCH2      0.000
+ TPP           H7'2   H    HCH2      0.000
+ TPP           C5'    C    CR6       0.000
+ TPP           C6'    C    CR16      0.000
+ TPP           H6'    H    HCR6      0.000
+ TPP           C4'    C    CR6       0.000
+ TPP           N4'    N    NH2       0.000
+ TPP           HN42   H    HNH2      0.000
+ TPP           HN41   H    HNH2      0.000
+ TPP           N3'    N    NR16      0.000
+ TPP           C2'    C    CR6       0.000
+ TPP           N1'    N    NR16      0.000
+ TPP           CM2    C    CH3       0.000
+ TPP           HM23   H    HCH3      0.000
+ TPP           HM22   H    HCH3      0.000
+ TPP           HM21   H    HCH3      0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ TPP      O1B    n/a    PB     START
+ TPP      PB     O1B    O3A    .
+ TPP      O2B    PB     .      .
+ TPP      O3B    PB     .      .
+ TPP      O3A    PB     PA     .
+ TPP      PA     O3A    O7     .
+ TPP      O1A    PA     .      .
+ TPP      O2A    PA     .      .
+ TPP      O7     PA     C7     .
+ TPP      C7     O7     C6     .
+ TPP      H71    C7     .      .
+ TPP      H72    C7     .      .
+ TPP      C6     C7     C5     .
+ TPP      H61    C6     .      .
+ TPP      H62    C6     .      .
+ TPP      C5     C6     S1     .
+ TPP      C4     C5     CM4    .
+ TPP      CM4    C4     HM41   .
+ TPP      HM43   CM4    .      .
+ TPP      HM42   CM4    .      .
+ TPP      HM41   CM4    .      .
+ TPP      S1     C5     C2     .
+ TPP      C2     S1     N3     .
+ TPP      H2     C2     .      .
+ TPP      N3     C2     C7'    .
+ TPP      C7'    N3     C5'    .
+ TPP      H7'1   C7'    .      .
+ TPP      H7'2   C7'    .      .
+ TPP      C5'    C7'    C4'    .
+ TPP      C6'    C5'    H6'    .
+ TPP      H6'    C6'    .      .
+ TPP      C4'    C5'    N3'    .
+ TPP      N4'    C4'    HN41   .
+ TPP      HN42   N4'    .      .
+ TPP      HN41   N4'    .      .
+ TPP      N3'    C4'    C2'    .
+ TPP      C2'    N3'    CM2    .
+ TPP      N1'    C2'    .      .
+ TPP      CM2    C2'    HM21   .
+ TPP      HM23   CM2    .      .
+ TPP      HM22   CM2    .      .
+ TPP      HM21   CM2    .      END
+ TPP      N1'    C6'    .    ADD
+ TPP      N3     C4     .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ TPP      PB     O1B       coval       1.510    0.020
+ TPP      O2B    PB        coval       1.510    0.020
+ TPP      O3B    PB        coval       1.510    0.020
+ TPP      O3A    PB        coval       1.610    0.020
+ TPP      PA     O3A       coval       1.610    0.020
+ TPP      O1A    PA        coval       1.510    0.020
+ TPP      O2A    PA        coval       1.510    0.020
+ TPP      O7     PA        coval       1.610    0.020
+ TPP      C7     O7        coval       1.410    0.020
+ TPP      H71    C7        coval       1.090    0.020
+ TPP      H72    C7        coval       1.090    0.020
+ TPP      C6     C7        coval       1.524    0.020
+ TPP      H61    C6        coval       1.090    0.020
+ TPP      H62    C6        coval       1.090    0.020
+ TPP      C5     C6        coval       1.500    0.020
+ TPP      C4     C5        coval       1.390    0.020
+ TPP      CM4    C4        coval       1.500    0.020
+ TPP      HM43   CM4       coval       1.090    0.020
+ TPP      HM42   CM4       coval       1.090    0.020
+ TPP      HM41   CM4       coval       1.090    0.020
+ TPP      S1     C5        coval       1.595    0.020
+ TPP      C2     S1        coval       1.595    0.020
+ TPP      H2     C2        coval       1.090    0.020
+ TPP      N3     C2        coval       1.370    0.020
+ TPP      N3     C4        coval       1.350    0.020
+ TPP      C7'    N3        coval       1.440    0.020
+ TPP      H7'1   C7'       coval       1.090    0.020
+ TPP      H7'2   C7'       coval       1.090    0.020
+ TPP      C5'    C7'       coval       1.511    0.020
+ TPP      C6'    C5'       coval       1.390    0.020
+ TPP      H6'    C6'       coval       1.090    0.020
+ TPP      C4'    C5'       coval       1.390    0.020
+ TPP      N4'    C4'       coval       1.330    0.020
+ TPP      HN42   N4'       coval       1.015    0.020
+ TPP      HN41   N4'       coval       1.015    0.020
+ TPP      N3'    C4'       coval       1.380    0.020
+ TPP      C2'    N3'       coval       1.380    0.020
+ TPP      N1'    C2'       coval       1.380    0.020
+ TPP      N1'    C6'       coval       1.380    0.020
+ TPP      CM2    C2'       coval       1.500    0.020
+ TPP      HM23   CM2       coval       1.090    0.020
+ TPP      HM22   CM2       coval       1.090    0.020
+ TPP      HM21   CM2       coval       1.090    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ TPP      O1B    PB     O2B     109.500    3.000
+ TPP      O1B    PB     O3B     109.500    3.000
+ TPP      O1B    PB     O3A     109.500    3.000
+ TPP      O2B    PB     O3B     109.500    3.000
+ TPP      O2B    PB     O3A     109.500    3.000
+ TPP      O3B    PB     O3A     109.500    3.000
+ TPP      PB     O3A    PA      120.500    3.000
+ TPP      O3A    PA     O1A     108.200    3.000
+ TPP      O3A    PA     O2A     109.500    3.000
+ TPP      O3A    PA     O7      102.600    3.000
+ TPP      O1A    PA     O2A     109.500    3.000
+ TPP      O1A    PA     O7      108.200    3.000
+ TPP      O2A    PA     O7      109.500    3.000
+ TPP      PA     O7     C7      120.500    3.000
+ TPP      O7     C7     H71     109.470    3.000
+ TPP      O7     C7     H72     109.470    3.000
+ TPP      O7     C7     C6      109.470    3.000
+ TPP      H71    C7     H72     107.900    3.000
+ TPP      H71    C7     C6      109.470    3.000
+ TPP      H72    C7     C6      109.470    3.000
+ TPP      C7     C6     H61     109.470    3.000
+ TPP      C7     C6     H62     109.470    3.000
+ TPP      C7     C6     C5      109.470    3.000
+ TPP      H61    C6     H62     107.900    3.000
+ TPP      H61    C6     C5      109.470    3.000
+ TPP      H62    C6     C5      109.470    3.000
+ TPP      C6     C5     C4      126.000    3.000
+ TPP      C6     C5     S1      108.000    3.000
+ TPP      C4     C5     S1      108.000    3.000
+ TPP      C5     C4     CM4     126.000    3.000
+ TPP      C5     C4     N3      108.000    3.000
+ TPP      CM4    C4     N3      126.000    3.000
+ TPP      C4     CM4    HM43    109.470    3.000
+ TPP      C4     CM4    HM42    109.470    3.000
+ TPP      C4     CM4    HM41    109.470    3.000
+ TPP      HM43   CM4    HM42    109.470    3.000
+ TPP      HM43   CM4    HM41    109.470    3.000
+ TPP      HM42   CM4    HM41    109.470    3.000
+ TPP      C5     S1     C2       90.000    3.000
+ TPP      S1     C2     H2      108.000    3.000
+ TPP      S1     C2     N3      108.000    3.000
+ TPP      H2     C2     N3      126.000    3.000
+ TPP      C2     N3     C7'     126.000    3.000
+ TPP      C2     N3     C4      108.000    3.000
+ TPP      C7'    N3     C4      126.000    3.000
+ TPP      N3     C7'    H7'1    109.500    3.000
+ TPP      N3     C7'    H7'2    109.500    3.000
+ TPP      N3     C7'    C5'     109.500    3.000
+ TPP      H7'1   C7'    H7'2    107.900    3.000
+ TPP      H7'1   C7'    C5'     109.470    3.000
+ TPP      H7'2   C7'    C5'     109.470    3.000
+ TPP      C7'    C5'    C6'     120.000    3.000
+ TPP      C7'    C5'    C4'     120.000    3.000
+ TPP      C6'    C5'    C4'     120.000    3.000
+ TPP      C5'    C6'    H6'     120.000    3.000
+ TPP      C5'    C6'    N1'     120.000    3.000
+ TPP      H6'    C6'    N1'     120.000    3.000
+ TPP      C5'    C4'    N4'     120.000    3.000
+ TPP      C5'    C4'    N3'     120.000    3.000
+ TPP      N4'    C4'    N3'     120.000    3.000
+ TPP      C4'    N4'    HN42    120.000    3.000
+ TPP      C4'    N4'    HN41    120.000    3.000
+ TPP      HN42   N4'    HN41    120.000    3.000
+ TPP      C4'    N3'    C2'     120.000    3.000
+ TPP      N3'    C2'    N1'     120.000    3.000
+ TPP      N3'    C2'    CM2     120.000    3.000
+ TPP      N1'    C2'    CM2     120.000    3.000
+ TPP      C2'    N1'    C6'     120.000    3.000
+ TPP      C2'    CM2    HM23    109.470    3.000
+ TPP      C2'    CM2    HM22    109.470    3.000
+ TPP      C2'    CM2    HM21    109.470    3.000
+ TPP      HM23   CM2    HM22    109.470    3.000
+ TPP      HM23   CM2    HM21    109.470    3.000
+ TPP      HM22   CM2    HM21    109.470    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ TPP      var_3    O1B    PB     O3A    PA       -19.056   20.000   1
+ TPP      var_4    PB     O3A    PA     O7       123.049   20.000   1
+ TPP      var_6    O3A    PA     O7     C7        52.817   20.000   1
+ TPP      var_7    PA     O7     C7     C6      -157.412   20.000   1
+ TPP      var_8    O7     C7     C6     C5      -175.271   20.000   3
+ TPP      var_9    C7     C6     C5     S1       -48.778   20.000   2
+ TPP      CONST_1  C6     C5     C4     CM4        0.000    0.000   0
+ TPP      CONST_2  C6     C5     C4     N3       180.000    0.000   0
+ TPP      var_10   C5     C4     CM4    HM41      60.000   20.000   1
+ TPP      var_11   C6     C5     S1     C2       178.245   20.000   1
+ TPP      CONST_3  C5     S1     C2     N3         0.465    0.000   0
+ TPP      CONST_4  S1     C2     N3     C7'      180.000    0.000   0
+ TPP      CONST_5  S1     C2     N3     C4         0.000    0.000   0
+ TPP      var_12   C2     N3     C7'    C5'       87.081   20.000   1
+ TPP      var_13   N3     C7'    C5'    C4'      -64.106   20.000   2
+ TPP      CONST_6  C7'    C5'    C6'    N1'      180.000    0.000   0
+ TPP      CONST_7  C7'    C5'    C4'    N3'      180.000    0.000   0
+ TPP      var_14   C5'    C4'    N4'    HN41       0.000   20.000   1
+ TPP      CONST_8  C5'    C4'    N3'    C2'        0.000    0.000   0
+ TPP      CONST_9  C4'    N3'    C2'    CM2      180.000    0.000   0
+ TPP      CONST_10 N3'    C2'    N1'    C6'        0.000    0.000   0
+ TPP      var_15   N3'    C2'    CM2    HM21      60.000   20.000   1
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ TPP      plan-1    C2'       0.020
+ TPP      plan-1    N1'       0.020
+ TPP      plan-1    CM2       0.020
+ TPP      plan-1    N3'       0.020
+ TPP      plan-1    C4'       0.020
+ TPP      plan-1    C5'       0.020
+ TPP      plan-1    C6'       0.020
+ TPP      plan-1    C7'       0.020
+ TPP      plan-1    CM2       0.020
+ TPP      plan-1    N4'       0.020
+ TPP      plan-2    N3        0.020
+ TPP      plan-2    C7'       0.020
+ TPP      plan-2    C2        0.020
+ TPP      plan-2    C4        0.020
+ TPP      plan-2    S1        0.020
+ TPP      plan-2    C5        0.020
+ TPP      plan-2    CM4       0.020
+ TPP      plan-2    C7'       0.020
+ TPP      plan-2    C6        0.020

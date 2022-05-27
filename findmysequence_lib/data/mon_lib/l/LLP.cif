@@ -1,0 +1,269 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+LLP      LLP 'LYSINE-PYRIDOXAL-5*-PHOSPHATE       ' L-peptide          38  24 .
+#
+data_comp_LLP
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ LLP           N      N    NH1      -0.204
+ LLP           H      H    HNH1      0.204
+ LLP           CA     C    CH1       0.058
+ LLP           HA     H    HCH1      0.046
+ LLP           CB     C    CH2      -0.076
+ LLP           HB1    H    HCH2      0.038
+ LLP           HB2    H    HCH2      0.038
+ LLP           CG     C    CH2      -0.076
+ LLP           HG1    H    HCH2      0.038
+ LLP           HG2    H    HCH2      0.038
+ LLP           CD     C    CH2      -0.076
+ LLP           HD1    H    HCH2      0.038
+ LLP           HD2    H    HCH2      0.038
+ LLP           CE     C    CH2      -0.013
+ LLP           HE1    H    HCH2      0.098
+ LLP           HE2    H    HCH2      0.098
+ LLP           NZ     N    NT3      -0.506
+ LLP           HZ1    H    HNT3      0.441
+ LLP           HZ2    H    HNT3      0.441
+ LLP           C4A    C    C         0.000
+ LLP           C4     C    CR6       0.000
+ LLP           C3     C    CR6       0.000
+ LLP           O3     O    O         0.000
+ LLP           C2     C    CR6       0.000
+ LLP           C2A    C    C         0.000
+ LLP           N1     N    NR16      0.000
+ LLP           HN1    H    HNR6      0.000
+ LLP           C5     C    CR6       0.000
+ LLP           C6     C    CR16      0.000
+ LLP           H6     H    HCR6      0.000
+ LLP           C5A    C    C         0.000
+ LLP           O4P    O    O2        0.000
+ LLP           P      P    P         0.000
+ LLP           O1P    O    OP        0.000
+ LLP           O2P    O    OP        0.000
+ LLP           O3P    O    OP        0.000
+ LLP           C      C    C         0.318
+ LLP           O      O    O        -0.422
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ LLP      N      n/a    CA     START
+ LLP      H      N      .      .
+ LLP      CA     N      C      .
+ LLP      HA     CA     .      .
+ LLP      CB     CA     CG     .
+ LLP      HB1    CB     .      .
+ LLP      HB2    CB     .      .
+ LLP      CG     CB     CD     .
+ LLP      HG1    CG     .      .
+ LLP      HG2    CG     .      .
+ LLP      CD     CG     CE     .
+ LLP      HD1    CD     .      .
+ LLP      HD2    CD     .      .
+ LLP      CE     CD     NZ     .
+ LLP      HE1    CE     .      .
+ LLP      HE2    CE     .      .
+ LLP      NZ     CE     C4A    .
+ LLP      HZ1    NZ     .      .
+ LLP      HZ2    NZ     .      .
+ LLP      C4A    NZ     C4     .
+ LLP      C4     C4A    C5     .
+ LLP      C3     C4     C2     .
+ LLP      O3     C3     .      .
+ LLP      C2     C3     N1     .
+ LLP      C2A    C2     .      .
+ LLP      N1     C2     HN1    .
+ LLP      HN1    N1     .      .
+ LLP      C5     C4     C5A    .
+ LLP      C6     C5     H6     .
+ LLP      H6     C6     .      .
+ LLP      C5A    C5     O4P    .
+ LLP      O4P    C5A    P      .
+ LLP      P      O4P    O3P    .
+ LLP      O1P    P      .      .
+ LLP      O2P    P      .      .
+ LLP      O3P    P      .      .
+ LLP      C      CA     .      END
+ LLP      O      C      .      .
+ LLP      N1     C6     .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ LLP      N      H         coval       0.860    0.020
+ LLP      N      CA        coval       1.458    0.019
+ LLP      CA     HA        coval       0.980    0.020
+ LLP      CA     CB        coval       1.530    0.020
+ LLP      CB     HB1       coval       0.970    0.020
+ LLP      CB     HB2       coval       0.970    0.020
+ LLP      CB     CG        coval       1.520    0.030
+ LLP      CG     HG1       coval       0.970    0.020
+ LLP      CG     HG2       coval       0.970    0.020
+ LLP      CG     CD        coval       1.520    0.030
+ LLP      CD     HD1       coval       0.970    0.020
+ LLP      CD     HD2       coval       0.970    0.020
+ LLP      CD     CE        coval       1.520    0.030
+ LLP      CE     HE1       coval       0.970    0.020
+ LLP      CE     HE2       coval       0.970    0.020
+ LLP      CE     NZ        coval       1.489    0.030
+ LLP      NZ     HZ1       coval       0.960    0.020
+ LLP      NZ     HZ2       coval       0.960    0.020
+ LLP      C4A    NZ        coval       1.330    0.020
+ LLP      C4     C4A       coval       1.500    0.020
+ LLP      C3     C4        coval       1.390    0.020
+ LLP      O3     C3        coval       1.230    0.020
+ LLP      C2     C3        coval       1.390    0.020
+ LLP      C2A    C2        coval       1.500    0.020
+ LLP      N1     C2        coval       1.380    0.020
+ LLP      N1     C6        coval       1.380    0.020
+ LLP      HN1    N1        coval       1.040    0.020
+ LLP      C5     C4        coval       1.390    0.020
+ LLP      C6     C5        coval       1.390    0.020
+ LLP      H6     C6        coval       1.090    0.020
+ LLP      C5A    C5        coval       1.500    0.020
+ LLP      O4P    C5A       coval       1.450    0.020
+ LLP      P      O4P       coval       1.610    0.020
+ LLP      O1P    P         coval       1.480    0.020
+ LLP      O2P    P         coval       1.480    0.020
+ LLP      O3P    P         coval       1.480    0.020
+ LLP      CA     C         coval       1.525    0.021
+ LLP      C      O         coval       1.231    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ LLP      H      N      CA      114.000    3.000
+ LLP      HA     CA     CB      109.000    3.000
+ LLP      CB     CA     C       110.100    1.900
+ LLP      HA     CA     C       109.000    3.000
+ LLP      N      CA     HA      110.000    3.000
+ LLP      N      CA     CB      110.500    1.700
+ LLP      HB1    CB     HB2     110.000    3.000
+ LLP      HB2    CB     CG      108.000    3.000
+ LLP      HB1    CB     CG      108.000    3.000
+ LLP      CA     CB     HB1     109.000    3.000
+ LLP      CA     CB     HB2     109.000    3.000
+ LLP      CA     CB     CG      114.100    2.000
+ LLP      HG1    CG     HG2     110.000    3.000
+ LLP      HG2    CG     CD      108.000    3.000
+ LLP      HG1    CG     CD      108.000    3.000
+ LLP      CB     CG     HG1     109.000    3.000
+ LLP      CB     CG     HG2     109.000    3.000
+ LLP      CB     CG     CD      111.300    2.300
+ LLP      HD1    CD     HD2     110.000    3.000
+ LLP      HD2    CD     CE      108.000    3.000
+ LLP      HD1    CD     CE      108.000    3.000
+ LLP      CG     CD     HD1     109.000    3.000
+ LLP      CG     CD     HD2     109.000    3.000
+ LLP      CG     CD     CE      111.300    2.300
+ LLP      HE1    CE     HE2     110.000    3.000
+ LLP      HE2    CE     NZ      108.000    3.000
+ LLP      HE1    CE     NZ      108.000    3.000
+ LLP      CD     CE     HE1     109.000    3.000
+ LLP      CD     CE     HE2     109.000    3.000
+ LLP      CD     CE     NZ      111.900    3.200
+ LLP      HZ1    NZ     HZ2     109.000    3.000
+ LLP      HZ2    NZ     C4A     109.000    3.000
+ LLP      HZ1    NZ     C4A     109.000    3.000
+ LLP      CE     NZ     HZ1     110.000    3.000
+ LLP      CE     NZ     HZ2     110.000    3.000
+ LLP      CE     NZ     C4A     109.500    3.000
+ LLP      NZ     C4A    C4      109.500    3.000
+ LLP      C4A    C4     C3      120.000    3.000
+ LLP      C4A    C4     C5      120.000    3.000
+ LLP      C3     C4     C5      120.000    3.000
+ LLP      C4     C3     O3      120.000    3.000
+ LLP      C4     C3     C2      120.000    3.000
+ LLP      O3     C3     C2      120.000    3.000
+ LLP      C3     C2     C2A     120.000    3.000
+ LLP      C3     C2     N1      120.000    3.000
+ LLP      C2A    C2     N1      120.000    3.000
+ LLP      C2     N1     HN1     120.000    3.000
+ LLP      C2     N1     C6      120.000    3.000
+ LLP      HN1    N1     C6      120.000    3.000
+ LLP      C4     C5     C6      120.000    3.000
+ LLP      C4     C5     C5A     120.000    3.000
+ LLP      C6     C5     C5A     120.000    3.000
+ LLP      C5     C6     H6      120.000    3.000
+ LLP      C5     C6     N1      120.000    3.000
+ LLP      H6     C6     N1      120.000    3.000
+ LLP      C5     C5A    O4P     120.000    3.000
+ LLP      C5A    O4P    P       120.000    3.000
+ LLP      O4P    P      O1P     108.200    3.000
+ LLP      O4P    P      O2P     108.200    3.000
+ LLP      O4P    P      O3P     108.200    3.000
+ LLP      O1P    P      O2P     119.900    3.000
+ LLP      O1P    P      O3P     119.900    3.000
+ LLP      O2P    P      O3P     119.900    3.000
+ LLP      N      CA     C       111.200    2.800
+ LLP      CA     C      O       120.800    1.700
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ LLP      chi1     N      CA     CB     CG       180.000   15.000   3
+ LLP      chi2     CA     CB     CG     CD       180.000   15.000   3
+ LLP      chi3     CB     CG     CD     CE       180.000   15.000   3
+ LLP      chi4     CG     CD     CE     NZ       180.000   15.000   3
+ LLP      var_1    CD     CE     NZ     C4A      180.000   20.000   3
+ LLP      var_2    CE     NZ     C4A    C4       180.000   20.000   3
+ LLP      var_3    NZ     C4A    C4     C5      -155.720   20.000   1
+ LLP      CONST_1  C4A    C4     C3     C2       180.000    0.000   0
+ LLP      CONST_2  C4     C3     C2     N1         0.000    0.000   0
+ LLP      CONST_3  C3     C2     N1     C6         0.000    0.000   0
+ LLP      CONST_4  C4A    C4     C5     C5A        0.000    0.000   0
+ LLP      CONST_5  C4     C5     C6     N1         0.000    0.000   0
+ LLP      var_6    C4     C5     C5A    O4P       56.277   20.000   1
+ LLP      var_7    C5     C5A    O4P    P       -148.800   20.000   1
+ LLP      var_8    C5A    O4P    P      O3P      -50.770   20.000   1
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ LLP      chir_01  CA     N      CB     C         negativ
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ LLP      plan-1    C2        0.020
+ LLP      plan-1    N1        0.020
+ LLP      plan-1    C2A       0.020
+ LLP      plan-1    C3        0.020
+ LLP      plan-1    C4        0.020
+ LLP      plan-1    C5        0.020
+ LLP      plan-1    C6        0.020
+ LLP      plan-1    C4A       0.020
+ LLP      plan-1    O3        0.020
+ LLP      plan-1    C5A       0.020

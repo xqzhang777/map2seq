@@ -1,0 +1,15 @@
+name: findmysequence
+channels:
+  - intel
+  - bioconda
+  - conda-forge
+  - pytorch
+dependencies:
+  - numpy
+  - cctbx-base 
+  - hmmer
+  - bokeh
+  - h5py
+  - pandas
+  - scipy
+  - pytorch
