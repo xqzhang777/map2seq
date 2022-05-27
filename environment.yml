@@ -6,3 +6,6 @@ channels:
 dependencies:
   - hmmer
   - pytorch
+  - cctbx-base
+  - scipy
+  - scons
