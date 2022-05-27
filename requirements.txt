@@ -1,8 +1,0 @@
-setuptools
-h5py
-numpy==1.21.6
-scipy
-scons
-torch
-pyhmmer
-streamlit
