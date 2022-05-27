@@ -1,0 +1,9 @@
+setuptools
+h5py
+numpy
+scipy
+scons
+torch
+cctbx-base
+pyhmmer
+streamlit
