@@ -8,7 +8,6 @@ dependencies:
   - hmmer
   - bokeh
   - h5py
-  - numpy
   - pandas
   - scipy
   - pytorch
