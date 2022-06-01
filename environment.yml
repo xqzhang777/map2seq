@@ -1,4 +1,4 @@
-name: findmysequence
+name: base
 channels:
   - bioconda
   - conda-forge
@@ -9,11 +9,9 @@ dependencies:
   - pandas
   - scipy
   - cctbx-base
-  - cctbx
   - hmmer
   - bokeh
   - pytorch
   - pip
   - pip:
     - streamlit
-    
