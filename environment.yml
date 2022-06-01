@@ -10,6 +10,7 @@ dependencies:
   - pandas
   - scipy
   - cctbx-base
+  - cctbx
   - hmmer
   - bokeh
   - pytorch
