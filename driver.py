@@ -15,9 +15,9 @@ def import_with_auto_install(packages, scope=locals()):
 def package_upgrade(package_names):
     import subprocess
     for i in range(len(package_names)):
-        subprocess.call(f'pip install --upgrade {package_names[i]}', shell=True)
+        subprocess.call(f'conda install -c conda-forge {package_names[i]}', shell=True)
 
-package_upgrade(["pandas","numpy"])
+package_upgrade(["cctbx-base"])
 
 import numpy as np
 import streamlit as st
