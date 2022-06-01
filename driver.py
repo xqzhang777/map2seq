@@ -17,8 +17,6 @@ def package_upgrade(package_names):
     for i in range(len(package_names)):
         subprocess.call(f'conda install -c conda-forge {package_names[i]}', shell=True)
 
-package_upgrade(["cctbx-base"])
-
 import numpy as np
 import streamlit as st
 import re
