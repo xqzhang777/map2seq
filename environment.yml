@@ -7,7 +7,6 @@ dependencies:
   - numpy
   - h5py
   - pandas
-  - streamlit
   - scipy
   - cctbx-base 
   - hmmer
