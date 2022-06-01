@@ -14,7 +14,8 @@ def import_with_auto_install(packages, scope=locals()):
 
 def package_upgrade(package_name):
     import subprocess
-    subprocess.call(f'pip install --upgrade {package_name}', shell=True)
+    subprocess.call(f'pip uninstall {package_name} -y', shell=True)
+    subprocess.call(f'pip install {package_name}', shell=True)
 
 package_upgrade("numpy")
 
