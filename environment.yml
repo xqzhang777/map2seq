@@ -4,10 +4,12 @@ channels:
   - conda-forge
   - pytorch
 dependencies:
+  - numpy
+  - h5py
+  - pandas
+  - streamlit
+  - scipy
   - cctbx-base 
   - hmmer
   - bokeh
-  - h5py
-  - pandas
-  - scipy
   - pytorch
