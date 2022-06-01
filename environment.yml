@@ -4,12 +4,12 @@ channels:
   - conda-forge
   - pytorch
 dependencies:
-  - python>=3.9
+  - python=3.9
   - numpy
   - h5py
   - pandas
   - scipy
-  - cctbx-base
+  - cctbx-base=2022.4
   - hmmer
   - bokeh
   - pytorch
