@@ -12,6 +12,12 @@ def import_with_auto_install(packages, scope=locals()):
             subprocess.call(f'pip install {package_pip_name}', shell=True)
             scope[package_import_name] =  __import__(package_import_name)
 
+def package_upgrade(package_name):
+    import subprocess
+    subprocess.call(f'pip install --upgrade {package_name}', shell=True)
+
+package_upgrade("numpy")
+
 import streamlit as st
 import numpy as np
 import re
