@@ -9,6 +9,7 @@ dependencies:
   - h5py
   - pandas
   - scipy
+  - cctbx
   - hmmer
   - bokeh
   - pytorch
