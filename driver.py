@@ -19,8 +19,8 @@ def package_upgrade(package_names):
 
 package_upgrade(["pandas","numpy"])
 
-import streamlit as st
 import numpy as np
+import streamlit as st
 import re
 import os
 from shutil import which
