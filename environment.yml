@@ -1,15 +1,5 @@
 name: map2seq
 channels:
-  - bioconda
   - conda-forge
-  - pytorch
 dependencies:
-  - streamlit>=0.73
-  - numpy
-  - h5py
-  - pandas
-  - scipy
-  - cctbx-base
-  - hmmer
-  - bokeh
-  - pytorch
+  - streamlit
