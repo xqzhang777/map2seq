@@ -1,4 +1,4 @@
-name: base
+name: map2seq
 channels:
   - bioconda
   - conda-forge
@@ -10,7 +10,6 @@ dependencies:
   - pandas
   - scipy
   - cctbx-base
-  - cctbx
   - hmmer
   - bokeh
   - pytorch
