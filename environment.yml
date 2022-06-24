@@ -4,6 +4,7 @@ channels:
   - bioconda
   - pytorch
 dependencies:
+  - python=3.9
   - numpy
   - h5py
   - pandas
