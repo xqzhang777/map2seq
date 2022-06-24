@@ -1,0 +1,323 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+GNP      .   '5*-GUANOSYL-IMIDO-TRIPHOSPHATE      ' non-polymer        46  32 .
+#
+data_comp_GNP
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ GNP           O3G    O    OP       0.000
+ GNP           PG     P    P         0.000
+ GNP           O1G    O    OP        0.000
+ GNP           O2G    O    OP        0.000
+ GNP           N3B    N    NH1       0.000
+ GNP           HN3B   H    HNH1      0.000
+ GNP           PB     P    P         0.000
+ GNP           O1B    O    OP        0.000
+ GNP           O2B    O    OP        0.000
+ GNP           O3A    O    OP        0.000
+ GNP           PA     P    P         0.000
+ GNP           O1A    O    OP        0.000
+ GNP           O2A    O    OP        0.000
+ GNP           O5*    O    OC2       0.000
+ GNP           C5*    C    CH2       0.000
+ GNP           H5*1   H    HCH2      0.000
+ GNP           H5*2   H    HCH2      0.000
+ GNP           C4*    C    CH1       0.000
+ GNP           H4*    H    HCH1      0.000
+ GNP           O4*    O    O2        0.000
+ GNP           C1*    C    CH1       0.000
+ GNP           H1*    H    HCH1      0.000
+ GNP           N9     N    NR5       0.000
+ GNP           C8     C    CR15      0.000
+ GNP           H8     H    HCR5      0.000
+ GNP           N7     N    NRD5      0.000
+ GNP           C5     C    CR56      0.000
+ GNP           C4     C    CR56      0.000
+ GNP           N3     N    NRD6      0.000
+ GNP           C2     C    CR6       0.000
+ GNP           N2     N    NH2       0.000
+ GNP           H21    H    HNH2      0.000
+ GNP           H22    H    HNH2      0.000
+ GNP           N1     N    NR16      0.000
+ GNP           H1     H    HNR6      0.000
+ GNP           C6     C    CR6       0.000
+ GNP           O6     O    O         0.000
+ GNP           C2*    C    CH1       0.000
+ GNP           H2*    H    HCH1      0.000
+ GNP           O2*    O    OH1       0.000
+ GNP           HO2*   H    HOH1      0.000
+ GNP           C3*    C    CH1       0.000
+ GNP           H3*    H    HCH1      0.000
+ GNP           O3*    O    OC2       0.000
+ GNP           HO3*   H    HOH1      0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ GNP      O3G    n/a    PG     START
+ GNP      PG     O3G    N3B    .
+ GNP      O1G    PG     .      .
+ GNP      O2G    PG     .      .
+ GNP      N3B    PG     PB     .
+ GNP      HN3B   N3B    .      .
+ GNP      PB     N3B    O3A    .
+ GNP      O1B    PB     .      .
+ GNP      O2B    PB     .      .
+ GNP      O3A    PB     .      .
+ GNP      PA     O3A    O5*    .
+ GNP      O1A    PA     .      .
+ GNP      O2A    PA     .      .
+ GNP      O5*    PA     C5*    .
+ GNP      C5*    O5*    C4*    .
+ GNP      H5*1   C5*    .      .
+ GNP      H5*2   C5*    .      .
+ GNP      C4*    C5*    C3*    .
+ GNP      H4*    C4*    .      .
+ GNP      O4*    C4*    C1*    .
+ GNP      C1*    O4*    C2*    .
+ GNP      H1*    C1*    .      .
+ GNP      N9     C1*    C8     .
+ GNP      C8     N9     N7     .
+ GNP      H8     C8     .      .
+ GNP      N7     C8     C5     .
+ GNP      C5     N7     C4     .
+ GNP      C4     C5     N3     .
+ GNP      N3     C4     C2     .
+ GNP      C2     N3     N1     .
+ GNP      N2     C2     H22    .
+ GNP      H21    N2     .      .
+ GNP      H22    N2     .      .
+ GNP      N1     C2     C6     .
+ GNP      H1     N1     .      .
+ GNP      C6     N1     O6     .
+ GNP      O6     C6     .      .
+ GNP      C2*    C1*    O2*    .
+ GNP      H2*    C2*    .      .
+ GNP      O2*    C2*    HO2*   .
+ GNP      HO2*   O2*    .      .
+ GNP      C3*    C4*    O3*    .
+ GNP      H3*    C3*    .      .
+ GNP      O3*    C3*    .      END
+ GNP      HO3*   O3*    .      .
+ GNP      C2*    C3*    .    ADD
+ GNP      N9     C4     .    ADD
+ GNP      C6     C5     .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ GNP      PG     O3G       coval       1.510    0.020
+ GNP      PG     O1G       coval       1.510    0.020
+ GNP      PG     O2G       coval       1.510    0.020
+ GNP      PG     N3B       coval       1.580    0.020
+ GNP      N3B    HN3B      coval       0.980    0.020
+ GNP      PB     N3B       coval       1.580    0.020
+ GNP      PB     O1B       coval       1.480    0.020
+ GNP      PB     O2B       coval       1.480    0.020
+ GNP      PB     O3A       coval       1.520    0.020
+ GNP      PA     O3A       coval       1.520    0.020
+ GNP      PA     O1A       coval       1.480    0.020
+ GNP      PA     O2A       coval       1.480    0.020
+ GNP      PA     O5*       coval       1.580    0.020
+ GNP      C1*    C2*       coval       1.525    0.020
+ GNP      C2*    C3*       coval       1.525    0.020
+ GNP      C3*    C4*       coval       1.523    0.020
+ GNP      C3*    O3*       coval       1.422    0.030
+ GNP      C4*    C5*       coval       1.518    0.020
+ GNP      C4*    O4*       coval       1.450    0.020
+ GNP      O4*    C1*       coval       1.414    0.020
+ GNP      C5*    O5*       coval       1.423    0.030
+ GNP      C2*    O2*       coval       1.414    0.020
+ GNP      C5*    H5*1      coval       0.980    0.020
+ GNP      C5*    H5*2      coval       0.980    0.020
+ GNP      C4*    H4*       coval       0.980    0.020
+ GNP      C1*    H1*       coval       0.980    0.020
+ GNP      C2*    H2*       coval       0.980    0.020
+ GNP      O2*    HO2*      coval       0.980    0.020
+ GNP      C3*    H3*       coval       0.980    0.020
+ GNP      O3*    HO3*      coval       0.980    0.020
+ GNP      N1     C2        coval       1.375    0.020
+ GNP      C2     N3        coval       1.327    0.020
+ GNP      N3     C4        coval       1.355    0.020
+ GNP      C4     C5        coval       1.377    0.020
+ GNP      C5     C6        coval       1.415    0.020
+ GNP      C6     N1        coval       1.393    0.020
+ GNP      C5     N7        coval       1.389    0.020
+ GNP      N7     C8        coval       1.304    0.020
+ GNP      C8     N9        coval       1.374    0.020
+ GNP      N9     C4        coval       1.377    0.020
+ GNP      C2     N2        coval       1.341    0.020
+ GNP      C6     O6        coval       1.239    0.020
+ GNP      N9     C1*       coval       1.460    0.020
+ GNP      N1     H1        coval       0.980    0.020
+ GNP      C8     H8        coval       0.980    0.020
+ GNP      N2     H21       coval       0.980    0.020
+ GNP      N2     H22       coval       0.980    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ GNP      C6     N1     C2      124.900    3.000
+ GNP      N1     C2     N3      124.000    3.000
+ GNP      C2     N3     C4      111.800    3.000
+ GNP      N3     C4     C5      128.400    3.000
+ GNP      C4     C5     C6      119.100    3.000
+ GNP      C5     C6     N1      111.700    3.000
+ GNP      C4     C5     N7      110.800    3.000
+ GNP      C5     N7     C8      104.200    3.000
+ GNP      N7     C8     N9      113.500    3.000
+ GNP      C8     N9     C4      106.000    3.000
+ GNP      C1*    N9     C4      127.000    3.000
+ GNP      C1*    N9     C8      127.000    3.000
+ GNP      N9     C4     C5      105.600    3.000
+ GNP      N3     C4     N9      126.000    3.000
+ GNP      C6     C5     N7      130.100    3.000
+ GNP      N1     C2     N2      116.300    3.000
+ GNP      N3     C2     N2      119.700    3.000
+ GNP      N1     C6     O6      120.000    3.000
+ GNP      C5     C6     O6      128.300    3.000
+ GNP      N9     C1*    O4*     108.400    3.000
+ GNP      N9     C1*    C2*     113.500    3.000
+ GNP      C6     N1     H1      117.600    3.000
+ GNP      C2     N1     H1      117.600    3.000
+ GNP      C2     N2     H21     120.000    3.000
+ GNP      C2     N2     H22     120.000    3.000
+ GNP      H21    N2     H22     120.000    3.000
+ GNP      N9     C8     H8      123.300    3.000
+ GNP      N7     C8     H8      123.300    3.000
+ GNP      O4*    C1*    C2*     106.400    3.000
+ GNP      C1*    C2*    C3*     101.600    3.000
+ GNP      C2*    C3*    C4*     102.400    3.000
+ GNP      C2*    C3*    O3*     111.500    3.000
+ GNP      O3*    C3*    C4*     110.000    3.000
+ GNP      C3*    C4*    C5*     114.900    3.000
+ GNP      C3*    C4*    O4*     105.400    3.000
+ GNP      O4*    C4*    C5*     109.400    3.000
+ GNP      C4*    O4*    C1*     109.700    3.000
+ GNP      C4*    C5*    O5*     110.800    3.000
+ GNP      O3G    PG     O1G     109.000    3.000
+ GNP      O3G    PG     O2G     120.000    3.000
+ GNP      O1G    PG     O2G     120.000    3.000
+ GNP      N3B    PG     O1G     112.000    3.000
+ GNP      N3B    PG     O2G     109.000    3.000
+ GNP      N3B    PG     O3G     109.000    3.000
+ GNP      PB     N3B    PG      120.000    3.000
+ GNP      PB     N3B    HN3B    120.000    3.000
+ GNP      PG     N3B    HN3B    120.000    3.000
+ GNP      N3B    PB     O1B     112.000    3.000
+ GNP      N3B    PB     O2B     108.000    3.000
+ GNP      O1B    PB     O2B     120.000    3.000
+ GNP      O3A    PB     O1B     109.000    3.000
+ GNP      O3A    PB     O2B     109.000    3.000
+ GNP      O3A    PB     N3B     109.000    3.000
+ GNP      PA     O3A    PB      120.000    3.000
+ GNP      O3A    PA     O1A     109.000    3.000
+ GNP      O3A    PA     O2A     112.000    3.000
+ GNP      O1A    PA     O2A     120.000    3.000
+ GNP      O5*    PA     O1A     109.000    3.000
+ GNP      O5*    PA     O2A     109.000    3.000
+ GNP      O5*    PA     O3A     109.000    3.000
+ GNP      C5*    O5*    PA      120.000    3.000
+ GNP      C1*    C2*    O2*     110.200    3.000
+ GNP      O2*    C2*    C3*     112.400    3.000
+ GNP      O5*    C5*    H5*1    109.000    3.000
+ GNP      O5*    C5*    H5*2    109.000    3.000
+ GNP      C4*    C5*    H5*1    109.000    3.000
+ GNP      C4*    C5*    H5*2    109.000    3.000
+ GNP      H5*1   C5*    H5*2    109.000    3.000
+ GNP      C5*    C4*    H4*     109.000    3.000
+ GNP      O4*    C4*    H4*     109.000    3.000
+ GNP      C3*    C4*    H4*     109.000    3.000
+ GNP      O4*    C1*    H1*     109.000    3.000
+ GNP      C2*    C1*    H1*     109.000    3.000
+ GNP      N9     C1*    H1*     109.000    3.000
+ GNP      C1*    C2*    H2*     109.000    3.000
+ GNP      O2*    C2*    H2*     109.000    3.000
+ GNP      C2*    O2*    HO2*    109.000    3.000
+ GNP      C4*    C3*    H3*     109.000    3.000
+ GNP      C3*    C2*    H2*     109.000    3.000
+ GNP      C2*    C3*    H3*     109.000    3.000
+ GNP      O3*    C3*    H3*     109.000    3.000
+ GNP      C3*    O3*    HO3*    109.000    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ GNP      var_1    O3G    PG     N3B    PB       180.000   25.000   2
+ GNP      var_2    PG     N3B    PB     O3A      150.000   25.000   3
+ GNP      var_3    N3B    PB     O3A    PA      -100.000   25.000   2
+ GNP      var_4    PB     O3A    PA     O5*      170.000   25.000   3
+ GNP      var_5    O3A    PA     O5*    C5*      -30.000   25.000   2
+ GNP      beta     PA     O5*    C5*    C4*      170.000   25.000   3
+ GNP      gamma    O5*    C5*    C4*    C3*       55.000   20.000   3
+ GNP      delta    C5*    C4*    C3*    O3*       88.000   30.000   3
+ GNP      nu0      C4*    O4*    C1*    C2*       13.000   40.000   3
+ GNP      nu1      O4*    C1*    C2*    C3*      -33.000   40.000   3
+ GNP      nu4      C5*    C4*    O4*    C1*      137.000   40.000   3
+ GNP      chi      O4*    C1*    N9     C8        30.000   40.000   2
+ GNP      CONST_01 C1*    N9     C8     N7       180.000    0.000   0
+ GNP      CONST_02 N9     C8     N7     C5         0.000    0.000   0
+ GNP      CONST_03 C8     N7     C5     C4         0.000    0.000   0
+ GNP      CONST_04 N7     C5     C4     N3       180.000    0.000   0
+ GNP      CONST_05 C5     C4     N3     C2         0.000    0.000   0
+ GNP      CONST_06 C4     N3     C2     N1         0.000    0.000   0
+ GNP      hh1      N3     C2     N2     H22        0.000   40.000   1
+ GNP      CONST_07 N3     C2     N1     C6         0.000    0.000   0
+ GNP      CONST_08 C2     N1     C6     C5         0.000    0.000   0
+ GNP      var_h    C4*    C3*    O3*    HO3*       0.000   40.000   1
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ GNP      chir_01  C3*    C2*    O3*    C4*       positiv
+ GNP      chir_02  C4*    C3*    O4*    C5*       positiv
+ GNP      chir_03  C1*    N9     O4*    C2*       positiv
+ GNP      chir_04  C2*    C1*    O2*    C3*       positiv
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ GNP      plan      N1        0.020
+ GNP      plan      C2        0.020
+ GNP      plan      N2        0.020
+ GNP      plan      N3        0.020
+ GNP      plan      C4        0.020
+ GNP      plan      C5        0.020
+ GNP      plan      C6        0.020
+ GNP      plan      O6        0.020
+ GNP      plan      N7        0.020
+ GNP      plan      C8        0.020
+ GNP      plan      N9        0.020
+ GNP      plan      C1*       0.020

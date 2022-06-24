@@ -1,0 +1,94 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+BAL      BAL 'BETA-ALANINE                        ' polymer            10   5 .
+#
+data_comp_BAL
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ BAL           N      N    NH1       0.000
+ BAL           H      H    HNH1      0.000
+ BAL           CA     C    CH2       0.000
+ BAL           HA1    H    HCH2      0.000
+ BAL           HA2    H    HCH2      0.000
+ BAL           CB     C    CH2       0.000
+ BAL           HB1    H    HCH2      0.000
+ BAL           HB2    H    HCH2      0.000
+ BAL           C      C    C         0.000
+ BAL           O      O    O         0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ BAL      N      n/a    CB     START
+ BAL      H      N      .      .
+ BAL      CA     CB     C      .
+ BAL      HA1    CA     .      .
+ BAL      HA2    CA     .      .
+ BAL      CB     N      CA     .
+ BAL      HB1    CB     .      .
+ BAL      HB2    CB     .      .
+ BAL      C      CA     .      END
+ BAL      O      C      .      .
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ BAL      N      H         coval       0.860    0.020
+ BAL      N      CB        coval       1.458    0.019
+ BAL      CB     HB1       coval       0.980    0.020
+ BAL      CB     HB2       coval       0.980    0.020
+ BAL      CA     CB        coval       1.521    0.033
+ BAL      CA     HA1       coval       0.960    0.020
+ BAL      CA     HA2       coval       0.960    0.020
+ BAL      CA     C         coval       1.525    0.021
+ BAL      C      O         coval       1.231    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ BAL      H      N      CB      114.000    3.000
+ BAL      HA1    CA     CB      109.000    3.000
+ BAL      HA2    CA     CB      109.000    3.000
+ BAL      HA1    CA     HA2     109.000    3.000
+ BAL      CB     CA     C       110.500    1.500
+ BAL      HA1    CA     C       109.000    3.000
+ BAL      HA2    CA     C       109.000    3.000
+ BAL      N      CB     HB1     110.000    3.000
+ BAL      N      CB     HB2     110.000    3.000
+ BAL      N      CB     CA      110.400    1.500
+ BAL      HB1    CB     HB2     110.000    3.000
+ BAL      CA     CB     HB1     109.000    3.000
+ BAL      CA     CB     HB2     109.000    3.000
+ BAL      CA     C      O       120.800    1.700
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ BAL      var_1    N      CB     CA     C         60.000   15.000   3

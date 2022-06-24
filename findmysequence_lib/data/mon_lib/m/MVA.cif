@@ -1,0 +1,156 @@
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+MVA      MVA 'N-METHYLVALINE                      ' L-peptide          20   8 .
+#
+data_comp_MVA
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+ MVA           O      O    O         0.000
+ MVA           C      C    C         0.000
+ MVA           CA     C    CH1       0.000
+ MVA           HA     H    HCH1      0.000
+ MVA           CB     C    CH1       0.000
+ MVA           HB     H    HCH1      0.000
+ MVA           CG2    C    CH3       0.000
+ MVA           HG23   H    HCH3      0.000
+ MVA           HG22   H    HCH3      0.000
+ MVA           HG21   H    HCH3      0.000
+ MVA           CG1    C    CH3       0.000
+ MVA           HG13   H    HCH3      0.000
+ MVA           HG12   H    HCH3      0.000
+ MVA           HG11   H    HCH3      0.000
+ MVA           N      N    NH1       0.000
+ MVA           HN     H    HNH1      0.000
+ MVA           CN     C    CH3       0.000
+ MVA           HN3    H    HCH3      0.000
+ MVA           HN2    H    HCH3      0.000
+ MVA           HN1    H    HCH3      0.000
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ MVA      O      C      .      .
+ MVA      C      CA     .      END
+ MVA      CA     N      C      .
+ MVA      HA     CA     .      .
+ MVA      CB     CA     CG1    .
+ MVA      HB     CB     .      .
+ MVA      CG2    CB     HG21   .
+ MVA      HG23   CG2    .      .
+ MVA      HG22   CG2    .      .
+ MVA      HG21   CG2    .      .
+ MVA      CG1    CB     HG11   .
+ MVA      HG13   CG1    .      .
+ MVA      HG12   CG1    .      .
+ MVA      HG11   CG1    .      .
+ MVA      N      n/a    CA     START
+ MVA      HN     N      .      .
+ MVA      CN     N      HN1    .
+ MVA      HN3    CN     .      .
+ MVA      HN2    CN     .      .
+ MVA      HN1    CN     .      .
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ MVA      C      O         coval       1.410    0.020
+ MVA      CA     C         coval       1.500    0.020
+ MVA      HA     CA        coval       1.090    0.020
+ MVA      CB     CA        coval       1.524    0.020
+ MVA      HB     CB        coval       1.090    0.020
+ MVA      CG2    CB        coval       1.524    0.020
+ MVA      HG23   CG2       coval       1.090    0.020
+ MVA      HG22   CG2       coval       1.090    0.020
+ MVA      HG21   CG2       coval       1.090    0.020
+ MVA      CG1    CB        coval       1.524    0.020
+ MVA      HG13   CG1       coval       1.090    0.020
+ MVA      HG12   CG1       coval       1.090    0.020
+ MVA      HG11   CG1       coval       1.090    0.020
+ MVA      N      CA        coval       1.450    0.020
+ MVA      HN     N         coval       1.010    0.020
+ MVA      CN     N         coval       1.450    0.020
+ MVA      HN3    CN        coval       1.090    0.020
+ MVA      HN2    CN        coval       1.090    0.020
+ MVA      HN1    CN        coval       1.090    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ MVA      O      C      CA      120.500    3.000
+ MVA      C      CA     HA      108.810    3.000
+ MVA      C      CA     CB      109.470    3.000
+ MVA      C      CA     N       111.600    3.000
+ MVA      HA     CA     CB      108.340    3.000
+ MVA      HA     CA     N       108.550    3.000
+ MVA      CB     CA     N       110.000    3.000
+ MVA      CA     CB     HB      108.340    3.000
+ MVA      CA     CB     CG2     111.000    3.000
+ MVA      CA     CB     CG1     111.000    3.000
+ MVA      HB     CB     CG2     108.340    3.000
+ MVA      HB     CB     CG1     108.340    3.000
+ MVA      CG2    CB     CG1     111.000    3.000
+ MVA      CB     CG2    HG23    109.470    3.000
+ MVA      CB     CG2    HG22    109.470    3.000
+ MVA      CB     CG2    HG21    109.470    3.000
+ MVA      HG23   CG2    HG22    109.470    3.000
+ MVA      HG23   CG2    HG21    109.470    3.000
+ MVA      HG22   CG2    HG21    109.470    3.000
+ MVA      CB     CG1    HG13    109.470    3.000
+ MVA      CB     CG1    HG12    109.470    3.000
+ MVA      CB     CG1    HG11    109.470    3.000
+ MVA      HG13   CG1    HG12    109.470    3.000
+ MVA      HG13   CG1    HG11    109.470    3.000
+ MVA      HG12   CG1    HG11    109.470    3.000
+ MVA      CA     N      HN      118.500    3.000
+ MVA      CA     N      CN      120.000    3.000
+ MVA      HN     N      CN      118.500    3.000
+ MVA      N      CN     HN3     109.470    3.000
+ MVA      N      CN     HN2     109.470    3.000
+ MVA      N      CN     HN1     109.470    3.000
+ MVA      HN3    CN     HN2     109.470    3.000
+ MVA      HN3    CN     HN1     109.470    3.000
+ MVA      HN2    CN     HN1     109.470    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ MVA      var_1    N      CA     CB     CG1      180.000   20.000   3
+ MVA      var_2    CA     CB     CG2    HG21      60.000   20.000   1
+ MVA      var_3    CA     CB     CG1    HG11      60.000   20.000   1
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ MVA      chir_01  CA     N      CB     C         negativ
+ MVA      chir_02  CB     CA     CG1    CG2       negativ
