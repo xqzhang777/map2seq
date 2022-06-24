@@ -12,6 +12,3 @@ dependencies:
   - hmmer
   - bokeh
   - pytorch
-  - pip
-  - pip:
-    - streamlit
