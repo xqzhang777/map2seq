@@ -1,4 +1,4 @@
-# Project Title
+# Map2seq
 
 ## Description
 A web app based on: 
