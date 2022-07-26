@@ -17,6 +17,8 @@ def package_upgrade(package_names):
     for i in range(len(package_names)):
         subprocess.call(f'pip install --upgrade {package_names[i]}', shell=True)
 
+from pathlib import Path
+
 # essential to avoid cctbx import errors
 target = Path("/home/appuser/venv/share/cctbx")
 if not target.exists():
