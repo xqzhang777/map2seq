@@ -17,6 +17,10 @@ def package_upgrade(package_names):
     for i in range(len(package_names)):
         subprocess.call(f'pip install --upgrade {package_names[i]}', shell=True)
 
+# essential to avoid cctbx import errors
+target = Path("/home/appuser/venv/share/cctbx")
+if not target.exists():
+  target.symlink_to("/home/appuser/.conda/share/cctbx")
 
 import numpy as np
 import streamlit as st
