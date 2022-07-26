@@ -20,7 +20,7 @@ def package_upgrade(package_names):
 # essential to avoid cctbx import errors
 target = Path("/home/appuser/venv/share/cctbx")
 if not target.exists():
-  target.symlink_to("/home/appuser/.conda/share/cctbx")
+    target.symlink_to("/home/appuser/.conda/share/cctbx")
 
 import numpy as np
 import streamlit as st
