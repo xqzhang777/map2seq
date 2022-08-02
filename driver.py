@@ -18,6 +18,7 @@ def package_upgrade(package_names):
         subprocess.call(f'pip install --upgrade {package_names[i]}', shell=True)
 
 from pathlib import Path
+import sys
 
 # essential to avoid cctbx import errors
 target = Path("/home/appuser/venv/share/cctbx")
