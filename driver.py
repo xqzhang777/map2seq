@@ -23,6 +23,7 @@ from pathlib import Path
 target = Path("/home/appuser/venv/share/cctbx")
 if not target.exists():
     target.symlink_to("/home/appuser/.conda/share/cctbx")
+sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
 
 import numpy as np
 import streamlit as st
