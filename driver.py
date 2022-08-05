@@ -65,6 +65,7 @@ def main():
 
     with col1:
         st.subheader("Settings")
+        st.markdown(which("hmmsearch"))
 
         mrc = None
         # make radio display horizontal
