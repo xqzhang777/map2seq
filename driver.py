@@ -21,7 +21,7 @@ target = Path("/home/appuser/venv/share/cctbx")
 if not target.exists():
   target.symlink_to("/home/appuser/.conda/share/cctbx")
 
-sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
+sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"] 
 
 import streamlit as st
 import numpy as np
@@ -183,7 +183,7 @@ def main():
         
         if mrc is None: return
         if pdb is None: return
-    	
+        
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
         direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, help=help_direction, key="direction_option")
@@ -238,21 +238,21 @@ def main():
             st.bokeh_chart(p, use_container_width=True)
             
             # Prepare for the second run
-            fa = pyfastx.Fasta("./tempDir/human.fa.gz")
-            seqin = tmpdir+"/tmp.fasta"
-            modelout = tmpdir+"/model_out.pdb"
-            with open(tmpdir+"/tmp.fasta","w") as tmp:
-                tmp.write(">"+xs[0]+"\n")
-                tmp.write(fa[xs[0]].seq)
-            
-            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
-            
-            st.write("Alignment with "+xs[0]+":")
-            with open(tmpdir+"/seq_align_output.txt","r") as tmp:
-                for line in tmp.readlines():
-                    if line[0:7]!="WARNING":
-                        st.write(line)
-            
+            #fa = pyfastx.Fasta("./tempDir/human.fa.gz")
+            #seqin = tmpdir+"/tmp.fasta"
+            #modelout = tmpdir+"/model_out.pdb"
+            #with open(tmpdir+"/tmp.fasta","w") as tmp:
+            #    tmp.write(">"+xs[0]+"\n")
+            #    tmp.write(fa[xs[0]].seq)
+            #
+            #map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
+            #
+            #st.write("Alignment with "+xs[0]+":")
+            #with open(tmpdir+"/seq_align_output.txt","r") as tmp:
+            #    for line in tmp.readlines():
+            #        if line[0:7]!="WARNING":
+            #            st.write(line)
+            #
             with col3:
                 #st.subheader("Result Table")
                 df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
@@ -503,10 +503,11 @@ def parse_file(outputFile, filepath):
             return -1
         for line in file:
             line = line.rstrip()
-            list = line.split('|')
-            list[0:3] = ["|".join(list[0:3])]
+            #list = line.split('|')
+            list = line.split(' ')
+            #list[0:3] = ["|".join(list[0:3])]
             list[0] = list[0].strip()
-            list[1] = list[1].removeprefix('E-value=')
+            #list[1] = list[1].removeprefix('E-value=')
             list[1] = float(list[1])
             ids.append(list[0])
             e_vals.append(list[1])
