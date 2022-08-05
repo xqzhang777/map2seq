@@ -11,6 +11,17 @@ def import_with_auto_install(packages, scope=locals()):
             import subprocess
             subprocess.call(f'pip install {package_pip_name}', shell=True)
             scope[package_import_name] =  __import__(package_import_name)
+            
+import sys
+import shutil
+from pathlib import Path
+
+# essential to avoid cctbx import errors
+target = Path("/home/appuser/venv/share/cctbx")
+if not target.exists():
+  target.symlink_to("/home/appuser/.conda/share/cctbx")
+
+sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
 
 import streamlit as st
 import numpy as np
@@ -20,7 +31,6 @@ import pandas
 import pyfastx
 import re
 import os
-import sys
 from shutil import which
 from findmysequence_lib.findmysequence import fms_main
 import pickle
@@ -227,7 +237,7 @@ def main():
             st.bokeh_chart(p, use_container_width=True)
             
             # Prepare for the second run
-            fa = pyfastx.Fasta("/net/jiang/home/zhan4377/apps/map2seq/tempDir/human.fa.gz")
+            fa = pyfastx.Fasta("./tempDir/human.fa.gz")
             seqin = tmpdir+"/tmp.fasta"
             modelout = tmpdir+"/model_out.pdb"
             with open(tmpdir+"/tmp.fasta","w") as tmp:
@@ -418,7 +428,7 @@ def flip_map_model(map_name,pdb_name):
             o.write(line)
 
 #------------------------------- Main Functions-------------------------------
-def map2seq_run(map, pdb, seqin, modelout, rev, flip, db = "/net/jiang/home/zhan4377/apps/map2seq/tempDir/human.fa.gz", outdir = "tempDir/", graphname1 = "fms"):
+def map2seq_run(map, pdb, seqin, modelout, rev, flip, db = "./tempDir/human.fa.gz", outdir = "tempDir/", graphname1 = "fms"):
 
     map = os.path.abspath(map)
     pdb = os.path.abspath(pdb)
