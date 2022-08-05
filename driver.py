@@ -12,32 +12,30 @@ def import_with_auto_install(packages, scope=locals()):
             subprocess.call(f'pip install {package_pip_name}', shell=True)
             scope[package_import_name] =  __import__(package_import_name)
 
-def package_upgrade(package_names):
-    import subprocess
-    for i in range(len(package_names)):
-        subprocess.call(f'pip install --upgrade {package_names[i]}', shell=True)
-
-from pathlib import Path
-import sys
-
-# essential to avoid cctbx import errors
-target = Path("/home/appuser/venv/share/cctbx")
-if not target.exists():
-    target.symlink_to("/home/appuser/.conda/share/cctbx")
-sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
-
-import numpy as np
 import streamlit as st
+import numpy as np
+import mrcfile
+import tempfile
+import pandas
+import pyfastx
 import re
 import os
+import sys
 from shutil import which
 from findmysequence_lib.findmysequence import fms_main
 import pickle
-from bokeh.plotting import ColumnDataSource, figure
+from bokeh.plotting import ColumnDataSource, figure, output_file, save
 from bokeh.models import Label
 
-tmpdir = "tempDir"
-tmpdir = os.path.abspath(tmpdir)
+tmpdir="map2seq_out"
+if not os.path.isdir(tmpdir):
+    os.mkdir(tmpdir)
+
+tophits = "--tophits 30000"
+hmmer_out = "hmmer_output.txt"
+
+matches_found = "Best matches"
+no_matches_found = "No matches found"
 
 def main():
     title = "Identification of Proteins from Density Map"
@@ -50,7 +48,7 @@ def main():
     with st.expander(label="README", expanded=False):
             st.write("Sample readme")
 
-    col1, col2 = st.columns([1.25, 3])
+    col1, col2, col3 = st.columns([1.25, 3, 0.75])
 
     mrc = None
     pdb = None
@@ -171,27 +169,40 @@ def main():
         print(mrc)
         print(which('hmmsearch'))
         print('-')
-    if mrc is None: return
-    if pdb is None: return
+        
+        if mrc is None: return
+        if pdb is None: return
+    	
+        direction_options = {0:"original", 1:"reversed"}
+        help_direction=None
+        direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, help=help_direction, key="direction_option")
+        
+        handedness_options = {0:"original", 1:"flipped"}
+        help_handedness=None
+        handedness_option = st.radio(label="Protein handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, help=help_handedness, key="handedness_option")
+        
+        if st.button("Confirm"):
+            if handedness_option == 1: # flipped
+                flip_map_model(mrc,pdb)
+        else:
+            return
+       
 
     with col2:
-        st.subheader("Result Plot")
         graph_success = False
         with st.spinner("Processing..."):
             remove_old_graph_log()
-            cmd_template = f"python .\main.py -map {mrc} -pdb {pdb}"
-            os.system(cmd_template)
+            seqin = None
+            modelout = None
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
             print('Main done.')
+            
 
-            #with open('tempDir/log.txt') as f:
             with open(os.path.join(tmpdir, 'log.txt')) as f:
                 first_line = f.readline()
                 if "Success" in first_line:
                     graph_success = True
         if graph_success:
-            #from PIL import Image
-            #image = Image.open(os.path.join(tmpdir, 'fms.png'))
-            #st.image(image, caption='Temp Title')
             with open(os.path.join(tmpdir, 'fms.png_x.pkl'),'rb') as inf:
                 xs = pickle.load(inf)
             with open(os.path.join(tmpdir, 'fms.png_y.pkl'),'rb') as inf:
@@ -214,6 +225,28 @@ def main():
             p.add_layout(label)
             
             st.bokeh_chart(p, use_container_width=True)
+            
+            # Prepare for the second run
+            fa = pyfastx.Fasta("/net/jiang/home/zhan4377/apps/map2seq/tempDir/human.fa.gz")
+            seqin = tmpdir+"/tmp.fasta"
+            modelout = tmpdir+"/model_out.pdb"
+            with open(tmpdir+"/tmp.fasta","w") as tmp:
+                tmp.write(">"+xs[0]+"\n")
+                tmp.write(fa[xs[0]].seq)
+            
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
+            
+            st.write("Alignment with "+xs[0]+":")
+            with open(tmpdir+"/seq_align_output.txt","r") as tmp:
+                for line in tmp.readlines():
+                    if line[0:7]!="WARNING":
+                        st.write(line)
+            
+            with col3:
+                #st.subheader("Result Table")
+                df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
+                st.dataframe(df)
+            
         else:
             st.text('Failed')
 
@@ -350,5 +383,127 @@ def get_pdb_ids():
     return pdb_ids
 #-------------------------------End Model Functions-------------------------------
 
+def flip_map_model(map_name,pdb_name):
+    mrc_data = mrcfile.open(map_name, 'r+')
+    v_size=mrc_data.voxel_size
+    nx=mrc_data.header['nx']
+    ny=mrc_data.header['ny']
+    nz=mrc_data.header['nz']
+    apix=v_size['z']
+
+    data=mrc_data.data
+    new_data=np.empty((nx,ny,nz),dtype=np.float32)
+    for i in range(nz):
+        new_data[i,:,:]=data[nz-1-i,:,:]
+        
+    mrc_data.set_data(new_data)
+    mrc_data.close()
+    
+    with open(pdb_name,'r') as f:
+        lines=f.readlines()
+        orig_atom_lines = []
+        for line in lines:
+            if line[0:4] == "ATOM":
+                orig_atom_lines.append(line)
+            elif line[0:3] == "TER":
+               orig_atom_lines.append(line)
+    with open(pdb_name, 'w') as o:
+        for line in orig_atom_lines:
+            if line[0:3] != "TER":
+                coord_vec = np.array(line[30:54].split()).astype(np.float32)
+                new_z=(nz-1)*apix-coord_vec[2]
+                line = list(line)
+                line[30:54] = list(" " + f'{coord_vec[0]:>7.3f}' + " " + f'{coord_vec[1]:>7.3f}' + " " + f'{new_z:>7.3f}')
+                line = "".join(line)
+            o.write(line)
+
+#------------------------------- Main Functions-------------------------------
+def map2seq_run(map, pdb, seqin, modelout, rev, flip, db = "/net/jiang/home/zhan4377/apps/map2seq/tempDir/human.fa.gz", outdir = "tempDir/", graphname1 = "fms"):
+
+    map = os.path.abspath(map)
+    pdb = os.path.abspath(pdb)
+    db = os.path.abspath(db)
+    outdir = os.path.abspath(outdir)
+
+    if outdir[-1] != "/":
+        outdir += "/"
+
+    print('start')
+    #create temp directory for hmmer_output.txt
+    with tempfile.TemporaryDirectory() as tmpdir:
+        orig_stdout = sys.stdout
+        f = open(os.path.join(outdir, 'log.txt'), 'w')
+        #sys.stdout = f
+        tmpdir = os.path.abspath(tmpdir)
+        tmpdir += '/'
+        #run fms on forward pdb
+        if seqin=="None":
+            seqin=None
+        if modelout=="None":
+            modelout=None
+        fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=30000)
+        
+        #graph fms output
+        num = parse_file("{}{}.png".format(outdir, graphname1), "{}{}".format(outdir, hmmer_out))
+        sys.stdout = f
+        if num == -1:
+            print("No Matches")
+        elif num == 1:
+            print("Success")
+        
+        sys.stdout = orig_stdout
+        f.close()
+
+def make_graph(ids, e_vals, outputFile):
+    
+    #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
+
+    output_file('{}.html'.format(outputFile))
+
+    source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
+    top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
+    label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+  
+    TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+   
+    p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
+    p.circle('x','y',source=source)
+    p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+    p.yaxis.axis_label = 'E-values'
+    p.xaxis.axis_label = 'Rank Order'
+    p.y_range.flipped = True
+    p.add_layout(label)
+    
+    save(p)
+    
+    with open('{}_x.pkl'.format(outputFile),'wb') as o:
+        pickle.dump(ids,o,pickle.HIGHEST_PROTOCOL)
+    with open('{}_y.pkl'.format(outputFile),'wb') as o:
+        pickle.dump(e_vals,o,pickle.HIGHEST_PROTOCOL)
+
+
+def parse_file(outputFile, filepath):
+    ids = []
+    e_vals = []
+    with open(filepath, 'r') as file:
+        firstline = file.readline().rstrip()
+        if firstline.find(matches_found) == -1:
+            print(no_matches_found)
+            return -1
+        for line in file:
+            line = line.rstrip()
+            list = line.split('|')
+            list[0:3] = ["|".join(list[0:3])]
+            list[0] = list[0].strip()
+            list[1] = list[1].removeprefix('E-value=')
+            list[1] = float(list[1])
+            ids.append(list[0])
+            e_vals.append(list[1])
+                        
+        make_graph(ids, e_vals, outputFile)
+    return 1
+#------------------------------- End Main Functions-------------------------------
+
 if __name__ == "__main__":  
+    print("Temp dir: ", tmpdir)
     main()
