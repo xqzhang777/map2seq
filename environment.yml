@@ -11,5 +11,6 @@ dependencies:
   - scipy
   - cctbx-base
   - hmmer
+  - pyfastx
   - bokeh
   - pytorch
