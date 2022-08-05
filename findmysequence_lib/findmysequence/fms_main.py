@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 # Copyright (c) 2021, EMBL/Grzegorz Chojnowski (gchojnowski@embl-hamburg.de)
 # All rights reserved.
 # License: BSD 3-Clause License
@@ -59,14 +61,19 @@ fms_header="""
 """%(version)
 
 class Fms_option:
-    def __init__(self,mapin,modelin,db,tmpdir,tophits=3):
+    def __init__(self,mapin,modelin,seqin, modelout, db,tmpdir,outdir,rev,flip,tophits=3):
         self.mapin=mapin
         self.modelin=modelin
+        self.seqin=seqin
+        self.modelout=modelout
         self.db=db
         self.tmpdir=tmpdir
+        self.outdir=outdir
         self.tophits=tophits
         self.slide=True if HMMER_AVAILABLE is None else False
         self.selstr="all"
+        self.rev=int(rev)
+        self.flip=int(flip)
 
 #def parse_args():
 #    """setup program options parsing"""
@@ -169,11 +176,17 @@ def guess(mapin         =   None,
           tophits_sto   =   3,
           badd          =   0,
           debug         =   False,
-          tempdir        =  None):
+          tempdir       =   None,
+          outdir        =   None,
+          rev           =   0,
+          flip          =   0):
 
     m2so = sequence_utils.model2sequence( mapin=mapin, mtzin=mtzin, labin=labin, badd=badd)
     ph, symm = m2so._xyz_utils.read_ph( modelin )
     msa_string = m2so.model2msa( ph, selstr=selstr, verbose=False )
+    if rev == 1:
+        print("reversing msa")
+        msa_string=reverse_msa(msa_string)
 
 
     print(" ==> Querying database using %s: %s" % ('sliding window' if slide else 'hmmer', db))
@@ -182,7 +195,7 @@ def guess(mapin         =   None,
     else:
         res = m2so.query_msa( msa_string, db_fname=db, refseq_fname=refseq_fname, verbose=debug, tophits_sto=tophits_sto)
     stdout = sys.stdout
-    sys.stdout = open(f'{tempdir}/hmmer_output.txt', 'w')
+    sys.stdout = open(f'{outdir}/hmmer_output.txt', 'w')
     if res is None:
         print(" ==> No matches found...")
     else:
@@ -203,21 +216,30 @@ def assign_sequence(mapin         =   None,
                     seqin_fname   =   None,
                     modelout      =   None,
                     slide         =   False,
-                    debug         =   False):
+                    debug         =   False,
+                    outdir        =   None,
+                    rev           =   0):
 
     m2so = sequence_utils.model2sequence( mapin=mapin, mtzin=mtzin, labin=labin )
     ph, symm = m2so._xyz_utils.read_ph( modelin )
     msa_string = m2so.model2msa( ph, selstr=selstr, verbose=False )
-
+    if rev == 1:
+        print("reversing msa")
+        msa_string=reverse_msa(msa_string)
+    
+    stdout = sys.stdout
+    sys.stdout = open(f'{outdir}/seq_align_output.txt', 'w')
     print( " ==> Aligning chain fragments to the input sequence" )
     with open(seqin_fname, 'r') as ifile:
         m2so.align_frags(target_sequence=ifile.read(), modelout=modelout, verbose=debug)
+    sys.stdout = stdout
+    print("Finished")
 
 
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-def fms_run(mapin=None, modelin=None, db=None, tmpdir=None, tophits=None):
+def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir=None, outdir=None, tophits=None, rev=0, flip=0):
 
 
     print(fms_header)
@@ -270,8 +292,9 @@ def fms_run(mapin=None, modelin=None, db=None, tmpdir=None, tophits=None):
     print(modelin)
     print(db)
     print(tmpdir)
+    print(outdir)
     print(tophits)
-    options=Fms_option(mapin=mapin, modelin=modelin, db=db, tmpdir=tmpdir, tophits=tophits)
+    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
 
 #    if options.modelin is None:
 
@@ -304,6 +327,22 @@ def fms_run(mapin=None, modelin=None, db=None, tmpdir=None, tophits=None):
 #                         slide        =   options.slide,
 #                         debug        =   options.debug)
 #        return 0
+    print(options.seqin)
+    print(options.modelout)
+    if options.seqin and options.modelout:
+        assign_sequence( mapin        =   options.mapin,
+                         mtzin        =   None,
+                         labin        =   None,
+                         modelin      =   options.modelin,
+                         db           =   options.db,
+                         selstr       =   options.selstr,
+                         seqin_fname  =   options.seqin,
+                         modelout     =   options.modelout,
+                         slide        =   options.slide,
+                         debug        =   False,
+                         outdir       =   options.outdir,
+                         rev          =   options.rev)
+        return 0
 
 
     if options.db is None or not os.path.exists(options.db):
@@ -338,8 +377,20 @@ def fms_run(mapin=None, modelin=None, db=None, tmpdir=None, tophits=None):
            tophits_sto  =   options.tophits,
            badd         =   0,
            debug        =   False,
-           tempdir       =  options.tmpdir)
+           tempdir      =   options.tmpdir,
+           outdir       =   options.outdir,
+           rev          =   options.rev,
+           flip         =   options.flip)
 
+def reverse_msa(msa_string):
+    lines=msa_string.split()
+    new_msa=""
+    for line in lines:
+        if line[0] == ">":
+            new_msa+=line+'\n'
+        else:
+            new_msa+=line[::-1]+'\n'
+    return new_msa
 
 
 if __name__=="__main__":
