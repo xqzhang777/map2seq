@@ -568,8 +568,6 @@ class model2sequence:
             target_sequence_processed.append(line)
 
         target_sequence_processed = "".join(target_sequence_processed)
-        
-        st.write(target_sequence_processed)
 
         aa_names_array =  np.array(self._xyz_utils.standard_aa_names)
         target_sequence_array = np.array([aa_names_array==self.tgo[_a] for _a in target_sequence_processed], dtype=float)
@@ -591,6 +589,8 @@ class model2sequence:
 
             frag_scores_array = np.array([[np.log(np.clip(_s[_a],1e-33,1.0)) for _a in aa_names_array] for _s in frag_scores], dtype=float)
             alignment_scores = self.calc_alignment_scores(frag_scores_array, target_sequence_array)
+            
+            st.write(alignment_scores)
 
             base_scores = self.calc_alignment_scores(frag_scores_array, random_sequence_array)
             _random_scores_mean,_random_scores_std = np.mean(base_scores), np.std(base_scores)
