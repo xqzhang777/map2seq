@@ -509,7 +509,7 @@ def parse_file(outputFile, filepath):
             #list = line.split(' ')
             list[0] = list[0].strip()
             list[1] = list[1].removeprefix('E-value=')
-            #list[1] = float(list[1])
+            list[1] = float(list[1])
             ids.append(list[0])
             e_vals.append(list[1])
                         
