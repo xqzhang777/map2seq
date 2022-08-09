@@ -590,7 +590,7 @@ class model2sequence:
             frag_scores_array = np.array([[np.log(np.clip(_s[_a],1e-33,1.0)) for _a in aa_names_array] for _s in frag_scores], dtype=float)
             alignment_scores = self.calc_alignment_scores(frag_scores_array, target_sequence_array)
             
-            st.write(alignment_scores)
+            st.write(ichf, alignment_scores)
 
             base_scores = self.calc_alignment_scores(frag_scores_array, random_sequence_array)
             _random_scores_mean,_random_scores_std = np.mean(base_scores), np.std(base_scores)
