@@ -245,7 +245,7 @@ def main():
             with open(tmpdir+"/tmp.fasta","w") as tmp:
                 tmp.write(">"+xs[0]+"\n")
                 tmp.write(fa[xs[0]].seq)
-            with open(tmpdir+"/tmp.fasta","w") as tmp:
+            with open(tmpdir+"/tmp.fasta","r") as tmp:
                 for line in tmp.readlines():
                     st.write(line)
             
