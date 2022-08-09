@@ -245,6 +245,8 @@ def main():
             with open(tmpdir+"/tmp.fasta","w") as tmp:
                 tmp.write(">"+xs[0]+"\n")
                 tmp.write(fa[xs[0]].seq)
+                st.write(">"+xs[0])
+                st.write(fa[xs[0]].seq)
             
             map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
             
