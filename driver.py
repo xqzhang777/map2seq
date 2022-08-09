@@ -13,6 +13,7 @@ def import_with_auto_install(packages, scope=locals()):
             scope[package_import_name] =  __import__(package_import_name)
             
 import sys
+import os
 import shutil
 from pathlib import Path
 
@@ -21,7 +22,8 @@ target = Path("/home/appuser/venv/share/cctbx")
 if not target.exists():
   target.symlink_to("/home/appuser/.conda/share/cctbx")
 
-sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"] 
+sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
+os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin" 
 
 import streamlit as st
 import numpy as np
@@ -30,7 +32,6 @@ import tempfile
 import pandas
 import pyfastx
 import re
-import os
 from shutil import which
 from findmysequence_lib.findmysequence import fms_main
 import pickle
