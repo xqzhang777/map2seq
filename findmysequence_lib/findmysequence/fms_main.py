@@ -48,6 +48,8 @@ import fmslib
 from fmslib import xyz_utils
 from fmslib import sequence_utils
 
+import streamlit as st
+
 HMMER_AVAILABLE = which('hmmsearch')
 
 try:
@@ -231,6 +233,7 @@ def assign_sequence(mapin         =   None,
     sys.stdout = open(f'{outdir}/seq_align_output.txt', 'w')
     print( " ==> Aligning chain fragments to the input sequence" )
     with open(seqin_fname, 'r') as ifile:
+        st.write(ifile.read())
         m2so.align_frags(target_sequence=ifile.read(), modelout=modelout, verbose=debug)
     sys.stdout = stdout
     print("Finished")
