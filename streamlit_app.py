@@ -234,7 +234,7 @@ def main():
         help_handedness=None
         handedness_option = st.radio(label="Protein handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, help=help_handedness, key="handedness_option")
         
-        if st.button("Confirm"):
+        if st.button("Run!"):
             if handedness_option == 1: # flipped
                 flip_map_model(mrc,pdb)
         else:
@@ -308,6 +308,8 @@ def main():
                 remove_old_pdbs()
                 remove_old_maps()
                 remove_old_graph_log()
+                mrc=None
+                pdb=None
             
         else:
             st.text('Failed')
@@ -417,7 +419,7 @@ def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
 	return f"{server}/{protid}.pdb.gz"
 	
-@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
+#@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
 def get_emdb_map(emdid):
     url = get_emdb_map_url(emdid)
     data = get_3d_map_from_url(url)
