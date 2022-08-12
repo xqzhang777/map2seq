@@ -250,16 +250,10 @@ def main():
             map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
             
             st.write("Alignment with "+xs[0]+":")
-            
-            with open(modelout,"r") as tmp:
-                out_model_text=modelout.readlines()
-                st.download_button("Download output model", out_model_text)
-
-
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
                 for line in tmp.readlines():
                     if line[0:7]!="WARNING":
-                        st.write(line)                
+                        st.write(line)
             
             with col3:
                 #st.subheader("Result Table")
