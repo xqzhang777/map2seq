@@ -103,7 +103,7 @@ def main():
             url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
             #st.markdown(f'[All {len(emdb_ids_helical)} helical structures in EMDB]({url})')
             st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
-            emd_id_default = "emd-10499"
+            emd_id_default = "emd-3488"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
                 help = "Randomly select another helical structure in EMDB"
@@ -170,7 +170,8 @@ def main():
             help = None
             # if max_map_size>0: help = warning_map_size
             label = "Input an PDB ID (for example: 4hhb):"
-            pdb_id = st.text_input(label=label, key='pdb_id', help=help)
+            pdb_id_default = "5me2"
+            pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
             pdb_id = pdb_id.lower()
             if pdb_id:
                 pdb_url=get_pdb_url(pdb_id)
