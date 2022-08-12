@@ -82,6 +82,7 @@ def main():
                 help = None
                 fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="file_upload")
                 if fileobj is not None:
+                    remove_old_maps()
                     emd_id = extract_emd_id(fileobj.name)
                     is_emd = emd_id is not None
                     with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
@@ -304,8 +305,8 @@ def main():
                 df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
                 st.dataframe(df)
                 
-                remove_old_pdbs()
-                remove_old_maps()
+                #remove_old_pdbs()
+                #remove_old_maps()
                 remove_old_graph_log()
             
         else:
