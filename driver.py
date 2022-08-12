@@ -101,7 +101,8 @@ def main():
                 st.warning("failed to obtained a list of helical structures in EMDB")
                 return
             url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
-            st.markdown(f'[All {len(emdb_ids_helical)} helical structures in EMDB]({url})')
+            #st.markdown(f'[All {len(emdb_ids_helical)} helical structures in EMDB]({url})')
+            st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
             emd_id_default = "emd-10499"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
@@ -122,9 +123,9 @@ def main():
                     msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
                     st.warning(msg)
                     return
-                elif emd_id not in emdb_ids_helical:
-                    msg= f"EMD-{emd_id} is in EMDB but annotated as a '{methods[emdb_ids_all.index(emd_id)]}' structure, not a helical structure" 
-                    st.warning(msg)
+                #elif emd_id not in emdb_ids_helical:
+                #    msg= f"EMD-{emd_id} is in EMDB but annotated as a '{methods[emdb_ids_all.index(emd_id)]}' structure, not a helical structure" 
+                #    st.warning(msg)
             if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
             else: emd_id = emd_id_default
             emd_id = emd_id.lower().split("emd-")[-1]
@@ -140,7 +141,7 @@ def main():
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
         #input_modes_model = {0:"upload"}
-        help_model = None
+        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,O) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
         input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=0, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
         pdb = None
@@ -258,6 +259,10 @@ def main():
                 #st.subheader("Result Table")
                 df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
                 st.dataframe(df)
+                
+                remove_old_pdbs()
+                remove_old_maps()
+                remove_old_graph_log()
             
         else:
             st.text('Failed')
