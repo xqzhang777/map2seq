@@ -252,7 +252,7 @@ def main():
             st.write("Alignment with "+xs[0]+":")
             
             with open(modelout,"r") as tmp:
-                out_model_text="\n".join(tmp.readlines())
+                out_model_text="".join(tmp.readlines())
                 st.download_button("Download output model", out_model_text)
             
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
