@@ -422,7 +422,7 @@ def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
 	return f"{server}/{protid}.pdb.gz"
 	
-@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
+#@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
 def get_emdb_map(emdid):
     url = get_emdb_map_url(emdid)
     data = get_3d_map_from_url(url)
