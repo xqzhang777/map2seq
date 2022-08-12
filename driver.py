@@ -161,6 +161,7 @@ def main():
             url = st.text_input(label="Input the url of a PDB model:", help=help, key="url")
             if url:
                 with st.spinner(f'Downloading {url.strip()}'):
+                    remove_old_pdbs()
                     filepath = get_3d_map_from_url(url.strip())
                     pdb = filepath
                 st.write("Done.")
@@ -253,7 +254,7 @@ def main():
             
             with open(modelout,"r") as tmp:
                 out_model_text="".join(tmp.readlines())
-                st.download_button("Download output model", out_model_text)
+                st.download_button("Download output model", data=out_model_text, file_name="model_out.pdb")
             
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
                 for line in tmp.readlines():
