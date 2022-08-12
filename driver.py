@@ -74,7 +74,7 @@ def main():
         # input_modes_map = {0:"upload", 1:"emd-xxxxx"}
         input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
         help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
-        input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=0, help=help_map, key="input_mode_map")
+        input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, help=help_map, key="input_mode_map")
         is_emd = False
         emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
         if input_mode_map == 0: # "upload a MRC file":
@@ -142,7 +142,7 @@ def main():
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
         #input_modes_model = {0:"upload"}
         help_model = "The input PDB model should have all backbone atoms (C-alpha,N,O) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
-        input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=0, help=help_model, key="input_mode_model")
+        input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
         pdb = None
 
@@ -497,7 +497,7 @@ def make_graph(ids, e_vals, outputFile):
     p.y_range.flipped = True
     p.add_layout(label)
     
-    save(p)
+    #save(p)
     
     with open('{}_x.pkl'.format(outputFile),'wb') as o:
         pickle.dump(ids,o,pickle.HIGHEST_PROTOCOL)
