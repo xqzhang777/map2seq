@@ -591,6 +591,12 @@ class model2sequence:
             base_scores = self.calc_alignment_scores(frag_scores_array, random_sequence_array)
             _random_scores_mean,_random_scores_std = np.mean(base_scores), np.std(base_scores)
 
+            # Added:
+            # sovling the argmax of empty array error
+            if not alignment_scores:
+                print(" ==> Empty alignment scores returned")
+                continue
+            
             best_match_index = np.argmax(alignment_scores)
             #n = max([2.0,float(len(alignment_scores))])
             #z = np.max([-3.0,(np.max(alignment_scores)-_random_scores_mean)/(_random_scores_std*np.sqrt(2.0))])

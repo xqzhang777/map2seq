@@ -1,15 +1,16 @@
-name: findmysequence
+name: map2seq
 channels:
-  - intel
-  - bioconda
   - conda-forge
+  - bioconda
   - pytorch
 dependencies:
+  - python=3.9
   - numpy
-  - cctbx-base 
-  - hmmer
-  - bokeh
   - h5py
   - pandas
   - scipy
+  - cctbx-base
+  - hmmer
+  - pyfastx
+  - bokeh
   - pytorch

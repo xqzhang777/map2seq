@@ -11,19 +11,42 @@ def import_with_auto_install(packages, scope=locals()):
             import subprocess
             subprocess.call(f'pip install {package_pip_name}', shell=True)
             scope[package_import_name] =  __import__(package_import_name)
+            
+import sys
+import os
+import shutil
+from pathlib import Path
+
+# essential to avoid cctbx import errors
+target = Path("/home/appuser/venv/share/cctbx")
+if not target.exists():
+  target.symlink_to("/home/appuser/.conda/share/cctbx")
+
+sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
+os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin" 
 
 import streamlit as st
 import numpy as np
+import mrcfile
+import tempfile
+import pandas
+import pyfastx
 import re
-import os
 from shutil import which
 from findmysequence_lib.findmysequence import fms_main
 import pickle
-from bokeh.plotting import ColumnDataSource, figure
+from bokeh.plotting import ColumnDataSource, figure, output_file, save
 from bokeh.models import Label
 
-tmpdir = "tempDir"
-tmpdir = os.path.abspath(tmpdir)
+tmpdir="map2seq_out"
+if not os.path.isdir(tmpdir):
+    os.mkdir(tmpdir)
+
+tophits = "--tophits 30000"
+hmmer_out = "hmmer_output.txt"
+
+matches_found = "Best matches"
+no_matches_found = "No matches found"
 
 def main():
     title = "Identification of Proteins from Density Map"
@@ -36,13 +59,14 @@ def main():
     with st.expander(label="README", expanded=False):
             st.write("Sample readme")
 
-    col1, col2 = st.columns([1.25, 3])
+    col1, col2, col3 = st.columns([1.25, 3, 0.75])
 
     mrc = None
     pdb = None
 
     with col1:
         st.subheader("Settings")
+        #st.markdown(which("hmmsearch"))
 
         mrc = None
         # make radio display horizontal
@@ -50,7 +74,7 @@ def main():
         # input_modes_map = {0:"upload", 1:"emd-xxxxx"}
         input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
         help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
-        input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=0, help=help_map, key="input_mode_map")
+        input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, help=help_map, key="input_mode_map")
         is_emd = False
         emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
         if input_mode_map == 0: # "upload a MRC file":
@@ -77,8 +101,9 @@ def main():
                 st.warning("failed to obtained a list of helical structures in EMDB")
                 return
             url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
-            st.markdown(f'[All {len(emdb_ids_helical)} helical structures in EMDB]({url})')
-            emd_id_default = "emd-10499"
+            #st.markdown(f'[All {len(emdb_ids_helical)} helical structures in EMDB]({url})')
+            st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
+            emd_id_default = "emd-3488"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
                 help = "Randomly select another helical structure in EMDB"
@@ -98,9 +123,9 @@ def main():
                     msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
                     st.warning(msg)
                     return
-                elif emd_id not in emdb_ids_helical:
-                    msg= f"EMD-{emd_id} is in EMDB but annotated as a '{methods[emdb_ids_all.index(emd_id)]}' structure, not a helical structure" 
-                    st.warning(msg)
+                #elif emd_id not in emdb_ids_helical:
+                #    msg= f"EMD-{emd_id} is in EMDB but annotated as a '{methods[emdb_ids_all.index(emd_id)]}' structure, not a helical structure" 
+                #    st.warning(msg)
             if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
             else: emd_id = emd_id_default
             emd_id = emd_id.lower().split("emd-")[-1]
@@ -116,8 +141,8 @@ def main():
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
         #input_modes_model = {0:"upload"}
-        help_model = None
-        input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=0, help=help_model, key="input_mode_model")
+        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,O) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
+        input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
         pdb = None
 
@@ -136,6 +161,7 @@ def main():
             url = st.text_input(label="Input the url of a PDB model:", help=help, key="url")
             if url:
                 with st.spinner(f'Downloading {url.strip()}'):
+                    remove_old_pdbs()
                     filepath = get_3d_map_from_url(url.strip())
                     pdb = filepath
                 st.write("Done.")
@@ -144,7 +170,8 @@ def main():
             help = None
             # if max_map_size>0: help = warning_map_size
             label = "Input an PDB ID (for example: 4hhb):"
-            pdb_id = st.text_input(label=label, key='pdb_id', help=help)
+            pdb_id_default = "5me2"
+            pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
             pdb_id = pdb_id.lower()
             if pdb_id:
                 pdb_url=get_pdb_url(pdb_id)
@@ -153,31 +180,44 @@ def main():
                     pdb = filepath
                 st.write("Done.")
         
-        print(pdb)
-        print(mrc)
-        print(which('hmmsearch'))
-        print('-')
-    if mrc is None: return
-    if pdb is None: return
+        #print(pdb)
+        #print(mrc)
+        #print(which('hmmsearch'))
+        #print('-')
+        
+        if mrc is None: return
+        if pdb is None: return
+        
+        direction_options = {0:"original", 1:"reversed"}
+        help_direction=None
+        direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, help=help_direction, key="direction_option")
+        
+        handedness_options = {0:"original", 1:"flipped"}
+        help_handedness=None
+        handedness_option = st.radio(label="Protein handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, help=help_handedness, key="handedness_option")
+        
+        if st.button("Confirm"):
+            if handedness_option == 1: # flipped
+                flip_map_model(mrc,pdb)
+        else:
+            return
+       
 
     with col2:
-        st.subheader("Result Plot")
         graph_success = False
         with st.spinner("Processing..."):
             remove_old_graph_log()
-            cmd_template = f"python .\main.py -map {mrc} -pdb {pdb}"
-            os.system(cmd_template)
+            seqin = None
+            modelout = None
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
             print('Main done.')
+            
 
-            #with open('tempDir/log.txt') as f:
             with open(os.path.join(tmpdir, 'log.txt')) as f:
                 first_line = f.readline()
                 if "Success" in first_line:
                     graph_success = True
         if graph_success:
-            #from PIL import Image
-            #image = Image.open(os.path.join(tmpdir, 'fms.png'))
-            #st.image(image, caption='Temp Title')
             with open(os.path.join(tmpdir, 'fms.png_x.pkl'),'rb') as inf:
                 xs = pickle.load(inf)
             with open(os.path.join(tmpdir, 'fms.png_y.pkl'),'rb') as inf:
@@ -200,6 +240,37 @@ def main():
             p.add_layout(label)
             
             st.bokeh_chart(p, use_container_width=True)
+            
+            # Prepare for the second run
+            fa = pyfastx.Fasta("./tempDir/human.fa.gz")
+            seqin = tmpdir+"/tmp.fasta"
+            modelout = tmpdir+"/model_out.pdb"
+            with open(tmpdir+"/tmp.fasta","w") as tmp:
+                tmp.write(">"+xs[0]+"\n")
+                tmp.write(fa[xs[0]].seq)
+            
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
+            
+            st.write("Alignment with "+xs[0]+":")
+            
+            with open(tmpdir+"/seq_align_output.txt","r") as tmp:
+                for line in tmp.readlines():
+                    if line[0:7]!="WARNING":
+                        st.write(line)
+                        
+            with open(modelout,"r") as tmp:
+                out_texts="".join(tmp.readlines())
+                st.download_button("Download output model", data=out_texts, file_name="model_out.pdb")
+            
+            with col3:
+                #st.subheader("Result Table")
+                df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
+                st.dataframe(df)
+                
+                remove_old_pdbs()
+                remove_old_maps()
+                remove_old_graph_log()
+            
         else:
             st.text('Failed')
 
@@ -336,5 +407,128 @@ def get_pdb_ids():
     return pdb_ids
 #-------------------------------End Model Functions-------------------------------
 
+def flip_map_model(map_name,pdb_name):
+    mrc_data = mrcfile.open(map_name, 'r+')
+    v_size=mrc_data.voxel_size
+    nx=mrc_data.header['nx']
+    ny=mrc_data.header['ny']
+    nz=mrc_data.header['nz']
+    apix=v_size['z']
+
+    data=mrc_data.data
+    new_data=np.empty((nx,ny,nz),dtype=np.float32)
+    for i in range(nz):
+        new_data[i,:,:]=data[nz-1-i,:,:]
+        
+    mrc_data.set_data(new_data)
+    mrc_data.close()
+    
+    with open(pdb_name,'r') as f:
+        lines=f.readlines()
+        orig_atom_lines = []
+        for line in lines:
+            if line[0:4] == "ATOM":
+                orig_atom_lines.append(line)
+            elif line[0:3] == "TER":
+               orig_atom_lines.append(line)
+    with open(pdb_name, 'w') as o:
+        for line in orig_atom_lines:
+            if line[0:3] != "TER":
+                coord_vec = np.array(line[30:54].split()).astype(np.float32)
+                new_z=(nz-1)*apix-coord_vec[2]
+                line = list(line)
+                line[30:54] = list(" " + f'{coord_vec[0]:>7.3f}' + " " + f'{coord_vec[1]:>7.3f}' + " " + f'{new_z:>7.3f}')
+                line = "".join(line)
+            o.write(line)
+
+#------------------------------- Main Functions-------------------------------
+def map2seq_run(map, pdb, seqin, modelout, rev, flip, db = "./tempDir/human.fa.gz", outdir = "tempDir/", graphname1 = "fms"):
+
+    map = os.path.abspath(map)
+    pdb = os.path.abspath(pdb)
+    db = os.path.abspath(db)
+    outdir = os.path.abspath(outdir)
+
+    if outdir[-1] != "/":
+        outdir += "/"
+
+    print('start')
+    #create temp directory for hmmer_output.txt
+    with tempfile.TemporaryDirectory() as tmpdir:
+        orig_stdout = sys.stdout
+        f = open(os.path.join(outdir, 'log.txt'), 'w')
+        #sys.stdout = f
+        tmpdir = os.path.abspath(tmpdir)
+        tmpdir += '/'
+        #run fms on forward pdb
+        if seqin=="None":
+            seqin=None
+        if modelout=="None":
+            modelout=None
+        fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=30000)
+        
+        #graph fms output
+        num = parse_file("{}{}.png".format(outdir, graphname1), "{}{}".format(outdir, hmmer_out))
+        sys.stdout = f
+        if num == -1:
+            print("No Matches")
+        elif num == 1:
+            print("Success")
+        
+        sys.stdout = orig_stdout
+        f.close()
+
+def make_graph(ids, e_vals, outputFile):
+    
+    #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
+
+    output_file('{}.html'.format(outputFile))
+
+    source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
+    top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
+    label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+  
+    TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+   
+    p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
+    p.circle('x','y',source=source)
+    p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+    p.yaxis.axis_label = 'E-values'
+    p.xaxis.axis_label = 'Rank Order'
+    p.y_range.flipped = True
+    p.add_layout(label)
+    
+    #save(p)
+    
+    with open('{}_x.pkl'.format(outputFile),'wb') as o:
+        pickle.dump(ids,o,pickle.HIGHEST_PROTOCOL)
+    with open('{}_y.pkl'.format(outputFile),'wb') as o:
+        pickle.dump(e_vals,o,pickle.HIGHEST_PROTOCOL)
+
+
+def parse_file(outputFile, filepath):
+    ids = []
+    e_vals = []
+    with open(filepath, 'r') as file:
+        firstline = file.readline().rstrip()
+        if firstline.find(matches_found) == -1:
+            print(no_matches_found)
+            return -1
+        for line in file:
+            line = line.rstrip()
+            list = line.split('|')
+            list[0:3] = ["|".join(list[0:3])]
+            #list = line.split(' ')
+            list[0] = list[0].strip()
+            list[1] = list[1].removeprefix('E-value=')
+            list[1] = float(list[1])
+            ids.append(list[0])
+            e_vals.append(list[1])
+                        
+        make_graph(ids, e_vals, outputFile)
+    return 1
+#------------------------------- End Main Functions-------------------------------
+
 if __name__ == "__main__":  
+    print("Temp dir: ", tmpdir)
     main()
