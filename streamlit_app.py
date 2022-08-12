@@ -308,6 +308,8 @@ def main():
                 remove_old_pdbs()
                 remove_old_maps()
                 remove_old_graph_log()
+                mrc=None
+                pdb=None
             
         else:
             st.text('Failed')
