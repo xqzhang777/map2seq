@@ -305,8 +305,8 @@ def main():
                 df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
                 st.dataframe(df)
                 
-                #remove_old_pdbs()
-                #remove_old_maps()
+                remove_old_pdbs()
+                remove_old_maps()
                 remove_old_graph_log()
             
         else:
@@ -351,7 +351,7 @@ def get_direct_url(url):
 
 #"https://ftp.wwpdb.org/" -> threw a IsADirectoryError: This app has encountered an error. ...
 #Since I delete maps from the "tempDir" folder 
-@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
+#@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
 def get_3d_map_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(None)
