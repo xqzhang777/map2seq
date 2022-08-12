@@ -247,9 +247,6 @@ def main():
             remove_old_graph_log()
             seqin = None
             modelout = None
-            st.write(mrc)
-            st.write(pdb)
-            st.info(list(Path("./map2seq_out")))
             map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
             print('Main done.')
             
