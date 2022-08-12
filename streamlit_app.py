@@ -234,7 +234,7 @@ def main():
         help_handedness=None
         handedness_option = st.radio(label="Protein handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, help=help_handedness, key="handedness_option")
         
-        if st.button("Confirm"):
+        if st.button("Run!"):
             if handedness_option == 1: # flipped
                 flip_map_model(mrc,pdb)
         else:
@@ -247,6 +247,9 @@ def main():
             remove_old_graph_log()
             seqin = None
             modelout = None
+            st.write(mrc)
+            st.write(pdb)
+            st.info(list(Path("./map2seq_out")))
             map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
             print('Main done.')
             
