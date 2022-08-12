@@ -82,6 +82,7 @@ def main():
                 help = None
                 fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="file_upload")
                 if fileobj is not None:
+                    remove_old_maps()
                     emd_id = extract_emd_id(fileobj.name)
                     is_emd = emd_id is not None
                     with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
@@ -180,6 +181,42 @@ def main():
                     pdb = filepath
                 st.write("Done.")
         
+        #----------------------------------------------------------------------------------------------------------------------------------------
+
+        #db input
+        input_modes_db = {0:"upload", 1:"url", 2:"use default (human)"}
+        #input_modes_model = {0:"upload"}
+        help_db = "The input sequence library in .fa.gz"
+        input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=2, help=help_db, key="input_mode_db")
+        # pdb_ids_all = get_pdb_ids()
+        db = None
+
+        if input_mode_model == 0: # "upload":
+            label = "Upload a compressed fasta file (.fa.gz)"
+            fileobj = st.file_uploader(label, type=['fa.gz'], help=None, key="file_upload")
+            if fileobj is not None:
+                #remove_old_db()
+                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+                    f.write(fileobj.getbuffer())
+                db = tmpdir + "/" + fileobj.name
+                # pdb = get_model_from_uploaded_file(fileobj)
+        
+        elif input_mode_model == 1: # "url":
+            help = "An online url (http:// or ftp://) or a local file path (/path/to/your/database.fa.gz)"
+            url = st.text_input(label="Input the url of a sequence database (.fa.gz):", help=help, key="url")
+            if url:
+                with st.spinner(f'Downloading {url.strip()}'):
+                    #remove_old_db()
+                    filepath = get_3d_map_from_url(url.strip())
+                    db = filepath
+                st.write("Done.")
+        
+        elif input_mode_model == 2: # "use default":
+            help = "Use the default human protein sequences: human.fa.gz"
+            # if max_map_size>0: help = warning_map_size
+            db = "./tempDir/human.fa.gz"
+            st.write("Using the default human protein sequences: human.fa.gz")
+        
         #print(pdb)
         #print(mrc)
         #print(which('hmmsearch'))
@@ -187,6 +224,7 @@ def main():
         
         if mrc is None: return
         if pdb is None: return
+        if db is None: return
         
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
@@ -209,7 +247,7 @@ def main():
             remove_old_graph_log()
             seqin = None
             modelout = None
-            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
             print('Main done.')
             
 
@@ -249,7 +287,7 @@ def main():
                 tmp.write(">"+xs[0]+"\n")
                 tmp.write(fa[xs[0]].seq)
             
-            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, outdir = tmpdir)
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
             
             st.write("Alignment with "+xs[0]+":")
             
@@ -313,7 +351,7 @@ def get_direct_url(url):
 
 #"https://ftp.wwpdb.org/" -> threw a IsADirectoryError: This app has encountered an error. ...
 #Since I delete maps from the "tempDir" folder 
-@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
+#@st.experimental_singleton(show_spinner=False, suppress_st_warning=True)
 def get_3d_map_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(None)
