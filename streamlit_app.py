@@ -142,7 +142,7 @@ def main():
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
         #input_modes_model = {0:"upload"}
-        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,O) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
+        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
         input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
         pdb = None
