@@ -279,31 +279,31 @@ def main():
             
             st.bokeh_chart(p, use_container_width=True)
             
-            # Prepare for the second run
-            fa = pyfastx.Fasta("./tempDir/human.fa.gz")
-            seqin = tmpdir+"/tmp.fasta"
-            modelout = tmpdir+"/model_out.pdb"
-            with open(tmpdir+"/tmp.fasta","w") as tmp:
-                tmp.write(">"+xs[0]+"\n")
-                tmp.write(fa[xs[0]].seq)
-            
-            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
-            
-            st.write("Alignment with "+xs[0]+":")
-            
-            with open(tmpdir+"/seq_align_output.txt","r") as tmp:
-                for line in tmp.readlines():
-                    if line[0:7]!="WARNING":
-                        st.write(line)
-                        
-            with open(modelout,"r") as tmp:
-                out_texts="".join(tmp.readlines())
-                st.download_button("Download output model", data=out_texts, file_name="model_out.pdb")
+            ## Prepare for the second run
+            #fa = pyfastx.Fasta("./tempDir/human.fa.gz")
+            #seqin = tmpdir+"/tmp.fasta"
+            #modelout = tmpdir+"/model_out.pdb"
+            #with open(tmpdir+"/tmp.fasta","w") as tmp:
+            #    tmp.write(">"+xs[0]+"\n")
+            #    tmp.write(fa[xs[0]].seq)
+            #
+            #map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+            #
+            #st.write("Alignment with "+xs[0]+":")
+            #
+            #with open(tmpdir+"/seq_align_output.txt","r") as tmp:
+            #    for line in tmp.readlines():
+            #        if line[0:7]!="WARNING":
+            #            st.write(line)
+            #            
+            #with open(modelout,"r") as tmp:
+            #    out_texts="".join(tmp.readlines())
+            #    st.download_button("Download output model", data=out_texts, file_name="model_out.pdb")
             
             with col3:
                 #st.subheader("Result Table")
                 df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
-                st.dataframe(df)
+                st.dataframe(df.iloc[:10,:])
                 
                 remove_old_pdbs()
                 remove_old_maps()
