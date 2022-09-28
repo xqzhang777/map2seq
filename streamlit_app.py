@@ -142,7 +142,7 @@ def main():
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
         #input_modes_model = {0:"upload"}
-        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,O) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
+        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
         input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
         pdb = None
@@ -279,31 +279,31 @@ def main():
             
             st.bokeh_chart(p, use_container_width=True)
             
-            # Prepare for the second run
-            fa = pyfastx.Fasta("./tempDir/human.fa.gz")
-            seqin = tmpdir+"/tmp.fasta"
-            modelout = tmpdir+"/model_out.pdb"
-            with open(tmpdir+"/tmp.fasta","w") as tmp:
-                tmp.write(">"+xs[0]+"\n")
-                tmp.write(fa[xs[0]].seq)
-            
-            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
-            
-            st.write("Alignment with "+xs[0]+":")
-            
-            with open(tmpdir+"/seq_align_output.txt","r") as tmp:
-                for line in tmp.readlines():
-                    if line[0:7]!="WARNING":
-                        st.write(line)
-                        
-            with open(modelout,"r") as tmp:
-                out_texts="".join(tmp.readlines())
-                st.download_button("Download output model", data=out_texts, file_name="model_out.pdb")
+            ## Prepare for the second run
+            #fa = pyfastx.Fasta("./tempDir/human.fa.gz")
+            #seqin = tmpdir+"/tmp.fasta"
+            #modelout = tmpdir+"/model_out.pdb"
+            #with open(tmpdir+"/tmp.fasta","w") as tmp:
+            #    tmp.write(">"+xs[0]+"\n")
+            #    tmp.write(fa[xs[0]].seq)
+            #
+            #map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+            #
+            #st.write("Alignment with "+xs[0]+":")
+            #
+            #with open(tmpdir+"/seq_align_output.txt","r") as tmp:
+            #    for line in tmp.readlines():
+            #        if line[0:7]!="WARNING":
+            #            st.write(line)
+            #            
+            #with open(modelout,"r") as tmp:
+            #    out_texts="".join(tmp.readlines())
+            #    st.download_button("Download output model", data=out_texts, file_name="model_out.pdb")
             
             with col3:
                 #st.subheader("Result Table")
                 df = pandas.DataFrame(np.log10(ys),index=xs,columns=["E-val (log10)"])
-                st.dataframe(df)
+                st.dataframe(df.iloc[:10,:])
                 
                 remove_old_pdbs()
                 remove_old_maps()
