@@ -237,19 +237,23 @@ def main():
                 
         #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
         
-        source = ColumnDataSource(data=dict(x=range(len(xs)),y=ys,ID=xs))
-        top_source = ColumnDataSource(data=dict(x=[0],y=[ys[0]],ID=[xs[0]]))
-        label = Label(x=0, y=ys[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+        source = ColumnDataSource(data=dict(x=range(1,len(xs)+1),y=ys,ID=xs))
+        top_source = ColumnDataSource(data=dict(x=[1],y=[ys[0]],ID=[xs[0]]))
+        label = Label(x=1, y=ys[0], text=f'Best match: {xs[0]}', x_offset=10, y_offset=-5, text_font_size='16px', render_mode='canvas')
 
-        TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+        TOOLTIPS = [('Rank','@x'),('Protein','@ID'),('E-val','@y')]
 
-        p = figure(tooltips=TOOLTIPS, y_axis_type='log', title='Ranked Sequences')
+        p = figure(tooltips=TOOLTIPS, y_axis_type='log', title='')
         p.circle('x','y',source=source)
         p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
         p.yaxis.axis_label = 'E-values'
         p.xaxis.axis_label = 'Rank Order'
         p.y_range.flipped = True
         p.add_layout(label)
+        p.xaxis.axis_label_text_font_size = "24pt"
+        p.yaxis.axis_label_text_font_size = "24pt"
+        p.xaxis.major_label_text_font_size = "16pt"
+        p.yaxis.major_label_text_font_size = "16pt"
         
         st.bokeh_chart(p, use_container_width=True)
                 
