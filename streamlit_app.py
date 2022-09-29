@@ -41,11 +41,6 @@ tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
-tophits = "--tophits 30000"
-hmmer_out = "hmmer_output.txt"
-
-matches_found = "Best matches"
-no_matches_found = "No matches found"
 
 def main():
     title = "Identification of Proteins from Density Map"
@@ -58,7 +53,7 @@ def main():
     with st.expander(label="README", expanded=False):
             st.write("This is a Web App to help users to identify proteins that best explain a density map. The user will provide a density map (mrc or ccp4 map format) and a Calpha model in pdb format. The user can also specify a database of protein sequences for the search. Currently, the [findMySequence](https://journals.iucr.org/m/issues/2022/01/00/pw5018/) method is included although we plan to include additional methods in the future.  \nNOTE: the uploaded map/model files are strictly confidential. The developers of this app does not have access to the files")
 
-    col1, col2 = st.columns([1, 3])
+    col1, [col2] = st.sidebar, st.columns(1)
 
     mrc = None
     pdb = None
@@ -225,6 +220,9 @@ def main():
         if handedness_option in [1, 2]: # flipped
             flip_map_model(mrc, pdb)    
 
+        st.markdown("""---""")
+        st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
+
     with col2:
         with st.spinner("Processing..."):
             #remove_old_graph_log()
@@ -254,35 +252,13 @@ def main():
         p.add_layout(label)
         
         st.bokeh_chart(p, use_container_width=True)
-        
-        ## Prepare for the second run
-        #import pyfastx
-        #fa = pyfastx.Fasta("./tempDir/human.fa.gz")
-        #seqin = tmpdir+"/tmp.fasta"
-        #modelout = tmpdir+"/model_out.pdb"
-        #with open(tmpdir+"/tmp.fasta","w") as tmp:
-        #    tmp.write(">"+xs[0]+"\n")
-        #    tmp.write(fa[xs[0]].seq)
-        #
-        #map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
-        #
-        #st.write("Alignment with "+xs[0]+":")
-        #
-        #with open(tmpdir+"/seq_align_output.txt","r") as tmp:
-        #    for line in tmp.readlines():
-        #        if line[0:7]!="WARNING":
-        #            st.write(line)
-        #            
-        #with open(modelout,"r") as tmp:
-        #    out_texts="".join(tmp.readlines())
-        #    st.download_button("Download output model", data=out_texts, file_name="model_out.pdb")
-        
+                
     with col2:
         df = pandas.DataFrame({"E-val (log10)":np.log10(ys).T, "Protein":np.array(xs).T})
         df.index += 1
               
         n = 10
-        st.subheader(f"Top {n} matches:")
+        st.markdown(f"**Top {n} matches:**")
         df_top = df.iloc[:n, :].copy()
         def link_to_uniprot(s):
             pid = s.split('|')[1]
@@ -302,18 +278,39 @@ def main():
         df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot_2)
         df.loc[:, "Protein"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
         st.download_button(
-            label=f"Download the scores for all {len(df)} proteins",
+            label=f"Download the scores for {len(df)} proteins",
             data=df.to_csv().encode('utf-8'),
             file_name='map2seq_results.csv',
             mime='text/csv'
         )
 
+    with col2:
+        tophit = xs[0]
+        if st.checkbox(label=f"Align top hit {tophit}"):
+            import pyfastx
+            fa = pyfastx.Fasta(db)
+            seqin = tmpdir+"/tmp.fasta"
+            modelout = tmpdir+"/model_out.pdb"
+            with open(tmpdir+"/tmp.fasta","w") as tmp:
+                tmp.write(">"+xs[0]+"\n")
+                tmp.write(fa[xs[0]].seq)
+            
+            map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+            
+            lines = []
+            with open(tmpdir+"/seq_align_output.txt","r") as tmp:
+                for line in tmp.readlines()[:-2]:
+                    if "==>" in line or "Empty" in line or "WARNING" in line: continue
+                    lines.append(line.rstrip())
+            st.text("\n".join(lines))
+                        
+            with open(modelout,"r") as tmp:
+                out_texts="".join(tmp.readlines())
+                st.download_button("Download output model", data=out_texts, file_name=f"map2seq_model.pdb")
+
     #remove_old_pdbs()
     #remove_old_maps()
     #remove_old_graph_log()
-    mrc=None
-    pdb=None
-
     
 def remove_old_graph_log():
     dir = os.listdir(tmpdir)
@@ -321,9 +318,7 @@ def remove_old_graph_log():
         if item.endswith(".png") or item.endswith(".txt"):
             os.remove(os.path.join(tmpdir, item))
 
-#-------------------------------Map Functions-------------------------------
 def remove_old_maps():
-
     dir = os.listdir(tmpdir)
     for item in dir:
         if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz"):
@@ -351,8 +346,6 @@ def get_direct_url(url):
     else:
         return url
 
-#"https://ftp.wwpdb.org/" -> threw a IsADirectoryError: This app has encountered an error. ...
-#Since I delete maps from the "tempDir" folder 
 @st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
@@ -478,7 +471,7 @@ def flip_map_model(map_name,pdb_name):
                 line = "".join(line)
             o.write(line)
 
-#------------------------------- Main Functions-------------------------------
+
 @st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
 
@@ -495,6 +488,7 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
     fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=np.iinfo(np.uint32).max)
     
     #graph fms output
+    hmmer_out = "hmmer_output.txt"
     num = parse_file(f"{outdir}{basename}.png", f"{outdir}{hmmer_out}")
     if num == -1:
         return None # failed
@@ -535,6 +529,9 @@ def make_graph(ids, e_vals, outputFile):
 
 
 def parse_file(outputFile, filepath):
+    matches_found = "Best matches"
+    no_matches_found = "No matches found"
+
     ids = []
     e_vals = []
     with open(filepath, 'r') as file:
@@ -555,7 +552,6 @@ def parse_file(outputFile, filepath):
                         
         make_graph(ids, e_vals, outputFile)
     return 1
-#------------------------------- End Main Functions-------------------------------
 
 if __name__ == "__main__":
     main()
