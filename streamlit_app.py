@@ -28,12 +28,11 @@ if Path("/home/appuser").exists():
 
 import streamlit as st
 import numpy as np
-import mrcfile
-import pandas
-import re
+import pandas as pd
 from shutil import which
-from findmysequence_lib.findmysequence import fms_main
 import pickle
+import mrcfile
+from findmysequence_lib.findmysequence import fms_main
 from bokeh.plotting import ColumnDataSource, figure, output_file, save
 from bokeh.models import Label
 
@@ -137,7 +136,7 @@ def main():
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
         #input_modes_model = {0:"upload"}
-        help_model = "The input PDB model should have all backbone atoms (C-alpha,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
+        help_model = "The input PDB model should have all backbone atoms (Cα,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
         input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, horizontal=True, help=help_model, key="input_mode_model")
         # pdb_ids_all = get_pdb_ids()
         pdb = None
@@ -177,38 +176,43 @@ def main():
             return
 
         #db input
-        input_modes_db = {0:"upload", 1:"url", 2:"human proteins"}
-        #input_modes_model = {0:"upload"}
-        help_db = "The input sequence library in .fa.gz"
+        input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all proteins"}
+        help_db = "The input sequence database (.fa, .fa.gz, .fasta, or .fasta.gz)"
         input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=2, horizontal=True, help=help_db, key="input_mode_db")
-        # pdb_ids_all = get_pdb_ids()
         
         db = None
+        info = "Searching {n:,d} protein sequences"
 
         if input_mode_db == 0: # "upload":
-            label = "Upload a compressed fasta file (.fa.gz)"
-            fileobj = st.file_uploader(label, type=['fa.gz'], help=None, key="file_upload")
-            if fileobj is not None:
-                #remove_old_db()
-                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
-                    f.write(fileobj.getbuffer())
-                db = tmpdir + "/" + fileobj.name
-                # pdb = get_model_from_uploaded_file(fileobj)
+            label = "Upload a fasta file (.fa, .fa.gz, .fasta, .fasta.gz)"
+            fileobj = st.file_uploader(label, type=['fa', 'fasta', 'fa.gz', 'fasta.gz'], help=None, key="file_upload")
+            if fileobj is None: return
+
+            #remove_old_db()
+            with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+                f.write(fileobj.getbuffer())
+            db = tmpdir + "/" + fileobj.name
         else:
             if input_mode_db == 1: # "url":
                 help = "An online url (http:// or ftp://) or a local file path (/path/to/your/database.fa.gz)"
-                url = st.text_input(label="Input the url of a sequence database (.fa.gz):", help=help, key="url")
-            elif input_mode_db == 2: # "use default":
+                url = st.text_input(label="Input the url of a sequence database (.fa, .fa.gz, .fasta, .fasta.gz):", help=help, key="url")
+                if len(url)<1: return
+            elif input_mode_db == 2: # "human proteins":
                 url = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
-                st.markdown(f"Using the [human protein sequences]({url})")
+                info = "Searching [{n:,d} human protein sequences](" + url + ")"
+            elif input_mode_db == 3: # "all proteins"
+                url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
+                info = "Searching [{n:,d} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
             with st.spinner(f'Downloading {url.strip()}'):
                 #remove_old_db()
                 db = get_file_from_url(url.strip())
         
         if db is None:
             st.warning(f"Failed to load the protein sequence database")
-            return
-        
+            return      
+
+        st.markdown(info.format(n=number_of_sequences(db)))
+
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
         direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, horizontal=True, help=help_direction, key="direction_option")
@@ -224,7 +228,7 @@ def main():
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
 
     with col2:
-        with st.spinner("Processing..."):
+        with st.spinner(info.format(n=number_of_sequences(db))):
             #remove_old_graph_log()
             seqin = None
             modelout = None
@@ -258,7 +262,7 @@ def main():
         st.bokeh_chart(p, use_container_width=True)
                 
     with col2:
-        df = pandas.DataFrame({"E-val (log10)":np.log10(ys).T, "Protein":np.array(xs).T})
+        df = pd.DataFrame({"E-val (log10)":np.log10(ys).T, "Protein":np.array(xs).T})
         df.index += 1
               
         n = 10
@@ -282,7 +286,7 @@ def main():
         df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot_2)
         df.loc[:, "Protein"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
         st.download_button(
-            label=f"Download the scores for {len(df)} proteins",
+            label=f"Download the scores for {len(df):,d} proteins",
             data=df.to_csv().encode('utf-8'),
             file_name='map2seq_results.csv',
             mime='text/csv'
@@ -329,6 +333,12 @@ def remove_old_maps():
         if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz"):
             os.remove(os.path.join(tmpdir, item))
 
+@st.experimental_memo()
+def number_of_sequences(db_fasta):
+    import pyfastx
+    fa = pyfastx.Fasta(db_fasta)
+    return fa.count(1)
+
 def get_direct_url(url):
     import re
     if url.startswith("https://drive.google.com/file/d/"):
@@ -351,7 +361,7 @@ def get_direct_url(url):
     else:
         return url
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(None)
@@ -361,7 +371,6 @@ def get_file_from_url(url):
     filename_final = None
     localfile_path  = None
     with ds.open(url) as fp:
-        # data = get_3d_map_from_file(fp.name)
         if fp.name.endswith(".gz"):
             filename_final = fp.name[:-3]
             import gzip, shutil
