@@ -546,5 +546,21 @@ def parse_file(outputFile, filepath):
         make_graph(ids, e_vals, outputFile)
     return 1
 
+
+@st.cache(persist=True, show_spinner=False)
+def setup_anonymous_usage_report():
+    try:
+        import pathlib, stat
+        index_file = pathlib.Path(st.__file__).parent / "static/index.html"
+        index_file.chmod(stat.S_IRUSR|stat.S_IWUSR|stat.S_IRGRP|stat.S_IROTH)
+        txt = index_file.read_text()
+        if txt.find("gtag/js?")==-1:
+            txt = txt.replace("<head>", '''<head><script async src="https://www.googletagmanager.com/gtag/js?id=G-VSTDDFT4HW"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-VSTDDFT4HW');</script>''')
+            index_file.write_text(txt)
+    except:
+        pass
+
+
 if __name__ == "__main__":
+    setup_anonymous_usage_report()
     main()
