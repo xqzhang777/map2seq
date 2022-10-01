@@ -42,7 +42,7 @@ if not os.path.isdir(tmpdir):
 
 
 def main():
-    title = "Identification of Proteins from Density Map"
+    title = "map2seq: identification of proteins from density map"
     st.set_page_config(page_title=title, layout="wide")
     st.title(title)
 
@@ -50,7 +50,7 @@ def main():
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
 
     with st.expander(label="README", expanded=False):
-            st.write("This is a Web App to help users to identify proteins that best explain a density map. The user will provide a density map (mrc or ccp4 map format) and a Calpha model in pdb format. The user can also specify a database of protein sequences for the search. Currently, the [findMySequence](https://journals.iucr.org/m/issues/2022/01/00/pw5018/) method is included although we plan to include additional methods in the future.  \nNOTE: the uploaded map/model files are strictly confidential. The developers of this app does not have access to the files")
+            st.write("This is a Web App to help users to identify proteins that best explain a density map. The user will provide a density map (mrc or ccp4 map format) and a Cα model in pdb format. The user can also specify a database of protein sequences such as human proteins or all proteins for the search for the search. Currently, only the [findMySequence](https://journals.iucr.org/m/issues/2022/01/00/pw5018/) method is included although we plan to include additional methods in the future.  \nNOTE: the uploaded map/model files are **strictly confidential**. The developers of this app does not have access to the files")
 
     col1, [col2] = st.sidebar, st.columns(1)
 
@@ -58,17 +58,11 @@ def main():
     pdb = None
 
     with col1:
-        #st.subheader("Settings")
-        #st.markdown(which("hmmsearch"))
 
         mrc = None
-        # make radio display horizontal
-        #st.markdown('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
-        # input_modes_map = {0:"upload", 1:"emd-xxxxx"}
         input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
         help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
         input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
-        #is_emd = False
         emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
         if input_mode_map == 0: # "upload a MRC file":
                 label = "Upload a map in MRC or CCP4 format"
@@ -94,20 +88,17 @@ def main():
                 st.warning("failed to obtained a list of helical structures in EMDB")
                 return
             url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
-            #st.markdown(f'[All {len(emdb_ids_helical)} helical structures in EMDB]({url})')
             st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
             emd_id_default = "emd-3488"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
                 help = "Randomly select another helical structure in EMDB"
-                # if max_map_size>0: help += f". {warning_map_size}"
                 button_clicked = st.button(label="Change EMDB ID", help=help)
                 if button_clicked:
                     import random
                     st.session_state.emd_id = 'emd-' + random.choice(emdb_ids_all)
             else:
                 help = None
-                # if max_map_size>0: help = warning_map_size
                 label = "Input an EMDB ID (emd-xxxxx):"
                 emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
                 emd_id = emd_id.lower().split("emd-")[-1]
@@ -116,9 +107,6 @@ def main():
                     msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
                     st.warning(msg)
                     return
-                #elif emd_id not in emdb_ids_helical:
-                #    msg= f"EMD-{emd_id} is in EMDB but annotated as a '{methods[emdb_ids_all.index(emd_id)]}' structure, not a helical structure" 
-                #    st.warning(msg)
             if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
             else: emd_id = emd_id_default
             emd_id = emd_id.lower().split("emd-")[-1]
@@ -129,16 +117,14 @@ def main():
                 st.warning(f"Failed to download [EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id})")
                 return
 
-        if mrc is None:
+        if mrc is None or not Path(mrc).exists():
             st.warning(f"Failed to load density map")
             return
 
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
-        #input_modes_model = {0:"upload"}
         help_model = "The input PDB model should have all backbone atoms (Cα,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
         input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, horizontal=True, help=help_model, key="input_mode_model")
-        # pdb_ids_all = get_pdb_ids()
         pdb = None
 
         if input_mode_model == 0: # "upload a PDB file":
@@ -149,7 +135,6 @@ def main():
                 with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                     f.write(fileobj.getbuffer())
                 pdb = tmpdir + "/" + fileobj.name
-                # pdb = get_model_from_uploaded_file(fileobj)
         
         elif input_mode_model == 1: # "url":
             help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
@@ -161,7 +146,6 @@ def main():
         
         elif input_mode_model == 2: # "PDB ID":
             help = None
-            # if max_map_size>0: help = warning_map_size
             label = "Input an PDB ID (for example: 4hhb):"
             pdb_id_default = "5me2"
             pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
@@ -171,7 +155,7 @@ def main():
                 with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
                     pdb = get_file_from_url(pdb_url)
         
-        if pdb is None:
+        if pdb is None or not Path(pdb).exists():
             st.warning(f"Failed to load the PDB model")
             return
 
@@ -199,7 +183,7 @@ def main():
                 if len(url)<1: return
             elif input_mode_db == 2: # "human proteins":
                 url = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
-                info = "Searching [{n:,d} human protein sequences](" + url + ")"
+                info = "Searching [{n:,d} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
             elif input_mode_db == 3: # "all proteins"
                 url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
                 info = "Searching [{n:,d} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
@@ -207,11 +191,12 @@ def main():
                 #remove_old_db()
                 db = get_file_from_url(url.strip())
         
-        if db is None:
+        if db is None or not Path(db).exists():
             st.warning(f"Failed to load the protein sequence database")
             return      
-
-        st.markdown(info.format(n=number_of_sequences(db)))
+        
+        info = info.format(n=number_of_sequences(db))
+        st.markdown(info)
 
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
@@ -239,14 +224,11 @@ def main():
 
             xs, ys = res
                 
-        #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
-        
         source = ColumnDataSource(data=dict(x=range(1,len(xs)+1),y=ys,ID=xs))
         top_source = ColumnDataSource(data=dict(x=[1],y=[ys[0]],ID=[xs[0]]))
         label = Label(x=1, y=ys[0], text=f'Best match: {xs[0]}', x_offset=10, y_offset=-5, text_font_size='16px', render_mode='canvas')
 
         TOOLTIPS = [('Rank','@x'),('Protein','@ID'),('E-val','@y')]
-
         p = figure(tooltips=TOOLTIPS, y_axis_type='log', title='')
         p.circle('x','y',source=source)
         p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
@@ -254,8 +236,8 @@ def main():
         p.xaxis.axis_label = 'Rank Order'
         p.y_range.flipped = True
         p.add_layout(label)
-        p.xaxis.axis_label_text_font_size = "24pt"
-        p.yaxis.axis_label_text_font_size = "24pt"
+        p.xaxis.axis_label_text_font_size = "20pt"
+        p.yaxis.axis_label_text_font_size = "20pt"
         p.xaxis.major_label_text_font_size = "16pt"
         p.yaxis.major_label_text_font_size = "16pt"
         
@@ -497,11 +479,10 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
     if outdir[-1] != "/":
         outdir += "/"
 
-    basename = f"{Path(map).stem}_{Path(pdb).stem}"
+    basename = f"map2seq_fms"
 
     fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=np.iinfo(np.uint32).max)
     
-    #graph fms output
     hmmer_out = "hmmer_output.txt"
     num = parse_file(f"{outdir}{basename}.png", f"{outdir}{hmmer_out}")
     if num == -1:
@@ -516,8 +497,6 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
         
 def make_graph(ids, e_vals, outputFile):
     
-    #https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
-
     output_file('{}.html'.format(outputFile))
 
     source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
