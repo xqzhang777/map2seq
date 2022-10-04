@@ -59,105 +59,110 @@ def main():
 
     with col1:
 
-        mrc = None
-        input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
-        help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
-        input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
-        emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
-        if input_mode_map == 0: # "upload a MRC file":
-                label = "Upload a map in MRC or CCP4 format"
-                help = None
-                fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="file_upload")
+        with st.form(key='input_mrc_pdb'):
+            mrc = None
+            input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
+            help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
+            input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
+            emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
+            if input_mode_map == 0: # "upload a MRC file":
+                    label = "Upload a map in MRC or CCP4 format"
+                    help = None
+                    fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="file_upload")
+                    if fileobj is not None:
+                        remove_old_maps()
+                        emd_id = extract_emd_id(fileobj.name)
+                        is_emd = emd_id is not None
+                        with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+                            f.write(fileobj.getbuffer())
+                        mrc = tmpdir + "/" + fileobj.name
+            elif input_mode_map == 1: # "url":
+                url_default = "https://ftp.wwpdb.org/pub/emdb/structures/EMD-10499/map/emd_10499.map.gz"
+                help = "An online url (http:// or ftp://) or a local file path (/path/to/your/structure.mrc)"
+                url = st.text_input(label="Input the url of a 3D map:", value=url_default, help=help, key="url")
+                emd_id = extract_emd_id(url)
+                is_emd = emd_id is not None and emd_id
+                with st.spinner(f'Downloading {url.strip()}'):
+                    mrc = get_file_from_url(url.strip())
+            elif input_mode_map == 2: # "emdb": randomly selects form emdb_ids_all not emdb_ids_helical anymore
+                if not emdb_ids_all:
+                    st.warning("failed to obtained a list of helical structures in EMDB")
+                    return
+                url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
+                st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
+                emd_id_default = "emd-3488"
+                do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
+                if do_random_embid:
+                    help = "Randomly select another helical structure in EMDB"
+                    button_clicked = st.button(label="Change EMDB ID", help=help)
+                    if button_clicked:
+                        import random
+                        st.session_state.emd_id = 'emd-' + random.choice(emdb_ids_all)
+                else:
+                    help = None
+                    label = "Input an EMDB ID (emd-xxxxx):"
+                    emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
+                    emd_id = emd_id.lower().split("emd-")[-1]
+                    if emd_id not in emdb_ids_all:
+                        import random
+                        msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
+                        st.warning(msg)
+                        return
+                if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
+                else: emd_id = emd_id_default
+                emd_id = emd_id.lower().split("emd-")[-1]
+                with st.spinner(f'Downloading EMD-{emd_id} from {get_emdb_map_url(emd_id)}'):
+                    filepath = get_emdb_map(emd_id)
+                    mrc = filepath
+                if mrc is None:
+                    st.warning(f"Failed to download [EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id})")
+                    return
+
+            if mrc is None or not Path(mrc).exists():
+                st.warning(f"Failed to load density map")
+                return
+
+            st.markdown("""---""")
+    
+            #pdb input
+            input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
+            help_model = "The input PDB model should have all backbone atoms (Cα,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
+            input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, horizontal=True, help=help_model, key="input_mode_model")
+            pdb = None
+
+            if input_mode_model == 0: # "upload a PDB file":
+                label = "Upload a PDB file"
+                fileobj = st.file_uploader(label, type=['pdb'], help=None, key="file_upload")
                 if fileobj is not None:
-                    remove_old_maps()
-                    emd_id = extract_emd_id(fileobj.name)
-                    is_emd = emd_id is not None
+                    remove_old_pdbs()
                     with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                         f.write(fileobj.getbuffer())
-                    mrc = tmpdir + "/" + fileobj.name
-        elif input_mode_map == 1: # "url":
-            url_default = "https://ftp.wwpdb.org/pub/emdb/structures/EMD-10499/map/emd_10499.map.gz"
-            help = "An online url (http:// or ftp://) or a local file path (/path/to/your/structure.mrc)"
-            url = st.text_input(label="Input the url of a 3D map:", value=url_default, help=help, key="url")
-            emd_id = extract_emd_id(url)
-            is_emd = emd_id is not None and emd_id
-            with st.spinner(f'Downloading {url.strip()}'):
-                mrc = get_file_from_url(url.strip())
-        elif input_mode_map == 2: # "emdb": randomly selects form emdb_ids_all not emdb_ids_helical anymore
-            if not emdb_ids_all:
-                st.warning("failed to obtained a list of helical structures in EMDB")
-                return
-            url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
-            st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
-            emd_id_default = "emd-3488"
-            do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
-            if do_random_embid:
-                help = "Randomly select another helical structure in EMDB"
-                button_clicked = st.button(label="Change EMDB ID", help=help)
-                if button_clicked:
-                    import random
-                    st.session_state.emd_id = 'emd-' + random.choice(emdb_ids_all)
-            else:
+                    pdb = tmpdir + "/" + fileobj.name
+            
+            elif input_mode_model == 1: # "url":
+                help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
+                url = st.text_input(label="Input the url of a PDB model:", help=help, key="url")
+                if url:
+                    with st.spinner(f'Downloading {url.strip()}'):
+                        remove_old_pdbs()
+                        pdb = get_file_from_url(url.strip())
+            
+            elif input_mode_model == 2: # "PDB ID":
                 help = None
-                label = "Input an EMDB ID (emd-xxxxx):"
-                emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
-                emd_id = emd_id.lower().split("emd-")[-1]
-                if emd_id not in emdb_ids_all:
-                    import random
-                    msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
-                    st.warning(msg)
-                    return
-            if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
-            else: emd_id = emd_id_default
-            emd_id = emd_id.lower().split("emd-")[-1]
-            with st.spinner(f'Downloading EMD-{emd_id} from {get_emdb_map_url(emd_id)}'):
-                filepath = get_emdb_map(emd_id)
-                mrc = filepath
-            if mrc is None:
-                st.warning(f"Failed to download [EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id})")
+                label = "Input an PDB ID (for example: 4hhb):"
+                pdb_id_default = "5me2"
+                pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
+                pdb_id = pdb_id.lower()
+                if pdb_id:
+                    pdb_url=get_pdb_url(pdb_id)
+                    with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
+                        pdb = get_file_from_url(pdb_url)
+            
+            if pdb is None or not Path(pdb).exists():
+                st.warning(f"Failed to load the PDB model")
                 return
 
-        if mrc is None or not Path(mrc).exists():
-            st.warning(f"Failed to load density map")
-            return
-
-        #pdb input
-        input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
-        help_model = "The input PDB model should have all backbone atoms (Cα,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
-        input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, horizontal=True, help=help_model, key="input_mode_model")
-        pdb = None
-
-        if input_mode_model == 0: # "upload a PDB file":
-            label = "Upload a PDB file"
-            fileobj = st.file_uploader(label, type=['pdb'], help=None, key="file_upload")
-            if fileobj is not None:
-                remove_old_pdbs()
-                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
-                    f.write(fileobj.getbuffer())
-                pdb = tmpdir + "/" + fileobj.name
-        
-        elif input_mode_model == 1: # "url":
-            help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
-            url = st.text_input(label="Input the url of a PDB model:", help=help, key="url")
-            if url:
-                with st.spinner(f'Downloading {url.strip()}'):
-                    remove_old_pdbs()
-                    pdb = get_file_from_url(url.strip())
-        
-        elif input_mode_model == 2: # "PDB ID":
-            help = None
-            label = "Input an PDB ID (for example: 4hhb):"
-            pdb_id_default = "5me2"
-            pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
-            pdb_id = pdb_id.lower()
-            if pdb_id:
-                pdb_url=get_pdb_url(pdb_id)
-                with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
-                    pdb = get_file_from_url(pdb_url)
-        
-        if pdb is None or not Path(pdb).exists():
-            st.warning(f"Failed to load the PDB model")
-            return
+            submit_button = st.form_submit_button(label='Run')
 
         #db input
         input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all proteins"}
