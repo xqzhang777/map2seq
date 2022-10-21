@@ -241,9 +241,6 @@ def assign_sequence(mapin         =   None,
 
 def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir=None, outdir=None, tophits=None, rev=0, flip=0):
 
-
-    print(fms_header)
-
 #    (parser, options) = parse_args()
 
 #    print( " ==> Command line: %s" % (" ".join(sys.argv)) )
@@ -288,12 +285,6 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir
 #        print
 #        return 1
     
-    print(mapin)
-    print(modelin)
-    print(db)
-    print(tmpdir)
-    print(outdir)
-    print(tophits)
     options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
 
 #    if options.modelin is None:
@@ -327,8 +318,7 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir
 #                         slide        =   options.slide,
 #                         debug        =   options.debug)
 #        return 0
-    print(options.seqin)
-    print(options.modelout)
+
     if options.seqin and options.modelout:
         assign_sequence( mapin        =   options.mapin,
                          mtzin        =   None,
