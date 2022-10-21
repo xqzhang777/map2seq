@@ -417,7 +417,14 @@ def plot_density_projection(mrc):
     ##mrc_fig=go.Figure(data=go.Volume(x=np.arange(0,nx*apix,apix),y=np.arange(0,ny*apix,apix),z=np.arange(0,nz*apix,apix),value=data,isomin=0.1,isomax=0.8,opacity=1,surface_count=200))
     #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
     #st.plotly_chart(mrc_fig,use_container_width=True)
-        
+
+@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
+def normalize(data, percentile=(0, 100)):
+    p0, p1 = percentile
+    vmin, vmax = sorted(np.percentile(data, (p0, p1)))
+    data2 = (data-vmin)/(vmax-vmin)
+    return data2
+       
 def remove_old_graph_log():
     dir = os.listdir(tmpdir)
     for item in dir:
