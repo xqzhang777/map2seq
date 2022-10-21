@@ -204,7 +204,16 @@ def guess(mapin         =   None,
             print( v[0], v[1] )
         sys.stdout = stdout
         print("Finished")
+    save_residue_score_dict(m2so.residue_scores_dicts,outdir)
 
+
+def save_residue_score_dict(score_dict,outdir):
+    import pandas as pd
+    import pickle  
+
+    df=pd.DataFrame.from_dict(score_dict,orient="index")
+    with open(f'{outdir}/score_dict.pkl','wb') as o:
+        pickle.dump(df,o,pickle.HIGHEST_PROTOCOL)
 # -----------------------------------------------------------------------------
 
 def assign_sequence(mapin         =   None,

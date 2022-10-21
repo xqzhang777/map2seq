@@ -1,3 +1,8 @@
+import sys
+import os
+import shutil
+from pathlib import Path
+
 def import_with_auto_install(packages, scope=locals()):
     if isinstance(packages, str): packages=[packages]
     for package in packages:
@@ -9,13 +14,12 @@ def import_with_auto_install(packages, scope=locals()):
             scope[package_import_name] = __import__(package_import_name)
         except ImportError:
             import subprocess
+            #if Path("/home/appuser").exists():
+            #    subprocess.call(f'/home/appuser/.conda/bin/pip install {package_pip_name}', shell=True)
+            #else:
             subprocess.call(f'pip install {package_pip_name}', shell=True)
             scope[package_import_name] =  __import__(package_import_name)
-            
-import sys
-import os
-import shutil
-from pathlib import Path
+
 
 if Path("/home/appuser").exists():
     # essential to avoid cctbx import errors
@@ -24,7 +28,7 @@ if Path("/home/appuser").exists():
         target.symlink_to("/home/appuser/.conda/share/cctbx")
 
     sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
-    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin" 
+    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
 
 import streamlit as st
 import numpy as np
@@ -33,8 +37,8 @@ from shutil import which
 import pickle
 import mrcfile
 from findmysequence_lib.findmysequence import fms_main
-from bokeh.plotting import ColumnDataSource, figure, output_file, save
-from bokeh.models import Label
+from bokeh.plotting import ColumnDataSource, figure, output_file, save,show
+from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, PrintfTickFormatter
 
 tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
@@ -52,7 +56,7 @@ def main():
     with st.expander(label="README", expanded=False):
             st.write("This is a Web App to help users to identify proteins that best explain a density map. The user will provide a density map (mrc or ccp4 map format) and a Cα model in pdb format. The user can also specify a database of protein sequences such as human proteins or all proteins for the search for the search. Currently, only the [findMySequence](https://journals.iucr.org/m/issues/2022/01/00/pw5018/) method is included although we plan to include additional methods in the future.  \nNOTE: the uploaded map/model files are **strictly confidential**. The developers of this app does not have access to the files")
 
-    col1, [col2] = st.sidebar, st.columns(1)
+    col1, [col2,col3] = st.sidebar, st.columns([1,0.5])
 
     mrc = None
     pdb = None
@@ -304,11 +308,123 @@ def main():
             with open(modelout,"r") as tmp:
                 out_texts="".join(tmp.readlines())
                 st.download_button("Download output model", data=out_texts, file_name=f"map2seq_model.pdb")
+     
+    with col2:
+        with open(os.path.join(f'{tmpdir}/score_dict.pkl'),'rb') as f:
+            score_dict_raw = pickle.load(f)
+            
+        score_dict_raw.index.name="Residue"
+        score_dict_raw.columns.name="AA"
+        res_list=list(score_dict_raw.index)
+        aa_list=list(score_dict_raw.columns)
+            
+        score_dict=pd.DataFrame(score_dict_raw.stack(),columns=["score"]).reset_index()
+        
+        colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+        mapper = LinearColorMapper(palette=colors, low=0, high=1)
+        
+        TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
+        
+        hm = figure(title="Predicted Scores",
+           x_range=res_list, y_range=aa_list,
+           x_axis_location="below", width=900, height=400,
+           tools=TOOLS, toolbar_location='above',
+           tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
+        
+        
+        hm.grid.grid_line_color = None
+        hm.axis.axis_line_color = None
+        hm.axis.major_tick_line_color = None
+        hm.axis.major_label_text_font_size = "7px"
+        hm.axis.major_label_standoff = 0
+        hm.xaxis.major_label_orientation = np.pi / 3
+        hm.rect(x="Residue", y="AA", width=1, height=1,
+           source=score_dict,
+           fill_color={'field': 'score','transform': mapper},
+           line_color=None)
+        
+        color_bar = ColorBar(color_mapper=mapper, major_label_text_font_size="7px",
+                     ticker=BasicTicker(desired_num_ticks=len(colors)),
+                     formatter=PrintfTickFormatter(format="%.1f"),
+                     label_standoff=6, border_line_color=None)
+        hm.add_layout(color_bar, 'right')
+        
+        hm
+        
+        st.download_button(
+            label=f"Download the score matrix",
+            data=score_dict.to_csv().encode('utf-8'),
+            file_name='score_matrix.csv',
+            mime='text/csv'
+        )
+    
+    with col3:
+        #st.markdown("PDB Model Overview")
+        #plot_pdb_model(pdb)
+        
+        st.markdown("MRC Density Projection Overview")
+        plot_density_projection(mrc)
 
     #remove_old_pdbs()
     #remove_old_maps()
     #remove_old_graph_log()
+
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#def plot_pdb_model(pdb):
+#    from stmol import showmol
+#    import py3Dmol
+#    with open(pdb) as f:
+#        s="".join([line for line in f])
+#    s_view=py3Dmol.view(data=s,width=400,height=300)
+#    s_view.setStyle({'cartoon':{'color':'spectrum'}})
+#    showmol(s_view)    
+
+@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+def plot_density_projection(mrc):
+    mrc_data = mrcfile.open(mrc, 'r+')
+    v_size=mrc_data.voxel_size
+    nx=mrc_data.header['nx']
+    ny=mrc_data.header['ny']
+    nz=mrc_data.header['nz']
+    apix=v_size['z']
     
+    data=mrc_data.data
+    ret = data.sum(axis=0)
+    ret=normalize(ret)
+    st.image(ret)
+
+    ret = data.sum(axis=1)
+    ret=normalize(ret)
+    st.image(ret)    
+
+    ret = data.sum(axis=2)
+    ret=normalize(ret)
+    st.image(ret)
+    
+    #mrc_data = mrcfile.open(mrc, 'r+')
+    #v_size=mrc_data.voxel_size
+    #nx=mrc_data.header['nx']
+    #ny=mrc_data.header['ny']
+    #nz=mrc_data.header['nz']
+    #apix=v_size['z']
+    
+    #data=mrc_data.data
+        
+    #X,Y,Z=np.mgrid[0:apix*nx:nx*1j,0:apix*ny:ny*1j,0:apix*nz:nz*1j]
+
+        
+    #import plotly.graph_objects as go
+    ##mrc_fig=go.Figure(data=go.Volume(x=np.arange(0,nx*apix,apix),y=np.arange(0,ny*apix,apix),z=np.arange(0,nz*apix,apix),value=data,isomin=0.1,isomax=0.8,opacity=1,surface_count=200))
+    #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
+    #st.plotly_chart(mrc_fig,use_container_width=True)
+
+@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
+def normalize(data, percentile=(0, 100)):
+    p0, p1 = percentile
+    vmin, vmax = sorted(np.percentile(data, (p0, p1)))
+    data2 = (data-vmin)/(vmax-vmin)
+    return data2
+       
 def remove_old_graph_log():
     dir = os.listdir(tmpdir)
     for item in dir:
