@@ -29,10 +29,6 @@ if Path("/home/appuser").exists():
 
     sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
     os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
-    
-    import subprocess 
-    subprocess.call(f'/home/appuser/.conda/bin/pip install stmol', shell=True)
-    scope["stmol"] =  __import__("stmol")
 
 import streamlit as st
 import numpy as np
@@ -363,8 +359,8 @@ def main():
         )
     
     with col3:
-        st.markdown("PDB Model Overview")
-        plot_pdb_model(pdb)
+        #st.markdown("PDB Model Overview")
+        #plot_pdb_model(pdb)
         
         st.markdown("MRC Density Projection Overview")
         plot_density_projection(mrc)
@@ -373,15 +369,15 @@ def main():
     #remove_old_maps()
     #remove_old_graph_log()
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
-def plot_pdb_model(pdb):
-    from stmol import showmol
-    import py3Dmol
-    with open(pdb) as f:
-        s="".join([line for line in f])
-    s_view=py3Dmol.view(data=s,width=400,height=300)
-    s_view.setStyle({'cartoon':{'color':'spectrum'}})
-    showmol(s_view)    
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#def plot_pdb_model(pdb):
+#    from stmol import showmol
+#    import py3Dmol
+#    with open(pdb) as f:
+#        s="".join([line for line in f])
+#    s_view=py3Dmol.view(data=s,width=400,height=300)
+#    s_view.setStyle({'cartoon':{'color':'spectrum'}})
+#    showmol(s_view)    
 
 @st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def plot_density_projection(mrc):
