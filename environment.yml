@@ -14,6 +14,3 @@ dependencies:
   - pyfastx
   - bokeh
   - pytorch
-  - pip
-  - pip:
-    - stmol

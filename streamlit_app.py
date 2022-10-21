@@ -28,7 +28,11 @@ if Path("/home/appuser").exists():
         target.symlink_to("/home/appuser/.conda/share/cctbx")
 
     sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
-    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin" 
+    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
+    
+    import subprocess 
+    subprocess.call(f'/home/appuser/.conda/bin/pip install stmol', shell=True)
+    scope["stmol"] =  __import__("stmol")
 
 import streamlit as st
 import numpy as np
