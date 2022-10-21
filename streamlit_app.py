@@ -14,13 +14,12 @@ def import_with_auto_install(packages, scope=locals()):
             scope[package_import_name] = __import__(package_import_name)
         except ImportError:
             import subprocess
-            if Path("/home/appuser").exists():
-                subprocess.call(f'/home/appuser/.conda/bin/pip install {package_pip_name}', shell=True)
-            else:
-                subprocess.call(f'pip install {package_pip_name}', shell=True)
+            #if Path("/home/appuser").exists():
+            #    subprocess.call(f'/home/appuser/.conda/bin/pip install {package_pip_name}', shell=True)
+            #else:
+            subprocess.call(f'pip install {package_pip_name}', shell=True)
             scope[package_import_name] =  __import__(package_import_name)
 
-import_with_auto_install(["stmol"])
 
 if Path("/home/appuser").exists():
     # essential to avoid cctbx import errors

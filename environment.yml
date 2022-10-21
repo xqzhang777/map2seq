@@ -15,3 +15,6 @@ dependencies:
   - bokeh
   - pytorch
   - py3Dmol
+  - pip
+  - pip:
+    - stmol
