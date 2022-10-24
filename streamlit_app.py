@@ -353,7 +353,7 @@ def main():
         
         st.download_button(
             label=f"Download the score matrix",
-            data=score_dict.to_csv().encode('utf-8'),
+            data=score_dict_raw.to_csv().encode('utf-8'),
             file_name='score_matrix.csv',
             mime='text/csv'
         )
