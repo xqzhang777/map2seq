@@ -339,7 +339,7 @@ def main():
            #x_range=res_list, y_range=aa_list,
            #x_axis_location="below", width=900, height=400,
            x_range=aa_list, y_range=res_list,
-           x_axis_location="above", width=900, height=len(res_list),
+           x_axis_location="above", width=900, height=len(res_list)*10,
            tools=TOOLS, toolbar_location='above',
            tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
         
