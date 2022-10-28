@@ -312,6 +312,13 @@ def main():
     with col2:
         with open(os.path.join(f'{tmpdir}/score_dict.pkl'),'rb') as f:
             score_dict_raw = pickle.load(f)
+        
+        st.download_button(
+            label=f"Download the score matrix",
+            data=score_dict_raw.to_csv().encode('utf-8'),
+            file_name='score_matrix.csv',
+            mime='text/csv'
+        )        
             
         score_dict_raw.index.name="Residue"
         score_dict_raw.columns.name="AA"
@@ -320,16 +327,18 @@ def main():
             
         score_dict=pd.DataFrame(score_dict_raw.stack(),columns=["score"]).reset_index()
         
+        
+        
         colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
         mapper = LinearColorMapper(palette=colors, low=0, high=1)
         
-        TOOLS = "hover,save,xwheel_pan,box_zoom,reset,wheel_zoom"
+        TOOLS = "hover,save,ywheel_pan,box_zoom,reset,wheel_zoom"
         
         hm = figure(title="Predicted Scores",
            #x_range=res_list, y_range=aa_list,
            #x_axis_location="below", width=900, height=400,
            x_range=aa_list, y_range=res_list,
-           x_axis_location="above",
+           x_axis_location="above", width=900, height=9000,
            tools=TOOLS, toolbar_location='above',
            tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
         
@@ -345,7 +354,7 @@ def main():
         #   fill_color={'field': 'score','transform': mapper},
         #   line_color=None)
         
-        hm.rect(x="AA", y="Residue", width=1, height=1,
+        hm.rect(x="AA", y="Residue",
            source=score_dict,
            fill_color={'field': 'score','transform': mapper},
            line_color=None)
@@ -358,12 +367,6 @@ def main():
         
         hm
         
-        st.download_button(
-            label=f"Download the score matrix",
-            data=score_dict_raw.to_csv().encode('utf-8'),
-            file_name='score_matrix.csv',
-            mime='text/csv'
-        )
     
     with col3:
         #st.markdown("PDB Model Overview")
