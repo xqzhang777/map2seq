@@ -4,7 +4,7 @@ channels:
   - bioconda
   - pytorch
 dependencies:
-  - python=3.9
+  - python=3.10
   - numpy
   - h5py
   - pandas
@@ -14,3 +14,8 @@ dependencies:
   - pyfastx
   - bokeh
   - pytorch
+  - mrcfile
+  - pip
+  - pip:
+    - stmol
+    - my3Dmol
