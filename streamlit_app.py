@@ -353,7 +353,7 @@ def main():
         
         st.download_button(
             label=f"Download the score matrix",
-            data=score_dict.to_csv().encode('utf-8'),
+            data=score_dict_raw.to_csv().encode('utf-8'),
             file_name='score_matrix.csv',
             mime='text/csv'
         )
@@ -379,7 +379,7 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def plot_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r+')
     v_size=mrc_data.voxel_size
