@@ -328,7 +328,7 @@ def main():
         hm = figure(title="Predicted Scores",
            x_range=res_list, y_range=aa_list,
            #x_axis_location="below", width=900, height=400,
-           x_axis_location="below",
+           x_axis_location="above",
            tools=TOOLS, toolbar_location='above',
            tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
         
