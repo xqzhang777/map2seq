@@ -326,8 +326,9 @@ def main():
         TOOLS = "hover,save,xwheel_pan,box_zoom,reset,wheel_zoom"
         
         hm = figure(title="Predicted Scores",
-           x_range=res_list, y_range=aa_list,
+           #x_range=res_list, y_range=aa_list,
            #x_axis_location="below", width=900, height=400,
+           x_range=aa_list, y_range=res_list,
            x_axis_location="above",
            tools=TOOLS, toolbar_location='above',
            tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
@@ -344,7 +345,7 @@ def main():
         #   fill_color={'field': 'score','transform': mapper},
         #   line_color=None)
         
-        hm.rect(x="Residue", y="AA", width=1, height=1,
+        hm.rect(x="AA", y="Residue", width=1, height=1,
            source=score_dict,
            fill_color={'field': 'score','transform': mapper},
            line_color=None)
