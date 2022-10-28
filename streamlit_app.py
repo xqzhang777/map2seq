@@ -323,6 +323,7 @@ def main():
         score_dict_raw.index.name="Residue"
         score_dict_raw.columns.name="AA"
         res_list=list(score_dict_raw.index)
+        res_list.reverse()
         aa_list=list(score_dict_raw.columns)
             
         score_dict=pd.DataFrame(score_dict_raw.stack(),columns=["score"]).reset_index()
@@ -337,7 +338,7 @@ def main():
         hm = figure(title="Predicted Scores",
            #x_range=res_list, y_range=aa_list,
            #x_axis_location="below", width=900, height=400,
-           x_range=aa_list, y_range=res_list.reverse(),
+           x_range=aa_list, y_range=res_list,
            x_axis_location="above", width=900, height=900,
            tools=TOOLS, toolbar_location='above',
            tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
