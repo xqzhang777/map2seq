@@ -323,7 +323,7 @@ def main():
         colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
         mapper = LinearColorMapper(palette=colors, low=0, high=1)
         
-        TOOLS = "hover,save,wheel_pan,box_zoom,reset,wheel_zoom"
+        TOOLS = "hover,save,ywheel_pan,box_zoom,reset,wheel_zoom"
         
         hm = figure(title="Predicted Scores",
            x_range=res_list, y_range=aa_list,
