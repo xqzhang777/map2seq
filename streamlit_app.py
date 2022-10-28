@@ -354,7 +354,7 @@ def main():
         #   fill_color={'field': 'score','transform': mapper},
         #   line_color=None)
         
-        hm.rect(x="AA", y="Residue",
+        hm.rect(x="AA", y="Residue", width=1, height=1,
            source=score_dict,
            fill_color={'field': 'score','transform': mapper},
            line_color=None)
