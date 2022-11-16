@@ -390,7 +390,7 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+##@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def plot_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r+')
     v_size=mrc_data.voxel_size
@@ -429,7 +429,7 @@ def plot_density_projection(mrc):
     #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
     #st.plotly_chart(mrc_fig,use_container_width=True)
 
-@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
+#@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
 def normalize(data, percentile=(0, 100)):
     p0, p1 = percentile
     vmin, vmax = sorted(np.percentile(data, (p0, p1)))
@@ -448,7 +448,7 @@ def remove_old_maps():
         if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz"):
             os.remove(os.path.join(tmpdir, item))
 
-@st.experimental_memo()
+#@st.experimental_memo()
 def number_of_sequences(db_fasta):
     import pyfastx
     fa = pyfastx.Fasta(db_fasta)
@@ -476,7 +476,7 @@ def get_direct_url(url):
     else:
         return url
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(None)
@@ -510,7 +510,7 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_emdb_ids():
     try:
         import_with_auto_install(["pandas"])
@@ -538,7 +538,7 @@ def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
 	return f"{server}/{protid}.pdb.gz"
 	
-@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
 def get_emdb_map(emdid):
     url = get_emdb_map_url(emdid)
     mapfile = get_file_from_url(url)
@@ -554,7 +554,7 @@ def remove_old_pdbs():
         if item.endswith(".pdb"):
             os.remove(os.path.join(tmpdir, item))
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
 def get_pdb_ids():
     try:
         url = "ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx"
@@ -601,7 +601,7 @@ def flip_map_model(map_name,pdb_name):
             o.write(line)
 
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
 
     map = os.path.abspath(map)
@@ -680,7 +680,7 @@ def parse_file(outputFile, filepath):
     return 1
 
 
-@st.cache(persist=True, show_spinner=False)
+#@st.cache(persist=True, show_spinner=False)
 def setup_anonymous_usage_report():
     try:
         import pathlib, stat
