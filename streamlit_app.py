@@ -37,6 +37,7 @@ from shutil import which
 import pickle
 import mrcfile
 from findmysequence_lib.findmysequence import fms_main
+import bokeh
 from bokeh.plotting import ColumnDataSource, figure, output_file, save,show
 from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, PrintfTickFormatter
 
@@ -49,6 +50,7 @@ def main():
     title = "map2seq: identification of proteins from density map"
     st.set_page_config(page_title=title, layout="wide")
     st.title(title)
+    st.write(bokeh.__version__)
 
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
@@ -390,7 +392,7 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-##@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def plot_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r+')
     v_size=mrc_data.voxel_size
@@ -429,7 +431,7 @@ def plot_density_projection(mrc):
     #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
     #st.plotly_chart(mrc_fig,use_container_width=True)
 
-#@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
+@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
 def normalize(data, percentile=(0, 100)):
     p0, p1 = percentile
     vmin, vmax = sorted(np.percentile(data, (p0, p1)))
@@ -448,7 +450,7 @@ def remove_old_maps():
         if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz"):
             os.remove(os.path.join(tmpdir, item))
 
-#@st.experimental_memo()
+@st.experimental_memo()
 def number_of_sequences(db_fasta):
     import pyfastx
     fa = pyfastx.Fasta(db_fasta)
@@ -476,7 +478,7 @@ def get_direct_url(url):
     else:
         return url
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(None)
@@ -510,7 +512,7 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_emdb_ids():
     try:
         import_with_auto_install(["pandas"])
@@ -538,7 +540,7 @@ def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
 	return f"{server}/{protid}.pdb.gz"
 	
-#@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
 def get_emdb_map(emdid):
     url = get_emdb_map_url(emdid)
     mapfile = get_file_from_url(url)
@@ -554,7 +556,7 @@ def remove_old_pdbs():
         if item.endswith(".pdb"):
             os.remove(os.path.join(tmpdir, item))
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
 def get_pdb_ids():
     try:
         url = "ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx"
@@ -601,7 +603,7 @@ def flip_map_model(map_name,pdb_name):
             o.write(line)
 
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
 
     map = os.path.abspath(map)
@@ -630,21 +632,21 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
         
 def make_graph(ids, e_vals, outputFile):
     
-    output_file('{}.html'.format(outputFile))
+    #output_file('{}.html'.format(outputFile))
 
-    source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
-    top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
-    label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+    #source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
+    #top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
+    #label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
   
-    TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+    #TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
    
-    p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
-    p.circle('x','y',source=source)
-    p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
-    p.yaxis.axis_label = 'E-values'
-    p.xaxis.axis_label = 'Rank Order'
-    p.y_range.flipped = True
-    p.add_layout(label)
+    #p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
+    #p.circle('x','y',source=source)
+    #p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+    #p.yaxis.axis_label = 'E-values'
+    #p.xaxis.axis_label = 'Rank Order'
+    #p.y_range.flipped = True
+    #p.add_layout(label)
     
     #save(p)
     
@@ -680,7 +682,7 @@ def parse_file(outputFile, filepath):
     return 1
 
 
-#@st.cache(persist=True, show_spinner=False)
+@st.cache(persist=True, show_spinner=False)
 def setup_anonymous_usage_report():
     try:
         import pathlib, stat
