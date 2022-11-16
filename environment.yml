@@ -12,5 +12,5 @@ dependencies:
   - cctbx-base
   - hmmer
   - pyfastx
-  - bokeh
+  - bokeh=2.4.3
   - pytorch
