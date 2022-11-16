@@ -13,3 +13,4 @@ dependencies:
   - hmmer
   - pyfastx
   - bokeh
+  - pytorch
