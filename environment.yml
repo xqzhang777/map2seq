@@ -5,12 +5,12 @@ channels:
   - pytorch
 dependencies:
   - python=3.9
-  - numpy
+  - numpy=1.22.3
   - h5py
-  - pandas
-  - scipy
-  - cctbx-base
+  - pandas=1.4.4
+  - scipy=1.8.0
+  - cctbx-base=2022.4
   - hmmer
   - pyfastx
   - bokeh=2.4.3
-  - pytorch
+  - pytorch=1.11.0
