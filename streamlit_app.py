@@ -37,7 +37,6 @@ from shutil import which
 import pickle
 import mrcfile
 from findmysequence_lib.findmysequence import fms_main
-import bokeh
 from bokeh.plotting import ColumnDataSource, figure, output_file, save,show
 from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, PrintfTickFormatter
 
@@ -50,7 +49,6 @@ def main():
     title = "map2seq: identification of proteins from density map"
     st.set_page_config(page_title=title, layout="wide")
     st.title(title)
-    st.write(bokeh.__version__)
 
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
