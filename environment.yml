@@ -6,7 +6,6 @@ channels:
 dependencies:
   - python=3.9
   - numpy=1.22.3
-  - h5py
   - pandas=1.4.4
   - scipy=1.8.0
   - cctbx-base=2022.4
