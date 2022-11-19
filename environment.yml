@@ -1,6 +1,5 @@
 name: map2seq
 channels:
-  - conda-forge
   - bioconda
   - pytorch
 dependencies:
