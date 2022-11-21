@@ -4,9 +4,9 @@ channels:
   - pytorch
 dependencies:
   - python=3.9
-  - numpy=1.22.3
-  - pandas=1.4.4
+  - numpy
+  - pandas
   - hmmer
   - pyfastx
   - bokeh=2.4.3
-  - pytorch=1.11.0
+  - pytorch
