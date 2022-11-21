@@ -8,5 +8,5 @@ dependencies:
   - pandas
   - hmmer
   - pyfastx
-  - bokeh=2.4.3
+  - bokeh
   - pytorch
