@@ -4,6 +4,6 @@
 
 NOTE: the uploaded map/model files are **strictly confidential**. The developers of this app does not have access to the files
 
-[Click me](https://jianglab-map2seq-streamlit-app-4mcw55.streamlitapp.com/) to identify the protein in your density map!
+[Click me](https://map2seq.streamlit.app) to identify the protein in your density map!
 
-<a href="https://jianglab-map2seq-streamlit-app-4mcw55.streamlitapp.com"><img src="./map2seq.jpg" style='width: 100%; object-fit: contain'></a>
+<a href="https://map2seq.streamlit.app"><img src="./map2seq.jpg" style='width: 100%; object-fit: contain'></a>
