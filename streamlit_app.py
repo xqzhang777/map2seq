@@ -312,22 +312,34 @@ def main():
     with col2:
         with open(os.path.join(f'{tmpdir}/score_dict.pkl'),'rb') as f:
             score_dict_raw = pickle.load(f)
+        
+        st.download_button(
+            label=f"Download the score matrix",
+            data=score_dict_raw.to_csv().encode('utf-8'),
+            file_name='score_matrix.csv',
+            mime='text/csv'
+        )        
             
         score_dict_raw.index.name="Residue"
         score_dict_raw.columns.name="AA"
         res_list=list(score_dict_raw.index)
+        res_list.reverse()
         aa_list=list(score_dict_raw.columns)
             
         score_dict=pd.DataFrame(score_dict_raw.stack(),columns=["score"]).reset_index()
         
+        
+        
         colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
         mapper = LinearColorMapper(palette=colors, low=0, high=1)
         
-        TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
+        TOOLS = "hover,save,ywheel_pan,box_zoom,reset,wheel_zoom"
         
         hm = figure(title="Predicted Scores",
-           x_range=res_list, y_range=aa_list,
-           x_axis_location="below", width=900, height=400,
+           #x_range=res_list, y_range=aa_list,
+           #x_axis_location="below", width=900, height=400,
+           x_range=aa_list, y_range=res_list,
+           x_axis_location="above", width=900, height=len(res_list)*10,
            tools=TOOLS, toolbar_location='above',
            tooltips=[('Residue Position', '@Residue'), ('AA', '@AA'), ('Score','@score')])
         
@@ -338,7 +350,12 @@ def main():
         hm.axis.major_label_text_font_size = "7px"
         hm.axis.major_label_standoff = 0
         hm.xaxis.major_label_orientation = np.pi / 3
-        hm.rect(x="Residue", y="AA", width=1, height=1,
+        #hm.rect(x="Residue", y="AA", width=1, height=1,
+        #   source=score_dict,
+        #   fill_color={'field': 'score','transform': mapper},
+        #   line_color=None)
+        
+        hm.rect(x="AA", y="Residue", width=1, height=1,
            source=score_dict,
            fill_color={'field': 'score','transform': mapper},
            line_color=None)
@@ -351,12 +368,6 @@ def main():
         
         hm
         
-        st.download_button(
-            label=f"Download the score matrix",
-            data=score_dict_raw.to_csv().encode('utf-8'),
-            file_name='score_matrix.csv',
-            mime='text/csv'
-        )
     
     with col3:
         #st.markdown("PDB Model Overview")
@@ -619,21 +630,21 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
         
 def make_graph(ids, e_vals, outputFile):
     
-    output_file('{}.html'.format(outputFile))
+    #output_file('{}.html'.format(outputFile))
 
-    source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
-    top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
-    label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
+    #source = ColumnDataSource(data=dict(x=range(len(ids)),y=e_vals,ID=ids))
+    #top_source = ColumnDataSource(data=dict(x=[0],y=[e_vals[0]],ID=[ids[0]]))
+    #label = Label(x=0, y=e_vals[0], text='Best Match', x_offset=10, y_offset=-5, render_mode='canvas')
   
-    TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
+    #TOOLTIPS = [('index','$index'),('ID','@ID'),('E-val','@y')]
    
-    p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
-    p.circle('x','y',source=source)
-    p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
-    p.yaxis.axis_label = 'E-values'
-    p.xaxis.axis_label = 'Rank Order'
-    p.y_range.flipped = True
-    p.add_layout(label)
+    #p = figure(width=400,height=400,tooltips=TOOLTIPS,y_axis_type='log', title='Ranked Sequences')
+    #p.circle('x','y',source=source)
+    #p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+    #p.yaxis.axis_label = 'E-values'
+    #p.xaxis.axis_label = 'Rank Order'
+    #p.y_range.flipped = True
+    #p.add_layout(label)
     
     #save(p)
     
