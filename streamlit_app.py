@@ -476,7 +476,7 @@ def get_direct_url(url):
     else:
         return url
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(None)
@@ -538,7 +538,7 @@ def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
 	return f"{server}/{protid}.pdb.gz"
 	
-@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
+#@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
 def get_emdb_map(emdid):
     url = get_emdb_map_url(emdid)
     mapfile = get_file_from_url(url)
