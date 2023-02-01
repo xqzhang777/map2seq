@@ -1,16 +1,16 @@
 name: map2seq
 channels:
+  - defaults
   - conda-forge
   - bioconda
-  - pytorch
 dependencies:
-  - python=3.9
-  - numpy
-  - h5py
-  - pandas
-  - scipy
-  - cctbx-base
-  - hmmer
-  - pyfastx
+  - python=3.9.13
+  - numpy=1.23.3
+  - scipy=1.9.1
   - bokeh=2.4.3
-  - pytorch
+  - pandas=1.5.0
+  - h5py=3.7.0
+  - hmmer=3.3.2
+  - pytorch=1.12.1
+  - pyfastx=0.8.4
+  - cctbx-base=2022.8
