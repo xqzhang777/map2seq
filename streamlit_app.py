@@ -42,7 +42,7 @@ except ImportError:
     with ds.open(url_final) as fp:
         filename_final = fp.name
     filepath_final = Path(filename_final).resolve()
-    out_path=Path("/home/appuser/venv/lib/python3.9/site-packages/cctbx/")
+    out_path=Path("/home/appuser/venv/")
     dctx=zstandard.ZstdDecompressor()
     with tempfile.TemporaryFile(suffix=".tar") as ofh:
         with filepath_final.open("rb") as ifh:
