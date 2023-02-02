@@ -54,10 +54,11 @@ def main():
     try:
         emd_id_default = st.session_state.emd_id
         pdb_id_default = st.session_state.pdb_id
+        db_default = st.session_state.input_mode_db
     except:
         import random
-        map_model_pairs = [("emd-3488", "5NI1"), ("emd-10499", "6TGN")]
-        emd_id_default, pdb_id_default = random.choice(map_model_pairs)
+        map_model_db = [("emd-3488", "5NI1", 2), ("emd-10499", "6TGN", 3)]
+        emd_id_default, pdb_id_default, db_default = random.choice(map_model_db)
 
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
@@ -202,7 +203,7 @@ def main():
         #db input
         input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all proteins"}
         help_db = "The input sequence database (.fa, .fa.gz, .fasta, or .fasta.gz)"
-        input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=2, horizontal=True, help=help_db, key="input_mode_db")
+        input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=db_default, horizontal=True, help=help_db, key="input_mode_db")
         
         db = None
         info = "Searching {n:,d} protein sequences"
