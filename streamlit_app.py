@@ -2,6 +2,7 @@ import sys
 import os
 import shutil
 from pathlib import Path
+import streamlit as st
 
 def import_with_auto_install(packages, scope=locals()):
     if isinstance(packages, str): packages=[packages]
@@ -33,10 +34,11 @@ except ImportError:
     import tarfile
     import numpy as np
     
+    st.info("downloading cctbx")
     url_final = "https://drive.google.com/uc?export=download&id=1WlSncOnzfoeYzUe2IQfg0ENrdmMQVWAg"
     ds = np.DataSource(tmpdir)
     if not ds.exists(url_final):
-        print("download error")
+        st.info("download error")
     with ds.open(url_final) as fp:
         filename_final = fp.name
     filepath_final = Path(filename_final).resolve()
@@ -48,7 +50,8 @@ except ImportError:
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(out_path)
-    
+
+st.info(list(Path("/home/appuser/venv/").rglob("*tbx*")))
 import cctbx
 
 
