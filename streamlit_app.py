@@ -21,14 +21,45 @@ def import_with_auto_install(packages, scope=locals()):
             scope[package_import_name] =  __import__(package_import_name)
 
 
-if Path("/home/appuser").exists():
-    # essential to avoid cctbx import errors
-    target = Path("/home/appuser/venv/share/cctbx")
-    if not target.exists():
-        target.symlink_to("/home/appuser/.conda/share/cctbx")
+tmpdir = "map2seq_out"
+if not os.path.isdir(tmpdir):
+    os.mkdir(tmpdir)
 
-    sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
-    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
+try:
+    import cctbx
+except ImportError:
+    import zstandard
+    import tempfile
+    import tarfile
+    import numpy as np
+    
+    url_final = "https://drive.google.com/uc?export=download&id=1WlSncOnzfoeYzUe2IQfg0ENrdmMQVWAg"
+    ds = np.DataSource(tmpdir)
+    if not ds.exists(url_final):
+        print("download error")
+    with ds.open(url_final) as fp:
+        filename_final = fp.name
+    filepath_final = Path(filename_final).resolve()
+    out_path=Path("/home/appuser/venv/")
+    dctx=zstandard.ZstdDecompressor()
+    with tempfile.TemporaryFile(suffix=".tar") as ofh:
+        with filepath_final.open("rb") as ifh:
+            dctx.copy_stream(ifh,ofh)
+        ofh.seek(0)
+        with tarfile.open(fileobj=ofh) as z:
+            z.extractall(out_path)
+    
+import cctbx
+
+
+#if Path("/home/appuser").exists():
+#    # essential to avoid cctbx import errors
+#    target = Path("/home/appuser/venv/share/cctbx")
+#    if not target.exists():
+#        target.symlink_to("/home/appuser/.conda/share/cctbx")
+#
+#    sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
+#    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
 
 import streamlit as st
 import numpy as np
@@ -39,10 +70,6 @@ import mrcfile
 from findmysequence_lib.findmysequence import fms_main
 from bokeh.plotting import ColumnDataSource, figure, output_file, save,show
 from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, PrintfTickFormatter
-
-tmpdir = "map2seq_out"
-if not os.path.isdir(tmpdir):
-    os.mkdir(tmpdir)
 
 
 def main():
