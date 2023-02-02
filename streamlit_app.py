@@ -57,7 +57,7 @@ def main():
         db_default = st.session_state.input_mode_db
     except:
         import random
-        map_model_db = [("emd-3488", "5NI1", 2), ("emd-10499", "6TGN", 3)]
+        map_model_db = [("emd-23871", "7mkf", 2), ("emd-10499", "6TGN", 3), ("emd-3488", "5NI1", 2)]
         emd_id_default, pdb_id_default, db_default = random.choice(map_model_db)
 
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
@@ -292,29 +292,35 @@ def main():
         df = pd.DataFrame({"E-val (log10)":np.log10(ys).T, "Protein":np.array(xs).T})
         df.index += 1
               
-        n = 10
-        st.markdown(f"**Top {n} matches:**")
-        df_top = df.iloc[:n, :].copy()
         def link_to_uniprot(s):
             pid = s.split('|')[1]
             url = f"https://www.uniprot.org/uniprotkb/{pid}"
-            return f'<a target="_blank" href="{url}">{pid}</a>'            
-        df_top.loc[:, "Link"] = df_top.loc[:, "Protein"].apply(link_to_uniprot)
-        df_top.loc[:, "Protein"] = df_top.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
-        df_top.reset_index(inplace=True)
-        df_top = df_top.rename(columns = {'index':'Rank'})
-        st.write(df_top.to_html(escape=False, index=False, justify="left"), unsafe_allow_html=True)
-
-        def link_to_uniprot_2(s):
-            pid = s.split('|')[1]
-            url = f"https://www.uniprot.org/uniprotkb/{pid}"
-            return url
+            return f'<a href="{url}">{pid}</a>'            
         df.loc[:, "Uniprot ID"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, 1]
-        df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot_2)
+        df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot)
         df.loc[:, "Protein"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
+        df.reset_index(inplace=True)
+        df = df.rename(columns = {'index':'Rank'})
+
+        n = 10
+        score_threshold = -2    # https://hmmer-web-docs.readthedocs.io/en/latest/searches.html
+        df_top = df.iloc[:n, [0, 1, 2, 4]].copy()
+        has_bad_scores = df_top.iloc[:, 1].astype(float).max()>score_threshold
+        def highlight_bad_score_rows(x, score_threshold=score_threshold):
+            if x[1] > score_threshold:
+                return ['background-color: red']*4
+            else:
+                return ['background-color: white']*4 
+        df_top_style = df_top.style.apply(highlight_bad_score_rows, axis=1)
+        df_top_style.hide_index()
+        st.markdown(f"**Top {n} matches:**")
+        st.write(df_top_style.to_html(escape=False, index=False, justify="left"), unsafe_allow_html=True)
+        if has_bad_scores:
+            st.markdown(":red[*Those in red rows are probably not positive hits*]")
+
         st.download_button(
-            label=f"Download the scores for {len(df):,d} proteins",
-            data=df.to_csv().encode('utf-8'),
+            label=f"Download the scores for {len(df):,} proteins",
+            data=df.to_csv(index=False).encode('utf-8'),
             file_name='map2seq_results.csv',
             mime='text/csv'
         )
