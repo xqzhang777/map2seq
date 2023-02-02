@@ -14,3 +14,4 @@ dependencies:
   - pytorch=1.12.1
   - pyfastx=0.8.4
   - cctbx-base=2022.8
+  - streamlit=1.17.0

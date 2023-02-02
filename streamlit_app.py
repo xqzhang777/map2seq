@@ -50,6 +50,16 @@ def main():
     st.set_page_config(page_title=title, layout="wide")
     st.title(title)
 
+    is_initial_run = "input_mode_map" not in st.session_state
+    try:
+        emd_id_default = st.session_state.emd_id
+        pdb_id_default = st.session_state.pdb_id
+        db_default = st.session_state.input_mode_db
+    except:
+        import random
+        map_model_db = [("emd-23871", "7mkf", 2), ("emd-10499", "6TGN", 3), ("emd-3488", "5NI1", 2)]
+        emd_id_default, pdb_id_default, db_default = random.choice(map_model_db)
+
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
 
@@ -63,164 +73,189 @@ def main():
 
     with col1:
 
-        with st.form(key='input_mrc_pdb'):
-            mrc = None
-            input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
-            help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
-            input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
-            emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
-            if input_mode_map == 0: # "upload a MRC file":
-                    label = "Upload a map in MRC or CCP4 format"
-                    help = None
-                    fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="file_upload")
-                    if fileobj is not None:
-                        remove_old_maps()
-                        emd_id = extract_emd_id(fileobj.name)
-                        is_emd = emd_id is not None
-                        with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
-                            f.write(fileobj.getbuffer())
-                        mrc = tmpdir + "/" + fileobj.name
-            elif input_mode_map == 1: # "url":
-                url_default = "https://ftp.wwpdb.org/pub/emdb/structures/EMD-10499/map/emd_10499.map.gz"
-                help = "An online url (http:// or ftp://) or a local file path (/path/to/your/structure.mrc)"
-                url = st.text_input(label="Input the url of a 3D map:", value=url_default, help=help, key="url")
-                emd_id = extract_emd_id(url)
-                is_emd = emd_id is not None and emd_id
-                with st.spinner(f'Downloading {url.strip()}'):
-                    mrc = get_file_from_url(url.strip())
-            elif input_mode_map == 2: # "emdb": randomly selects form emdb_ids_all not emdb_ids_helical anymore
-                if not emdb_ids_all:
-                    st.warning("failed to obtained a list of helical structures in EMDB")
-                    return
-                url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
-                st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
-                emd_id_default = "emd-3488"
-                do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
-                if do_random_embid:
-                    help = "Randomly select another helical structure in EMDB"
-                    button_clicked = st.button(label="Change EMDB ID", help=help)
-                    if button_clicked:
-                        import random
-                        st.session_state.emd_id = 'emd-' + random.choice(emdb_ids_all)
-                else:
-                    help = None
-                    label = "Input an EMDB ID (emd-xxxxx):"
-                    emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
-                    emd_id = emd_id.lower().split("emd-")[-1]
-                    if emd_id not in emdb_ids_all:
-                        import random
-                        msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
-                        st.warning(msg)
-                        return
-                if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
-                else: emd_id = emd_id_default
-                emd_id = emd_id.lower().split("emd-")[-1]
-                with st.spinner(f'Downloading EMD-{emd_id} from {get_emdb_map_url(emd_id)}'):
-                    filepath = get_emdb_map(emd_id)
-                    mrc = filepath
-                if mrc is None:
-                    st.warning(f"Failed to download [EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id})")
-                    return
-
-            if mrc is None or not Path(mrc).exists():
-                st.warning(f"Failed to load density map")
-                return
-
-            st.markdown("""---""")
-    
-            #pdb input
-            input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
-            help_model = "The input PDB model should have all backbone atoms (Cα,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
-            input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, horizontal=True, help=help_model, key="input_mode_model")
-            pdb = None
-
-            if input_mode_model == 0: # "upload a PDB file":
-                label = "Upload a PDB file"
-                fileobj = st.file_uploader(label, type=['pdb'], help=None, key="file_upload")
-                if fileobj is not None:
-                    remove_old_pdbs()
-                    with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
-                        f.write(fileobj.getbuffer())
-                    pdb = tmpdir + "/" + fileobj.name
-            
-            elif input_mode_model == 1: # "url":
-                help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
-                url = st.text_input(label="Input the url of a PDB model:", help=help, key="url")
-                if url:
-                    with st.spinner(f'Downloading {url.strip()}'):
-                        remove_old_pdbs()
-                        pdb = get_file_from_url(url.strip())
-            
-            elif input_mode_model == 2: # "PDB ID":
-                help = None
-                label = "Input an PDB ID (for example: 4hhb):"
-                pdb_id_default = "5me2"
-                pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
-                pdb_id = pdb_id.lower()
-                if pdb_id:
-                    pdb_url=get_pdb_url(pdb_id)
-                    with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
-                        pdb = get_file_from_url(pdb_url)
-            
-            if pdb is None or not Path(pdb).exists():
-                st.warning(f"Failed to load the PDB model")
-                return
-
-            st.markdown("""---""")
-
-            #db input
-            input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all proteins"}
-            help_db = "The input sequence database (.fa, .fa.gz, .fasta, or .fasta.gz)"
-            input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=2, horizontal=True, help=help_db, key="input_mode_db")
-            
-            db = None
-            info = "Searching {n:,d} protein sequences"
-
-            if input_mode_db == 0: # "upload":
-                label = "Upload a fasta file (.fa, .fa.gz, .fasta, .fasta.gz)"
-                fileobj = st.file_uploader(label, type=['fa', 'fasta', 'fa.gz', 'fasta.gz'], help=None, key="file_upload")
-                if fileobj is None: return
-
-                #remove_old_db()
+        mrc = None
+        input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
+        help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
+        input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
+        if input_mode_map == 0: # "upload a MRC file":
+            label = "Upload a map in MRC or CCP4 format"
+            help = None
+            fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="upload_map")
+            if fileobj is not None:
+                emd_id = extract_emd_id(fileobj.name)
+                is_emd = emd_id is not None
                 with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                     f.write(fileobj.getbuffer())
-                db = tmpdir + "/" + fileobj.name
+                mrc = tmpdir + "/" + fileobj.name
             else:
-                if input_mode_db == 1: # "url":
-                    help = "An online url (http:// or ftp://) or a local file path (/path/to/your/database.fa.gz)"
-                    url = st.text_input(label="Input the url of a sequence database (.fa, .fa.gz, .fasta, .fasta.gz):", help=help, key="url")
-                    if len(url)<1: return
-                elif input_mode_db == 2: # "human proteins":
-                    url = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
-                    info = "Searching [{n:,d} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
-                elif input_mode_db == 3: # "all proteins"
-                    url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
-                    info = "Searching [{n:,d} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
-                with st.spinner(f'Downloading {url.strip()}'):
-                    #remove_old_db()
-                    db = get_file_from_url(url.strip())
-            
-            if db is None or not Path(db).exists():
-                st.warning(f"Failed to load the protein sequence database")
-                return      
-            
-            info = info.format(n=number_of_sequences(db))
-            st.markdown(info)
+                return
+        elif input_mode_map == 1: # "url":
+            url_default = get_emdb_map_url(emd_id_default)
+            help = "An online url (http:// or ftp://) or a local file path (/path/to/your/structure.mrc)"
+            url = st.text_input(label="Input the url of a 3D map:", value=url_default, help=help, key="url_map").strip()
+            if not url: return
+            emd_id = extract_emd_id(url)
+            is_emd = emd_id is not None and emd_id
+            with st.spinner(f'Downloading {url}'):
+                mrc = get_file_from_url(url)
+            if mrc is None:
+                st.warning(f"Failed to download [{url}]({url})")
+                return
+        elif input_mode_map == 2: # "emdb": randomly selects form emdb_ids_all
+            with st.spinner(f'Downloading the list of all EMDB entries'):
+                emdb_ids_all, resolutions = get_emdb_ids()
+            if not emdb_ids_all:
+                st.warning("failed to obtained a list of structures in EMDB")
+                return
+            url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=10&sort=release_date%20desc"
+            st.markdown(f'[All {len(emdb_ids_all):,} structures in EMDB]({url})')
+            do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
+            if do_random_embid:
+                help = "Randomly select another structure in EMDB"
+                button_clicked = st.button(label="Change EMDB ID", help=help)
+                if button_clicked:
+                    import random
+                    st.session_state.emd_id = 'emd-' + random.choice(emdb_ids_all)
+            else:
+                help = None
+                label = "Input an EMDB ID (emd-xxxxx):"
+                emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
+                if not emd_id: return
+                emd_id = emd_id.lower().split("emd-")[-1]
+                if emd_id not in emdb_ids_all:
+                    import random
+                    msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_all)}')"
+                    st.warning(msg)
+                    return
+            if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
+            else: emd_id = emd_id_default
+            emd_id = emd_id.lower().split("emd-")[-1]
+            url = get_emdb_map_url(emd_id)
+            with st.spinner(f'Downloading EMD-{emd_id} from {url}'):
+                mrc = get_file_from_url(url)
+            if mrc is None:
+                st.warning(f"Failed to download [EMD-{emd_id}]({url})")
+                return
+            resolution = resolutions[emdb_ids_all.index(emd_id)]
+            msg = f'[EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id}) | resolution={resolution}Å'
+            st.markdown(msg)
 
-            direction_options = {0:"original", 1:"reversed"}
-            help_direction=None
-            direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, horizontal=True, help=help_direction, key="direction_option")
-            
-            handedness_options = {0:"original", 1:"flipped"}
-            help_handedness=None
-            handedness_option = st.radio(label="Map handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, horizontal=True, help=help_handedness, key="handedness_option")
+        if mrc is None or not Path(mrc).exists():
+            st.warning(f"Failed to load density map")
+            return
+
+        st.markdown("""---""")
+
+        #pdb input
+        input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
+        help_model = "The input PDB model should have all backbone atoms (Cα,N,C) of each residue. Sidechain atoms are not required, resiudes can be labeled as any amino acids."
+        input_mode_model = st.radio(label="How to obtain the input PDB file:", options=list(input_modes_model.keys()), format_func=lambda i:input_modes_model[i], index=2, horizontal=True, help=help_model, key="input_mode_model")
+        pdb = None
+
+        if input_mode_model == 0: # "upload a PDB file":
+            label = "Upload a PDB file"
+            fileobj = st.file_uploader(label, type=['pdb'], help=None, key="upload_model")
+            if fileobj is not None:
+                remove_old_pdbs()
+                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+                    f.write(fileobj.getbuffer())
+                pdb = tmpdir + "/" + fileobj.name
+            else:
+                return
         
-            submit_button = st.form_submit_button(label='Run')
+        elif input_mode_model == 1: # "url":
+            help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
+            url_default = get_pdb_url(pdb_id_default)
+            url = st.text_input(label="Input the url of a PDB model:", value=url_default, help=help, key="url_model").strip()
+            if url:
+                with st.spinner(f'Downloading {url}'):
+                    remove_old_pdbs()
+                    pdb = get_file_from_url(url)
+                    if pdb is None:
+                        st.warning(f"Failed to download [{url}]({url})")
+                        return
+            else:
+                return
+        
+        elif input_mode_model == 2: # "PDB ID":
+            help = None
+            label = "Input an PDB ID (for example: 4hhb):"
+            pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
+            pdb_id = pdb_id.upper()
+            if pdb_id:
+                pdb_url=get_pdb_url(pdb_id)
+                with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
+                    pdb = get_file_from_url(pdb_url)
+                if pdb is None:
+                    st.warning(f"Failed to download [PDB: {pdb_id}]({pdb_url})")
+                    return
+                msg = f'[PDB-{pdb_id}](https://www.rcsb.org/structure/{pdb_id})'
+                st.markdown(msg)
+            else:
+                return
 
+        if pdb is None or not Path(pdb).exists():
+            st.warning(f"Failed to load the PDB model")
+            return
+
+        st.markdown("""---""")
+
+        #db input
+        input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all proteins"}
+        help_db = "The input sequence database (.fa, .fa.gz, .fasta, or .fasta.gz)"
+        input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=db_default, horizontal=True, help=help_db, key="input_mode_db")
+        
+        db = None
+        info = "Searching {n:,} protein sequences"
+
+        if input_mode_db == 0: # "upload":
+            label = "Upload a fasta file (.fa, .fa.gz, .fasta, .fasta.gz)"
+            if fileobj is None: return
+            fileobj = st.file_uploader(label, type=['fa', 'fasta', 'fa.gz', 'fasta.gz'], help=None, key="upload_db")
+
+            #remove_old_db()
+            with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+                f.write(fileobj.getbuffer())
+            db = tmpdir + "/" + fileobj.name
+        else:
+            if input_mode_db == 1: # "url":
+                help = "An online url (http:// or ftp://) or a local file path (/path/to/your/database.fa.gz)"
+                url = st.text_input(label="Input the url of a sequence database (.fa, .fa.gz, .fasta, .fasta.gz):", help=help, key="url_db")
+                if len(url)<1: return
+            elif input_mode_db == 2: # "human proteins":
+                url = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
+                info = "Searching [{n:,} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
+            elif input_mode_db == 3: # "all proteins"
+                url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
+                info = "Searching [{n:,} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
+            with st.spinner(f'Downloading {url.strip()}'):
+                #remove_old_db()
+                db = get_file_from_url(url.strip())
+        
+        if db is None or not Path(db).exists():
+            st.warning(f"Failed to load the protein sequence database")
+            return      
+        
+        info = info.format(n=number_of_sequences(db))
+        st.markdown(info)
+
+        direction_options = {0:"original", 1:"reversed"}
+        help_direction=None
+        direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, horizontal=True, help=help_direction, key="direction_option")
+        
+        handedness_options = {0:"original", 1:"flipped"}
+        help_handedness=None
+        handedness_option = st.radio(label="Map handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, horizontal=True, help=help_handedness, key="handedness_option")
+        
         if handedness_option in [1]: # flipped
-            flip_map_model(mrc, pdb)    
+            flip_map_model(mrc, pdb)
+
+        st.markdown("""---""")
+        run_button_clicked = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
+
+    if not (is_initial_run or run_button_clicked or st.session_state.get("align_top_hit", False)): return
 
     with col2:
         with st.spinner(info.format(n=number_of_sequences(db))):
@@ -257,36 +292,42 @@ def main():
         df = pd.DataFrame({"E-val (log10)":np.log10(ys).T, "Protein":np.array(xs).T})
         df.index += 1
               
-        n = 10
-        st.markdown(f"**Top {n} matches:**")
-        df_top = df.iloc[:n, :].copy()
         def link_to_uniprot(s):
             pid = s.split('|')[1]
             url = f"https://www.uniprot.org/uniprotkb/{pid}"
-            return f'<a target="_blank" href="{url}">{pid}</a>'            
-        df_top.loc[:, "Link"] = df_top.loc[:, "Protein"].apply(link_to_uniprot)
-        df_top.loc[:, "Protein"] = df_top.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
-        df_top.reset_index(inplace=True)
-        df_top = df_top.rename(columns = {'index':'Rank'})
-        st.write(df_top.to_html(escape=False, index=False, justify="left"), unsafe_allow_html=True)
-
-        def link_to_uniprot_2(s):
-            pid = s.split('|')[1]
-            url = f"https://www.uniprot.org/uniprotkb/{pid}"
-            return url
+            return f'<a href="{url}">{pid}</a>'            
         df.loc[:, "Uniprot ID"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, 1]
-        df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot_2)
+        df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot)
         df.loc[:, "Protein"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
+        df.reset_index(inplace=True)
+        df = df.rename(columns = {'index':'Rank'})
+
+        n = 10
+        score_threshold = -2    # https://hmmer-web-docs.readthedocs.io/en/latest/searches.html
+        df_top = df.iloc[:n, [0, 1, 2, 4]].copy()
+        has_bad_scores = df_top.iloc[:, 1].astype(float).max()>score_threshold
+        def highlight_bad_score_rows(x, score_threshold=score_threshold):
+            if x[1] > score_threshold:
+                return ['background-color: red']*4
+            else:
+                return ['background-color: white']*4 
+        df_top_style = df_top.style.apply(highlight_bad_score_rows, axis=1)
+        df_top_style.hide_index()
+        st.markdown(f"**Top {n} matches:**")
+        st.write(df_top_style.to_html(escape=False, index=False, justify="left"), unsafe_allow_html=True)
+        if has_bad_scores:
+            st.markdown(":red[*Those in red rows are probably not positive hits*]")
+
         st.download_button(
-            label=f"Download the scores for {len(df):,d} proteins",
-            data=df.to_csv().encode('utf-8'),
+            label=f"Download the scores for {len(df):,} proteins",
+            data=df.to_csv(index=False).encode('utf-8'),
             file_name='map2seq_results.csv',
             mime='text/csv'
         )
 
     with col2:
         tophit = xs[0]
-        if st.checkbox(label=f"Align top hit {tophit}"):
+        if st.checkbox(label=f"Align top hit {tophit}", key="align_top_hit"):
             import pyfastx
             fa = pyfastx.Fasta(db)
             seqin = tmpdir+"/tmp.fasta"
@@ -377,7 +418,7 @@ def main():
         plot_density_projection(mrc)
 
     #remove_old_pdbs()
-    #remove_old_maps()
+    remove_old_maps(keep=10)
     #remove_old_graph_log()
 
 #@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
@@ -442,11 +483,12 @@ def remove_old_graph_log():
         if item.endswith(".png") or item.endswith(".txt"):
             os.remove(os.path.join(tmpdir, item))
 
-def remove_old_maps():
-    dir = os.listdir(tmpdir)
-    for item in dir:
-        if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz"):
-            os.remove(os.path.join(tmpdir, item))
+def remove_old_maps(keep=0):
+    map_files = [os.path.join(tmpdir, item) for item in os.listdir(tmpdir) if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz")]
+    if keep>0:
+        map_files = sorted(map_files, key=lambda f: os.path.getmtime(f))[:-keep]
+    for f in map_files:
+        os.remove(os.path.join(tmpdir, item))
 
 @st.experimental_memo()
 def number_of_sequences(db_fasta):
@@ -476,10 +518,10 @@ def get_direct_url(url):
     else:
         return url
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=10, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
-    ds = np.DataSource(None)
+    ds = np.DataSource(tmpdir)
     if not ds.exists(url_final):
         st.error(f"ERROR: {url} could not be downloaded. If this url points to a cloud drive file, make sure the link is a direct download link instead of a link for preview")
         st.stop()
@@ -493,11 +535,7 @@ def get_file_from_url(url):
                 shutil.copyfileobj(f_in, f_out)
         else:
             filename_final = fp.name
-  
-        import shutil
-        shutil.copy2(filename_final, tmpdir)
-        localfile_path = Path(tmpdir) / Path(filename_final).name
-    return str(localfile_path.resolve())
+    return filename_final
 
 def extract_emd_id(text):
     import re
@@ -510,21 +548,17 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_emdb_ids():
     try:
-        import_with_auto_install(["pandas"])
         import pandas as pd
-        entries_all = pd.read_csv('https://www.ebi.ac.uk/emdb/api/search/current_status:"REL"?wt=csv&download=true&fl=emdb_id,structure_determination_method,resolution')
-        methods = list(entries_all["structure_determination_method"])
-        entries_helical = entries_all[entries_all["structure_determination_method"]=="helical"]
-        emdb_ids_all     = list(entries_all.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
-        emdb_ids_helical = list(entries_helical.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
+        entries = pd.read_csv("https://www.ebi.ac.uk/emdb/api/search/current_status:%22REL%22%20?wt=csv&download=true&fl=emdb_id,resolution")
+        emdb_ids = list(entries.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
+        resolutions = entries.iloc[:,1].values
     except:
-        emdb_ids_all = []
-        emdb_ids_helical = []
-        methods = {}
-    return emdb_ids_all, emdb_ids_helical, methods
+        emdb_ids = []
+        resolutions = []
+    return emdb_ids, resolutions
 
 def get_emdb_map_url(emdid):
     emdid_number = emdid.lower().split("emd-")[-1]
@@ -538,13 +572,6 @@ def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
 	return f"{server}/{protid}.pdb.gz"
 	
-#@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False, suppress_st_warning=True)
-def get_emdb_map(emdid):
-    url = get_emdb_map_url(emdid)
-    mapfile = get_file_from_url(url)
-    # If no this line the returning path will be wrong. WHY???
-    return mapfile
-
 #-------------------------------End Map Functions-------------------------------
 
 #-------------------------------Model Functions-------------------------------
@@ -554,7 +581,7 @@ def remove_old_pdbs():
         if item.endswith(".pdb"):
             os.remove(os.path.join(tmpdir, item))
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
 def get_pdb_ids():
     try:
         url = "ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx"
@@ -575,7 +602,7 @@ def flip_map_model(map_name,pdb_name):
     apix=v_size['z']
 
     data=mrc_data.data
-    new_data=np.empty((nx,ny,nz),dtype=np.float32)
+    new_data=np.zeros_like(data)
     for i in range(nz):
         new_data[i,:,:]=data[nz-1-i,:,:]
         
@@ -601,7 +628,7 @@ def flip_map_model(map_name,pdb_name):
             o.write(line)
 
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=10, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
 
     map = os.path.abspath(map)
