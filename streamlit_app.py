@@ -108,7 +108,7 @@ def main():
                 st.warning("failed to obtained a list of structures in EMDB")
                 return
             url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=10&sort=release_date%20desc"
-            st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
+            st.markdown(f'[All {len(emdb_ids_all):,} structures in EMDB]({url})')
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
                 help = "Randomly select another structure in EMDB"
@@ -206,7 +206,7 @@ def main():
         input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=db_default, horizontal=True, help=help_db, key="input_mode_db")
         
         db = None
-        info = "Searching {n:,d} protein sequences"
+        info = "Searching {n:,} protein sequences"
 
         if input_mode_db == 0: # "upload":
             label = "Upload a fasta file (.fa, .fa.gz, .fasta, .fasta.gz)"
@@ -224,10 +224,10 @@ def main():
                 if len(url)<1: return
             elif input_mode_db == 2: # "human proteins":
                 url = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
-                info = "Searching [{n:,d} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
+                info = "Searching [{n:,} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
             elif input_mode_db == 3: # "all proteins"
                 url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
-                info = "Searching [{n:,d} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
+                info = "Searching [{n:,} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
             with st.spinner(f'Downloading {url.strip()}'):
                 #remove_old_db()
                 db = get_file_from_url(url.strip())
@@ -255,7 +255,7 @@ def main():
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
 
-    if not (is_initial_run or run_button_clicked): return
+    if not (is_initial_run or run_button_clicked or st.session_state.get("align_top_hit", False)): return
 
     with col2:
         with st.spinner(info.format(n=number_of_sequences(db))):
@@ -327,7 +327,7 @@ def main():
 
     with col2:
         tophit = xs[0]
-        if st.checkbox(label=f"Align top hit {tophit}"):
+        if st.checkbox(label=f"Align top hit {tophit}", key="align_top_hit"):
             import pyfastx
             fa = pyfastx.Fasta(db)
             seqin = tmpdir+"/tmp.fasta"
@@ -628,7 +628,7 @@ def flip_map_model(map_name,pdb_name):
             o.write(line)
 
 
-@st.experimental_memo(max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=10, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
 
     map = os.path.abspath(map)
