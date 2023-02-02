@@ -50,6 +50,15 @@ def main():
     st.set_page_config(page_title=title, layout="wide")
     st.title(title)
 
+    is_initial_run = "input_mode_map" not in st.session_state
+    try:
+        emd_id_default = st.session_state.emd_id
+        pdb_id_default = st.session_state.pdb_id
+    except:
+        import random
+        map_model_pairs = [("emd-3488", "5NI1"), ("emd-10499", "6TGN")]
+        emd_id_default, pdb_id_default = random.choice(map_model_pairs)
+
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
 
@@ -68,21 +77,22 @@ def main():
         help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
         input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
         if input_mode_map == 0: # "upload a MRC file":
-                label = "Upload a map in MRC or CCP4 format"
-                help = None
-                fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="upload_map")
-                if fileobj is not None:
-                    emd_id = extract_emd_id(fileobj.name)
-                    is_emd = emd_id is not None
-                    with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
-                        f.write(fileobj.getbuffer())
-                    mrc = tmpdir + "/" + fileobj.name
-                else:
-                    return
+            label = "Upload a map in MRC or CCP4 format"
+            help = None
+            fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="upload_map")
+            if fileobj is not None:
+                emd_id = extract_emd_id(fileobj.name)
+                is_emd = emd_id is not None
+                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+                    f.write(fileobj.getbuffer())
+                mrc = tmpdir + "/" + fileobj.name
+            else:
+                return
         elif input_mode_map == 1: # "url":
-            url_default = "https://ftp.wwpdb.org/pub/emdb/structures/EMD-10499/map/emd_10499.map.gz"
+            url_default = get_emdb_map_url(emd_id_default)
             help = "An online url (http:// or ftp://) or a local file path (/path/to/your/structure.mrc)"
             url = st.text_input(label="Input the url of a 3D map:", value=url_default, help=help, key="url_map").strip()
+            if not url: return
             emd_id = extract_emd_id(url)
             is_emd = emd_id is not None and emd_id
             with st.spinner(f'Downloading {url}'):
@@ -90,18 +100,17 @@ def main():
             if mrc is None:
                 st.warning(f"Failed to download [{url}]({url})")
                 return
-        elif input_mode_map == 2: # "emdb": randomly selects form emdb_ids_all not emdb_ids_helical anymore
+        elif input_mode_map == 2: # "emdb": randomly selects form emdb_ids_all
             with st.spinner(f'Downloading the list of all EMDB entries'):
-                emdb_ids_all, emdb_ids_helical, methods = get_emdb_ids()
+                emdb_ids_all, resolutions = get_emdb_ids()
             if not emdb_ids_all:
-                st.warning("failed to obtained a list of helical structures in EMDB")
+                st.warning("failed to obtained a list of structures in EMDB")
                 return
-            url = "https://www.ebi.ac.uk/emdb/search/*%20AND%20structure_determination_method:%22helical%22?rows=10&sort=release_date%20desc"
+            url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=10&sort=release_date%20desc"
             st.markdown(f'[All {len(emdb_ids_all)} structures in EMDB]({url})')
-            emd_id_default = "emd-3488"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
-                help = "Randomly select another helical structure in EMDB"
+                help = "Randomly select another structure in EMDB"
                 button_clicked = st.button(label="Change EMDB ID", help=help)
                 if button_clicked:
                     import random
@@ -110,10 +119,11 @@ def main():
                 help = None
                 label = "Input an EMDB ID (emd-xxxxx):"
                 emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
+                if not emd_id: return
                 emd_id = emd_id.lower().split("emd-")[-1]
                 if emd_id not in emdb_ids_all:
                     import random
-                    msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_helical)}')"
+                    msg = f"EMD-{emd_id} is not a valid EMDB entry. Please input a valid id (for example, a randomly selected valid id 'emd-{random.choice(emdb_ids_all)}')"
                     st.warning(msg)
                     return
             if 'emd_id' in st.session_state: emd_id = st.session_state.emd_id
@@ -125,6 +135,9 @@ def main():
             if mrc is None:
                 st.warning(f"Failed to download [EMD-{emd_id}]({url})")
                 return
+            resolution = resolutions[emdb_ids_all.index(emd_id)]
+            msg = f'[EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id}) | resolution={resolution}Å'
+            st.markdown(msg)
 
         if mrc is None or not Path(mrc).exists():
             st.warning(f"Failed to load density map")
@@ -151,7 +164,8 @@ def main():
         
         elif input_mode_model == 1: # "url":
             help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
-            url = st.text_input(label="Input the url of a PDB model:", help=help, key="url_model").strip()
+            url_default = get_pdb_url(pdb_id_default)
+            url = st.text_input(label="Input the url of a PDB model:", value=url_default, help=help, key="url_model").strip()
             if url:
                 with st.spinner(f'Downloading {url}'):
                     remove_old_pdbs()
@@ -159,13 +173,14 @@ def main():
                     if pdb is None:
                         st.warning(f"Failed to download [{url}]({url})")
                         return
+            else:
+                return
         
         elif input_mode_model == 2: # "PDB ID":
             help = None
             label = "Input an PDB ID (for example: 4hhb):"
-            pdb_id_default = "5me2"
             pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
-            pdb_id = pdb_id.lower()
+            pdb_id = pdb_id.upper()
             if pdb_id:
                 pdb_url=get_pdb_url(pdb_id)
                 with st.spinner(f'Downloading {pdb_id}.pdb from {pdb_url}'):
@@ -173,7 +188,11 @@ def main():
                 if pdb is None:
                     st.warning(f"Failed to download [PDB: {pdb_id}]({pdb_url})")
                     return
-        
+                msg = f'[PDB-{pdb_id}](https://www.rcsb.org/structure/{pdb_id})'
+                st.markdown(msg)
+            else:
+                return
+
         if pdb is None or not Path(pdb).exists():
             st.warning(f"Failed to load the PDB model")
             return
@@ -231,11 +250,11 @@ def main():
             flip_map_model(mrc, pdb)
 
         st.markdown("""---""")
-        run_button = st.button(label="Run")
+        run_button_clicked = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
 
-    if not run_button: return
+    if not (is_initial_run or run_button_clicked): return
 
     with col2:
         with st.spinner(info.format(n=number_of_sequences(db))):
@@ -392,7 +411,7 @@ def main():
         plot_density_projection(mrc)
 
     #remove_old_pdbs()
-    remove_old_maps(keep=3)
+    remove_old_maps(keep=10)
     #remove_old_graph_log()
 
 #@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
@@ -492,7 +511,7 @@ def get_direct_url(url):
     else:
         return url
 
-@st.experimental_memo(persist='disk', max_entries=6, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=10, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
     ds = np.DataSource(tmpdir)
@@ -522,21 +541,17 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_emdb_ids():
     try:
-        import_with_auto_install(["pandas"])
         import pandas as pd
-        entries_all = pd.read_csv('https://www.ebi.ac.uk/emdb/api/search/current_status:"REL"?wt=csv&download=true&fl=emdb_id,structure_determination_method,resolution')
-        methods = list(entries_all["structure_determination_method"])
-        entries_helical = entries_all[entries_all["structure_determination_method"]=="helical"]
-        emdb_ids_all     = list(entries_all.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
-        emdb_ids_helical = list(entries_helical.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
+        entries = pd.read_csv("https://www.ebi.ac.uk/emdb/api/search/current_status:%22REL%22%20?wt=csv&download=true&fl=emdb_id,resolution")
+        emdb_ids = list(entries.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
+        resolutions = entries.iloc[:,1].values
     except:
-        emdb_ids_all = []
-        emdb_ids_helical = []
-        methods = {}
-    return emdb_ids_all, emdb_ids_helical, methods
+        emdb_ids = []
+        resolutions = []
+    return emdb_ids, resolutions
 
 def get_emdb_map_url(emdid):
     emdid_number = emdid.lower().split("emd-")[-1]
@@ -559,7 +574,7 @@ def remove_old_pdbs():
         if item.endswith(".pdb"):
             os.remove(os.path.join(tmpdir, item))
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
 def get_pdb_ids():
     try:
         url = "ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx"
@@ -606,7 +621,7 @@ def flip_map_model(map_name,pdb_name):
             o.write(line)
 
 
-@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+@st.experimental_memo(max_entries=1, ttl=60*60, show_spinner=False, suppress_st_warning=True)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
 
     map = os.path.abspath(map)
