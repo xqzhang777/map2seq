@@ -35,6 +35,7 @@ except ImportError:
     import numpy as np
     
     st.info("downloading cctbx-base")
+    ds = np.DataSource(tmpdir)
     url_final = "https://drive.google.com/uc?export=download&id=1s_okkzojFeQccQII0MvAPGENodMM19NV"
     if not ds.exists(url_final):
         st.info("download error")
