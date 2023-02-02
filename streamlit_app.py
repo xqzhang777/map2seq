@@ -72,7 +72,6 @@ def main():
                 help = None
                 fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="upload_map")
                 if fileobj is not None:
-                    remove_old_maps()
                     emd_id = extract_emd_id(fileobj.name)
                     is_emd = emd_id is not None
                     with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
@@ -229,9 +228,14 @@ def main():
         handedness_option = st.radio(label="Map handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, horizontal=True, help=help_handedness, key="handedness_option")
         
         if handedness_option in [1]: # flipped
-            flip_map_model(mrc, pdb)    
+            flip_map_model(mrc, pdb)
+
+        st.markdown("""---""")
+        run_button = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
+
+    if not run_button: return
 
     with col2:
         with st.spinner(info.format(n=number_of_sequences(db))):
@@ -388,7 +392,7 @@ def main():
         plot_density_projection(mrc)
 
     #remove_old_pdbs()
-    #remove_old_maps()
+    remove_old_maps(keep=3)
     #remove_old_graph_log()
 
 #@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
@@ -453,11 +457,12 @@ def remove_old_graph_log():
         if item.endswith(".png") or item.endswith(".txt"):
             os.remove(os.path.join(tmpdir, item))
 
-def remove_old_maps():
-    dir = os.listdir(tmpdir)
-    for item in dir:
-        if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz"):
-            os.remove(os.path.join(tmpdir, item))
+def remove_old_maps(keep=0):
+    map_files = [os.path.join(tmpdir, item) for item in os.listdir(tmpdir) if item.endswith(".mrc") or item.endswith(".map") or item.endswith(".map.gz")]
+    if keep>0:
+        map_files = sorted(map_files, key=lambda f: os.path.getmtime(f))[:-keep]
+    for f in map_files:
+        os.remove(os.path.join(tmpdir, item))
 
 @st.experimental_memo()
 def number_of_sequences(db_fasta):
@@ -490,7 +495,7 @@ def get_direct_url(url):
 @st.experimental_memo(persist='disk', max_entries=6, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
 def get_file_from_url(url):
     url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
-    ds = np.DataSource(None)
+    ds = np.DataSource(tmpdir)
     if not ds.exists(url_final):
         st.error(f"ERROR: {url} could not be downloaded. If this url points to a cloud drive file, make sure the link is a direct download link instead of a link for preview")
         st.stop()
@@ -504,11 +509,7 @@ def get_file_from_url(url):
                 shutil.copyfileobj(f_in, f_out)
         else:
             filename_final = fp.name
-  
-        import shutil
-        shutil.copy2(filename_final, tmpdir)
-        localfile_path = Path(tmpdir) / Path(filename_final).name
-    return str(localfile_path.resolve())
+    return filename_final
 
 def extract_emd_id(text):
     import re
