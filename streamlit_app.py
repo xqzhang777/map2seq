@@ -34,7 +34,7 @@ except ImportError:
     import tarfile
     import numpy as np
     
-    st.info("downloading cctbx")
+    st.info("downloading cctbx-base")
     url_final = "https://drive.google.com/uc?export=download&id=1WlSncOnzfoeYzUe2IQfg0ENrdmMQVWAg"
     ds = np.DataSource(tmpdir)
     if not ds.exists(url_final):
@@ -50,9 +50,28 @@ except ImportError:
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(out_path)
+    
+    st.info("downloading cctbx")
+    url_final = "https://drive.google.com/uc?export=download&id=1Vh03BnTqB_XBnzFebEA0i0JBKJwl4zF2"
+    ds = np.DataSource(tmpdir)
+    if not ds.exists(url_final):
+        st.info("download error")
+    with ds.open(url_final) as fp:
+        filename_final = fp.name
+    filepath_final = Path(filename_final).resolve()
+    out_path=Path("/home/appuser/venv/lib/python3.9/site-packages/")
+    dctx=zstandard.ZstdDecompressor()
+    with tempfile.TemporaryFile(suffix=".tar") as ofh:
+        with filepath_final.open("rb") as ifh:
+            dctx.copy_stream(ifh,ofh)
+        ofh.seek(0)
+        with tarfile.open(fileobj=ofh) as z:
+            z.extractall(out_path)
 
-st.info(list(Path("/home/appuser/venv/").rglob("*tbx*")))
-import cctbx
+
+
+#st.info(list(Path("/home/appuser/venv/").rglob("*tbx*")))
+#import cctbx
 
 
 #if Path("/home/appuser").exists():
