@@ -9,4 +9,3 @@ pyfastx==0.8.4
 mrcfile
 streamlit==1.17.0
 zstandard
-boost
