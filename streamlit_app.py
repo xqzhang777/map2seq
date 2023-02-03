@@ -161,7 +161,7 @@ def main():
             st.warning(f"Failed to load the PDB model")
             return
 
-        pdb_changed = st.session_state.get("pdb_last", mrc) != pdb
+        pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
 
         st.markdown("""---""")
@@ -498,10 +498,8 @@ def get_file_from_url(url):
     if filename_final.exists():
         return filename_final.as_posix()
     
-    db_folder = Path(sys.executable).parent.parent.parent.parent / "protein_seqeuence_db"
-    st.info(db_folder)
     if is_jianglab():
-        db_folder = Path(sys.executable).parent.parent.parent.parent / "protein_seqeuence_db"
+        db_folder = Path(sys.executable).parent.parent.parent.parent / "protein_sequence_db"
         db_file = db_folder / filename_final.name
         if db_file.exists():
             filename_final.symlink_to(db_file)
@@ -518,7 +516,8 @@ def get_file_from_url(url):
             st.stop()
         with ds.open(url_final) as fp:
             local_file_name = Path(tmpdir)/Path(fp.name).name
-            Path(fp.name).rename(local_file_name)
+            import shutil
+            shutil.move(fp.name, local_file_name)
 
     if local_file_name.suffix == ".gz":
         import gzip, shutil
