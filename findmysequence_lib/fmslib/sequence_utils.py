@@ -71,7 +71,7 @@ __HMMER_SH="""
 # --max -E 1e10 --domE 1e10
 HMMER_SH="""
 %(hmmbuild_bin)s %(tmpdirname)s/msa.hmm %(tmpdirname)s/msa.fa
-%(hmmsearch_bin)s --noali --max -E 1e11 --domE 1e11 --domZ 20600 --tblout %(tmpdirname)s/hmmsearch.log %(tmpdirname)s/msa.hmm  %(db_fname)s
+%(hmmsearch_bin)s --noali --max -E 1e11 --domE 1e11 --domZ 20600 --cpu %(cpu)s --tblout %(tmpdirname)s/hmmsearch.log %(tmpdirname)s/msa.hmm  %(db_fname)s
 """
 
 CLUTALW_SH="""
@@ -212,8 +212,10 @@ class model2sequence:
             with open(os.path.join(tmpdirname, 'msa.fa'), 'w') as ofile:
                 ofile.write(msa_string)
 
-
+            cpu = int(os.environ['cpu'])
             hmmer_script = HMMER_SH%locals()
+            print(hmmer_script)
+
             ppipe = subprocess.Popen( hmmer_script,
                                       shell=True,
                                       stdout=subprocess.PIPE,

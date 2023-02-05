@@ -220,19 +220,24 @@ def main():
         if handedness_option in [1]: # flipped
             mrc, pdb = flip_map_model(mrc, pdb)
 
+        if is_hosted():
+            cpu = 1
+        else:
+            cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, key="cpu")
+
         st.markdown("""---""")
         run_button_clicked = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
 
-    if (mrc_changed or pdb_changed) and not run_button_clicked: return
+    if (mrc_changed or pdb_changed or input_mode_db in [3, 4]) and not run_button_clicked: return
 
     with col2:
         with st.spinner(info.format(n=number_of_sequences(db))):
             #remove_old_graph_log()
             seqin = None
             modelout = None
-            res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+            res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
             if res is None:
                 st.error(f"Failed")
                 return
@@ -307,7 +312,7 @@ def main():
                 tmp.write(fa[xs[0]].seq)
             
             with st.spinner("Processing..."):
-                map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+                map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
             
             lines = []
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
@@ -620,7 +625,8 @@ def flip_map_model(map_name, pdb_name):
     return str(map_flip), str(pdb_flip)
 
 @st.experimental_memo(max_entries=10, ttl=60*60, show_spinner=False, suppress_st_warning=True)
-def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
+def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir/"):
+    os.environ['cpu'] = f"{cpu}"
 
     map = os.path.abspath(map)
     pdb = os.path.abspath(pdb)
