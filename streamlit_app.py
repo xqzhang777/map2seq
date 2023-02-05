@@ -206,8 +206,9 @@ def main():
             st.warning(f"Failed to load the protein sequence database")
             return      
         
-        info = info.format(n=number_of_sequences(db))
-        st.markdown(info)
+        with st.spinner(f"Getting # of sequences in {db}"):
+            n = number_of_sequences(db)
+            st.markdown(info.format(n=n))
 
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
@@ -223,7 +224,7 @@ def main():
         if is_hosted():
             cpu = 1
         else:
-            cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, key="cpu")
+            cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
 
         st.markdown("""---""")
         run_button_clicked = st.button(label="Run")
@@ -464,11 +465,11 @@ def remove_old_maps(keep=0):
     for f in map_files:
         os.remove(os.path.join(tmpdir, f))
 
-@st.experimental_memo()
+@st.experimental_memo(persist=True, show_spinner=False)
 def number_of_sequences(db_fasta):
     import pyfastx
     fa = pyfastx.Fasta(db_fasta)
-    return fa.count(1)
+    return len(fa)
 
 def get_direct_url(url):
     import re
