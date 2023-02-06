@@ -1,5 +1,70 @@
 import sys, os, pickle
 from pathlib import Path
+import streamlit as st
+
+def import_with_auto_install(packages, scope=locals()):
+    if isinstance(packages, str): packages=[packages]
+    for package in packages:
+        if package.find(":")!=-1:
+            package_import_name, package_pip_name = package.split(":")
+        else:
+            package_import_name, package_pip_name = package, package
+        try:
+            scope[package_import_name] = __import__(package_import_name)
+        except ImportError:
+            import subprocess
+            #if Path("/home/appuser").exists():
+            #    subprocess.call(f'/home/appuser/.conda/bin/pip install {package_pip_name}', shell=True)
+            #else:
+            subprocess.call(f'pip install {package_pip_name}', shell=True)
+            scope[package_import_name] =  __import__(package_import_name)
+
+
+tmpdir = "map2seq_out"
+if not os.path.isdir(tmpdir):
+    os.mkdir(tmpdir)
+
+try:
+    import cctbx
+except ImportError:
+    import zstandard
+    import tempfile
+    import tarfile
+    import numpy as np
+    
+    st.info("downloading cctbx-base")
+    ds = np.DataSource(tmpdir)
+    url_final = "https://drive.google.com/uc?export=download&id=1G9SxBgEfxm-JNF8cnbfJ90wCTI1xnJcG"
+    if not ds.exists(url_final):
+        st.info("download error")
+    with ds.open(url_final) as fp:
+        filename_final = fp.name
+    filepath_final = Path(filename_final).resolve()
+    out_path=Path("/home/appuser/venv/")
+    dctx=zstandard.ZstdDecompressor()
+    with tempfile.TemporaryFile(suffix=".tar") as ofh:
+        with filepath_final.open("rb") as ifh:
+            dctx.copy_stream(ifh,ofh)
+        ofh.seek(0)
+        with tarfile.open(fileobj=ofh) as z:
+            z.extractall(out_path)
+
+
+
+#st.info(list(Path("/home/appuser/venv/").rglob("*tbx*")))
+#import cctbx
+
+
+#if Path("/home/appuser").exists():
+#    # essential to avoid cctbx import errors
+#    target = Path("/home/appuser/venv/share/cctbx")
+#    if not target.exists():
+#        target.symlink_to("/home/appuser/.conda/share/cctbx")
+#
+#    sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
+#    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
+
+
 import numpy as np
 import pandas as pd
 from bokeh.plotting import ColumnDataSource, figure
@@ -7,10 +72,6 @@ from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, Printf
 
 from findmysequence_lib.findmysequence import fms_main
 import mrcfile
-import streamlit as st
-
-tmpdir = "map2seq_out"
-if not os.path.isdir(tmpdir): os.mkdir(tmpdir)
 
 
 def main():

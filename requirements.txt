@@ -1,0 +1,11 @@
+numpy==1.23.3
+scipy==1.9.1
+bokeh==2.4.3
+pandas==1.5.0
+h5py==3.7.0
+hmmer
+torch
+pyfastx==0.8.4
+mrcfile
+streamlit==1.17.0
+zstandard
