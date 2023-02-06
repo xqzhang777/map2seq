@@ -25,6 +25,8 @@ if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
 st.info(os.environ["LD_LIBRARY_PATH"])
+from shutil import which
+st.info(which("python"))
 
 try:
     import cctbx
