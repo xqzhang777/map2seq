@@ -1,6 +1,4 @@
-import sys
-import os
-import shutil
+import sys, os, pickle
 from pathlib import Path
 import streamlit as st
 
@@ -66,15 +64,14 @@ except ImportError:
 #    sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
 #    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
 
-import streamlit as st
+
 import numpy as np
 import pandas as pd
-from shutil import which
-import pickle
-import mrcfile
-from findmysequence_lib.findmysequence import fms_main
-from bokeh.plotting import ColumnDataSource, figure, output_file, save,show
+from bokeh.plotting import ColumnDataSource, figure
 from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, PrintfTickFormatter
+
+from findmysequence_lib.findmysequence import fms_main
+import mrcfile
 
 
 def main():
@@ -82,21 +79,11 @@ def main():
     st.set_page_config(page_title=title, layout="wide")
     st.title(title)
 
-    is_initial_run = "input_mode_map" not in st.session_state
-    try:
-        emd_id_default = st.session_state.emd_id
-        pdb_id_default = st.session_state.pdb_id
-        db_default = st.session_state.input_mode_db
-    except:
-        import random
-        map_model_db = [("emd-23871", "7mkf", 2), ("emd-10499", "6TGN", 3), ("emd-3488", "5NI1", 2)]
-        emd_id_default, pdb_id_default, db_default = random.choice(map_model_db)
-
     #https://discuss.streamlit.io/t/hide-titles-link/19783/4
     st.markdown(""" <style> .css-15zrgzn {display: none} </style> """, unsafe_allow_html=True)
 
     with st.expander(label="README", expanded=False):
-            st.write("This is a Web App to help users to identify proteins that best explain a density map. The user will provide a density map (mrc or ccp4 map format) and a Cα model in pdb format. The user can also specify a database of protein sequences such as human proteins or all proteins for the search for the search. Currently, only the [findMySequence](https://journals.iucr.org/m/issues/2022/01/00/pw5018/) method is included although we plan to include additional methods in the future.  \nNOTE: the uploaded map/model files are **strictly confidential**. The developers of this app does not have access to the files")
+            st.write("This is a Web App to help users identify proteins that best explain a density map. The user will provide a density map (mrc or ccp4 map format) and a main-chain model in pdb format using any sequence (e.g. Ala-model). The user can also specify a database of protein sequences such as human proteins or all proteins for the search. Currently, only the [findMySequence](https://journals.iucr.org/m/issues/2022/01/00/pw5018/) method is included although we plan to include additional methods in the future.  \nNOTE: the uploaded map/model files are **strictly confidential**. The developers of this app does not have access to the files")
 
     col1, [col2,col3] = st.sidebar, st.columns([1,0.5])
 
@@ -122,6 +109,7 @@ def main():
             else:
                 return
         elif input_mode_map == 1: # "url":
+            emd_id_default = "emd-10499"
             url_default = get_emdb_map_url(emd_id_default)
             help = "An online url (http:// or ftp://) or a local file path (/path/to/your/structure.mrc)"
             url = st.text_input(label="Input the url of a 3D map:", value=url_default, help=help, key="url_map").strip()
@@ -151,6 +139,7 @@ def main():
             else:
                 help = None
                 label = "Input an EMDB ID (emd-xxxxx):"
+                emd_id_default = "emd-23871"
                 emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
                 if not emd_id: return
                 emd_id = emd_id.lower().split("emd-")[-1]
@@ -176,6 +165,9 @@ def main():
             st.warning(f"Failed to load density map")
             return
 
+        mrc_changed = st.session_state.get("mrc_last", mrc) != mrc
+        st.session_state.mrc_last = mrc
+
         st.markdown("""---""")
 
         #pdb input
@@ -188,7 +180,6 @@ def main():
             label = "Upload a PDB file"
             fileobj = st.file_uploader(label, type=['pdb'], help=None, key="upload_model")
             if fileobj is not None:
-                remove_old_pdbs()
                 with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                     f.write(fileobj.getbuffer())
                 pdb = tmpdir + "/" + fileobj.name
@@ -197,11 +188,11 @@ def main():
         
         elif input_mode_model == 1: # "url":
             help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
+            pdb_id_default = "6TGN"
             url_default = get_pdb_url(pdb_id_default)
             url = st.text_input(label="Input the url of a PDB model:", value=url_default, help=help, key="url_model").strip()
             if url:
                 with st.spinner(f'Downloading {url}'):
-                    remove_old_pdbs()
                     pdb = get_file_from_url(url)
                     if pdb is None:
                         st.warning(f"Failed to download [{url}]({url})")
@@ -212,6 +203,7 @@ def main():
         elif input_mode_model == 2: # "PDB ID":
             help = None
             label = "Input an PDB ID (for example: 4hhb):"
+            pdb_id_default = "7mkf"
             pdb_id = st.text_input(label=label, key='pdb_id', value=pdb_id_default, help=help)
             pdb_id = pdb_id.upper()
             if pdb_id:
@@ -230,12 +222,16 @@ def main():
             st.warning(f"Failed to load the PDB model")
             return
 
+        pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
+        st.session_state.pdb_last = pdb
+
         st.markdown("""---""")
 
         #db input
-        input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all proteins"}
+        input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all curated proteins"}
+        if not is_hosted(): input_modes_db[4] = "all proteins"
         help_db = "The input sequence database (.fa, .fa.gz, .fasta, or .fasta.gz)"
-        input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=db_default, horizontal=True, help=help_db, key="input_mode_db")
+        input_mode_db = st.radio(label="Which sequence database to use:", options=list(input_modes_db.keys()), format_func=lambda i:input_modes_db[i], index=2, horizontal=True, help=help_db, key="input_mode_db")
         
         db = None
         info = "Searching {n:,} protein sequences"
@@ -245,7 +241,6 @@ def main():
             if fileobj is None: return
             fileobj = st.file_uploader(label, type=['fa', 'fasta', 'fa.gz', 'fasta.gz'], help=None, key="upload_db")
 
-            #remove_old_db()
             with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                 f.write(fileobj.getbuffer())
             db = tmpdir + "/" + fileobj.name
@@ -255,21 +250,26 @@ def main():
                 url = st.text_input(label="Input the url of a sequence database (.fa, .fa.gz, .fasta, .fasta.gz):", help=help, key="url_db")
                 if len(url)<1: return
             elif input_mode_db == 2: # "human proteins":
-                url = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
-                info = "Searching [{n:,} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
-            elif input_mode_db == 3: # "all proteins"
-                url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
-                info = "Searching [{n:,} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
+                url = "https://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.fasta.gz"
+                info = "[{n:,} human protein sequences](https://www.uniprot.org/uniprotkb?facets=reviewed%3Atrue&query=%28proteome%3AUP000005640%29)"
+            elif input_mode_db == 3: # "all curated proteins"
+                url = "https://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.fasta.gz"
+                info = "[{n:,} reviewed protein sequences](https://www.uniprot.org/uniprotkb?query=reviewed:true)"
+            elif input_mode_db == 4: # "all proteins"
+                #url = "https://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.fasta.gz"
+                #info = "[{n:,} protein sequences (e.g. all known proteins) in Unreviewed (TrEMBL)](https://www.uniprot.org/help/downloads)"
+                url = "https://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/uniparc/uniparc_active.fasta.gz"
+                info = "[{n:,} protein sequences (e.g. all known proteins) in UniParc](https://www.uniprot.org/help/uniparc)"
             with st.spinner(f'Downloading {url.strip()}'):
-                #remove_old_db()
                 db = get_file_from_url(url.strip())
         
         if db is None or not Path(db).exists():
             st.warning(f"Failed to load the protein sequence database")
             return      
         
-        info = info.format(n=number_of_sequences(db))
-        st.markdown(info)
+        with st.spinner(f"Getting # of sequences in {db}"):
+            n = number_of_sequences(db)
+            st.markdown(info.format(n=n))
 
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
@@ -280,21 +280,26 @@ def main():
         handedness_option = st.radio(label="Map handedness:", options=list(handedness_options.keys()), format_func=lambda i:handedness_options[i], index=0, horizontal=True, help=help_handedness, key="handedness_option")
         
         if handedness_option in [1]: # flipped
-            flip_map_model(mrc, pdb)
+            mrc, pdb = flip_map_model(mrc, pdb)
+
+        if is_hosted():
+            cpu = 1
+        else:
+            cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
 
         st.markdown("""---""")
         run_button_clicked = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
 
-    if not (is_initial_run or run_button_clicked or st.session_state.get("align_top_hit", False)): return
+    if (mrc_changed or pdb_changed or input_mode_db in [3, 4]) and not run_button_clicked: return
 
     with col2:
         with st.spinner(info.format(n=number_of_sequences(db))):
             #remove_old_graph_log()
             seqin = None
             modelout = None
-            res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+            res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
             if res is None:
                 st.error(f"Failed")
                 return
@@ -337,18 +342,18 @@ def main():
         n = 10
         score_threshold = -2    # https://hmmer-web-docs.readthedocs.io/en/latest/searches.html
         df_top = df.iloc[:n, [0, 1, 2, 4]].copy()
-        has_bad_scores = df_top.iloc[:, 1].astype(float).max()>score_threshold
+        has_good_scores = df_top.iloc[:, 1].astype(float).min()<score_threshold
         def highlight_bad_score_rows(x, score_threshold=score_threshold):
             if x[1] > score_threshold:
                 return ['background-color: red']*4
             else:
                 return ['background-color: white']*4 
         df_top_style = df_top.style.apply(highlight_bad_score_rows, axis=1)
-        df_top_style.hide_index()
+        df_top_style.hide(axis="index")
         st.markdown(f"**Top {n} matches:**")
         st.write(df_top_style.to_html(escape=False, index=False, justify="left"), unsafe_allow_html=True)
-        if has_bad_scores:
-            st.markdown(":red[*Those in red rows are probably not positive hits*]")
+        if not has_good_scores:
+            st.markdown(f":red[*No protein with meaningful score (<{score_threshold:g}). Check if the model is positioned properly in the map, or change the protein sequence database to **all curated proteins***]")
 
         st.download_button(
             label=f"Download the scores for {len(df):,} proteins",
@@ -359,7 +364,7 @@ def main():
 
     with col2:
         tophit = xs[0]
-        if st.checkbox(label=f"Align top hit {tophit}", key="align_top_hit"):
+        if st.button(label=f"Align top hit {tophit}", key="align_top_hit"):
             import pyfastx
             fa = pyfastx.Fasta(db)
             seqin = tmpdir+"/tmp.fasta"
@@ -369,7 +374,7 @@ def main():
                 tmp.write(fa[xs[0]].seq)
             
             with st.spinner("Processing..."):
-                map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, outdir = tmpdir)
+                map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
             
             lines = []
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
@@ -446,10 +451,10 @@ def main():
         #st.markdown("PDB Model Overview")
         #plot_pdb_model(pdb)
         
-        st.markdown("MRC Density Projection Overview")
+        st.markdown("Map Projections")
         plot_density_projection(mrc)
 
-    #remove_old_pdbs()
+    remove_old_pdbs(keep=10)
     remove_old_maps(keep=10)
     #remove_old_graph_log()
 
@@ -502,7 +507,6 @@ def plot_density_projection(mrc):
     #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
     #st.plotly_chart(mrc_fig,use_container_width=True)
 
-@st.experimental_memo(persist='disk', max_entries=1, show_spinner=False)
 def normalize(data, percentile=(0, 100)):
     p0, p1 = percentile
     vmin, vmax = sorted(np.percentile(data, (p0, p1)))
@@ -520,13 +524,13 @@ def remove_old_maps(keep=0):
     if keep>0:
         map_files = sorted(map_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in map_files:
-        os.remove(os.path.join(tmpdir, item))
+        os.remove(os.path.join(tmpdir, f))
 
-@st.experimental_memo()
+@st.experimental_memo(persist=True, show_spinner=False)
 def number_of_sequences(db_fasta):
     import pyfastx
     fa = pyfastx.Fasta(db_fasta)
-    return fa.count(1)
+    return len(fa)
 
 def get_direct_url(url):
     import re
@@ -550,24 +554,44 @@ def get_direct_url(url):
     else:
         return url
 
-@st.experimental_memo(max_entries=10, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+# do not use st cache
 def get_file_from_url(url):
-    url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
-    ds = np.DataSource(tmpdir)
-    if not ds.exists(url_final):
-        st.error(f"ERROR: {url} could not be downloaded. If this url points to a cloud drive file, make sure the link is a direct download link instead of a link for preview")
-        st.stop()
-    filename_final = None
-    localfile_path  = None
-    with ds.open(url) as fp:
-        if fp.name.endswith(".gz"):
-            filename_final = fp.name[:-3]
-            import gzip, shutil
-            with gzip.open(fp.name, 'r') as f_in, open(filename_final, 'wb') as f_out:
-                shutil.copyfileobj(f_in, f_out)
-        else:
-            filename_final = fp.name
-    return filename_final
+    local_file_name = Path(url).name
+    local_file_name = Path(tmpdir)/local_file_name
+    if local_file_name.suffix == ".gz":
+        filename_final = local_file_name.parent / local_file_name.stem
+    else:
+        filename_final = local_file_name    
+    if filename_final.exists():
+        return filename_final.as_posix()
+    
+    if is_jianglab():
+        db_folder = Path(sys.executable).parent.parent.parent.parent / "protein_sequence_db"
+        db_file = db_folder / filename_final.name
+        if db_file.exists():
+            filename_final.symlink_to(db_file)
+            return filename_final.as_posix()
+        db_file = db_folder / local_file_name.name
+        if db_file.exists():
+            local_file_name.symlink_to(db_file)
+    
+    if not local_file_name.exists():
+        url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
+        ds = np.DataSource(None)
+        if not ds.exists(url_final):
+            st.error(f"ERROR: {url} could not be downloaded. If this url points to a cloud drive file, make sure the link is a direct download link instead of a link for preview")
+            st.stop()
+        with ds.open(url_final) as fp:
+            local_file_name = Path(tmpdir)/Path(fp.name).name
+            import shutil
+            shutil.move(fp.name, local_file_name)
+
+    if local_file_name.suffix == ".gz":
+        import gzip, shutil
+        with gzip.open(local_file_name, 'r') as f_in, open(filename_final, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+    return filename_final.as_posix()
 
 def extract_emd_id(text):
     import re
@@ -607,11 +631,12 @@ def get_pdb_url(protid):
 #-------------------------------End Map Functions-------------------------------
 
 #-------------------------------Model Functions-------------------------------
-def remove_old_pdbs():
-    dir = os.listdir(tmpdir)
-    for item in dir:
-        if item.endswith(".pdb"):
-            os.remove(os.path.join(tmpdir, item))
+def remove_old_pdbs(keep=0):
+    pdb_files = [os.path.join(tmpdir, item) for item in os.listdir(tmpdir) if item.endswith(".pdb") or item.endswith(".pdb.gz")]
+    if keep>0:
+        pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
+    for f in pdb_files:
+        os.remove(os.path.join(tmpdir, f))
 
 @st.experimental_memo(max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
 def get_pdb_ids():
@@ -625,22 +650,23 @@ def get_pdb_ids():
     return pdb_ids
 #-------------------------------End Model Functions-------------------------------
 
-def flip_map_model(map_name,pdb_name):
-    mrc_data = mrcfile.open(map_name, 'r+')
-    v_size=mrc_data.voxel_size
-    nx=mrc_data.header['nx']
-    ny=mrc_data.header['ny']
-    nz=mrc_data.header['nz']
-    apix=v_size['z']
+def flip_map_model(map_name, pdb_name):
+    map_flip = Path(map_name).with_suffix(".flip.mrc")
+    if not map_flip.exists():
+        with mrcfile.open(map_name) as mrc_data:
+            apix=mrc_data.voxel_size.z
+            with mrcfile.new(str(map_flip), overwrite=True) as mrc_data_flip:
+                mrc_data_flip.set_data(mrc_data.data[::-1, :, :])   # z-flip
+                mrc_data_flip.voxel_size = apix
 
-    data=mrc_data.data
-    new_data=np.zeros_like(data)
-    for i in range(nz):
-        new_data[i,:,:]=data[nz-1-i,:,:]
-        
-    mrc_data.set_data(new_data)
-    mrc_data.close()
-    
+    pdb_flip = Path(pdb_name).with_suffix(".flip.pdb")
+    if pdb_flip.exists():
+        return str(map_flip), str(pdb_flip)
+
+    with mrcfile.open(map_name, header_only=True) as mrc_data:
+        apix=mrc_data.voxel_size.z
+        nz=mrc_data.header['nz']
+
     with open(pdb_name,'r') as f:
         lines=f.readlines()
         orig_atom_lines = []
@@ -649,7 +675,7 @@ def flip_map_model(map_name,pdb_name):
                 orig_atom_lines.append(line)
             elif line[0:3] == "TER":
                orig_atom_lines.append(line)
-    with open(pdb_name, 'w') as o:
+    with open(pdb_flip, 'w') as o:
         for line in orig_atom_lines:
             if line[0:3] != "TER":
                 coord_vec = np.array(line[30:54].split()).astype(np.float32)
@@ -658,10 +684,11 @@ def flip_map_model(map_name,pdb_name):
                 line[30:54] = list(" " + f'{coord_vec[0]:>7.3f}' + " " + f'{coord_vec[1]:>7.3f}' + " " + f'{new_z:>7.3f}')
                 line = "".join(line)
             o.write(line)
-
+    return str(map_flip), str(pdb_flip)
 
 @st.experimental_memo(max_entries=10, ttl=60*60, show_spinner=False, suppress_st_warning=True)
-def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, outdir = "tempDir/"):
+def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir/"):
+    os.environ['cpu'] = f"{cpu}"
 
     map = os.path.abspath(map)
     pdb = os.path.abspath(pdb)
@@ -738,6 +765,13 @@ def parse_file(outputFile, filepath):
         make_graph(ids, e_vals, outputFile)
     return 1
 
+def is_hosted():
+    ret = Path("/home/appuser").exists()
+    return ret
+
+def is_jianglab():
+    ret = Path("/net/jiang").exists()
+    return ret
 
 @st.cache(persist=True, show_spinner=False)
 def setup_anonymous_usage_report():
@@ -755,4 +789,14 @@ def setup_anonymous_usage_report():
 
 if __name__ == "__main__":
     setup_anonymous_usage_report()
+
+    if is_hosted():
+        # essential to avoid cctbx import errors
+        target = Path("/home/appuser/venv/share/cctbx")
+        if not target.exists():
+            target.symlink_to("/home/appuser/.conda/share/cctbx")
+
+        sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
+        os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
+
     main()
