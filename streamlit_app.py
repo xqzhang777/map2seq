@@ -793,12 +793,12 @@ if __name__ == "__main__":
     setup_anonymous_usage_report()
 
     if is_hosted():
-        # essential to avoid cctbx import errors
-        target = Path("/home/appuser/venv/share/cctbx")
-        if not target.exists():
-            target.symlink_to("/home/appuser/.conda/share/cctbx")
+        ## essential to avoid cctbx import errors
+        #target = Path("/home/appuser/venv/share/cctbx")
+        #if not target.exists():
+        #    target.symlink_to("/home/appuser/.conda/share/cctbx")
 
         sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
-        os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
+        #os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
 
     main()
