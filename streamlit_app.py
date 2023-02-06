@@ -24,7 +24,7 @@ tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
-st.info(os.environ["DL_LIBRARY_PATH"])
+st.info(os.environ["LD_LIBRARY_PATH"])
 
 try:
     import cctbx
