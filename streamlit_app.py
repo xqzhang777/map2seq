@@ -24,10 +24,12 @@ tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
-#st.info(os.environ["LD_LIBRARY_PATH"])
+st.info(os.environ["LD_LIBRARY_PATH"])
 from shutil import which
 #st.info(which("python"))
 
+
+os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
 try:
     import cctbx
     #raise ImportError
