@@ -24,34 +24,38 @@ tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
-st.info(os.environ["LD_LIBRARY_PATH"])
+#st.info(os.environ["LD_LIBRARY_PATH"])
 from shutil import which
-st.info(which("python"))
+#st.info(which("python"))
 
 try:
     import cctbx
+    #raise ImportError
 except ImportError:
     import zstandard
     import tempfile
     import tarfile
     import numpy as np
-    
-    st.info("downloading cctbx-base")
+   
+    #st.info("downloading cctbx-base")
     ds = np.DataSource(tmpdir)
-    url_final = "https://drive.google.com/uc?export=download&id=1G9SxBgEfxm-JNF8cnbfJ90wCTI1xnJcG"
+    url_final = "https://drive.google.com/uc?export=download&id=11Uo2AFIJE_gH4gzCMchW2mDi6xJUn_ms"
     if not ds.exists(url_final):
-        st.info("download error")
+        print("download error")
     with ds.open(url_final) as fp:
         filename_final = fp.name
     filepath_final = Path(filename_final).resolve()
-    out_path=Path("/home/appuser/venv/")
+    #out_path=Path("/home/appuser/venv/")
+    root_folder = Path(sys.executable).parent.parent
     dctx=zstandard.ZstdDecompressor()
     with tempfile.TemporaryFile(suffix=".tar") as ofh:
         with filepath_final.open("rb") as ifh:
             dctx.copy_stream(ifh,ofh)
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
-            z.extractall(out_path)
+            z.extractall(root_folder)
+    dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
+    os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib:$LD_LIBRARY_PATH"
 
 
 
@@ -337,15 +341,24 @@ def main():
             pid = s.split('|')[1]
             url = f"https://www.uniprot.org/uniprotkb/{pid}"
             return f'<a href="{url}">{pid}</a>'            
-        df.loc[:, "Uniprot ID"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, 1]
-        df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot)
-        df.loc[:, "Protein"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
-        df.reset_index(inplace=True)
-        df = df.rename(columns = {'index':'Rank'})
-
+        
         n = 10
         score_threshold = -2    # https://hmmer-web-docs.readthedocs.io/en/latest/searches.html
-        df_top = df.iloc[:n, [0, 1, 2, 4]].copy()
+        n_df_col=4
+        
+        try:
+            df.loc[:, "Uniprot ID"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, 1]
+            df.loc[:, "URL"] = df.loc[:, "Protein"].apply(link_to_uniprot)
+            df.loc[:, "Protein"] = df.loc[:, "Protein"].str.split("|", expand=True).iloc[:, -1]
+            df.reset_index(inplace=True)
+            df = df.rename(columns = {'index':'Rank'})
+            df_top = df.iloc[:n, [0, 1, 2, 4]].copy()
+        except:
+            df.reset_index(inplace=True)
+            df = df.rename(columns = {'index':'Rank'})
+            df_top = df.iloc[:n, [0, 1, 2]].copy()
+            n_df_col=3
+        
         has_good_scores = df_top.iloc[:, 1].astype(float).min()<score_threshold
         def highlight_bad_score_rows(x, score_threshold=score_threshold):
             if x[1] > score_threshold:
@@ -758,13 +771,15 @@ def parse_file(outputFile, filepath):
         for line in file:
             line = line.rstrip()
             list = line.split('|')
-            list[0:3] = ["|".join(list[0:3])]
-            #list = line.split(' ')
-            list[0] = list[0].strip()
-            list[1] = list[1].removeprefix('E-value=')
-            list[1] = float(list[1])
-            ids.append(list[0])
-            e_vals.append(list[1])
+            #list[0:3] = ["|".join(list[0:3])]
+            ##list = line.split(' ')
+            #list[0] = list[0].strip()
+            #list[1] = list[1].removeprefix('E-value=')
+            #list[1] = float(list[1])
+            curr_id="|".join(list[:-1])
+            curr_ev=float(list[-1].removeprefix('E-value='))
+            ids.append(curr_id)
+            e_vals.append(curr_ev)
                         
         make_graph(ids, e_vals, outputFile)
     return 1
