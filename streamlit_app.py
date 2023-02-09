@@ -29,7 +29,7 @@ from shutil import which
 #st.info(which("python"))
 
 
-os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
+os.system("ls /home/appuser/venv/lib/")
 try:
     import cctbx
     #raise ImportError
