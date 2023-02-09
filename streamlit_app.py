@@ -55,7 +55,7 @@ except ImportError:
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(root_folder)
-    os.system("ls /home/appuser/venv/lib/")
+    os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
     dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
     os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib:$LD_LIBRARY_PATH"
     st.info(dylib_folder)
