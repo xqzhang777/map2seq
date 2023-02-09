@@ -47,6 +47,7 @@ except ImportError:
     filepath_final = Path(filename_final).resolve()
     #out_path=Path("/home/appuser/venv/")
     root_folder = Path(sys.executable).parent.parent
+    st.info(root_folder)
     dctx=zstandard.ZstdDecompressor()
     with tempfile.TemporaryFile(suffix=".tar") as ofh:
         with filepath_final.open("rb") as ifh:
@@ -55,6 +56,7 @@ except ImportError:
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(root_folder)
     dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
+    st.info(dylib_folder)
     os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib:$LD_LIBRARY_PATH"
 
 
