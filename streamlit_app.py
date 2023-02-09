@@ -29,7 +29,6 @@ from shutil import which
 #st.info(which("python"))
 
 
-os.system("ls /home/appuser/venv/lib/")
 try:
     import cctbx
     #raise ImportError
@@ -56,8 +55,10 @@ except ImportError:
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(root_folder)
+    os.system("ls /home/appuser/venv/lib/")
     dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
     os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib:$LD_LIBRARY_PATH"
+    st.info(dylib_folder)
 
 
 
