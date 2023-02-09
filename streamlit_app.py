@@ -61,6 +61,7 @@ except ImportError:
     os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib:$LD_LIBRARY_PATH"
     sys.path.append("/home/appuser/venv/lib/python3.9/lib-dynload")
     sys.path.append("/home/appuser/venv/lib")
+    os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 libstdc++.so.6")
     st.info(dylib_folder)
     st.info(os.environ["LD_LIBRARY_PATH"])
 
