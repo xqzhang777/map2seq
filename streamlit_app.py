@@ -65,6 +65,7 @@ except ImportError:
     os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
     os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
     os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
+	os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
     st.info(dylib_folder)
     st.info(os.environ["LD_LIBRARY_PATH"])
 
