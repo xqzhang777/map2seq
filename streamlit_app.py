@@ -58,10 +58,10 @@ except ImportError:
     os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
     os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
     dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
-    os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib:$LD_LIBRARY_PATH"
+    os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib"
     sys.path.append("/home/appuser/venv/lib/python3.9/lib-dynload")
     sys.path.append("/home/appuser/venv/lib")
-    os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 libstdc++.so.6")
+    os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
     st.info(dylib_folder)
     st.info(os.environ["LD_LIBRARY_PATH"])
 
