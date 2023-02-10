@@ -24,7 +24,7 @@ tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
-st.info(os.environ["LD_LIBRARY_PATH"])
+#st.info(os.environ["LD_LIBRARY_PATH"])
 from shutil import which
 #st.info(which("python"))
 
@@ -38,7 +38,7 @@ except ImportError:
     import tarfile
     import numpy as np
    
-    #st.info("downloading cctbx-base")
+    st.info("downloading cctbx-base")
     ds = np.DataSource(tmpdir)
     url_final = "https://drive.google.com/uc?export=download&id=1zVYWYQtpS2_nEZ_JofFU5OYlkgZfZKZo"
     if not ds.exists(url_final):
