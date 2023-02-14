@@ -782,6 +782,7 @@ def parse_file(outputFile, filepath):
             return -1
         for line in file:
             line = line.rstrip()
+	    st.write(line)
             list = line.split('|')
             #list[0:3] = ["|".join(list[0:3])]
             ##list = line.split(' ')
