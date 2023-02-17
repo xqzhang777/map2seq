@@ -44,6 +44,7 @@ import random
 import subprocess
 import string
 import gzip
+import pyhmmer
 
 # cctbx imports
 from iotbx.pdb import amino_acid_codes as aac
@@ -189,51 +190,27 @@ class model2sequence:
 
     def query_msa(self, msa_string, db_fname=None, refseq_fname=None, verbose=False, tophits_sto=3):
 
-        refseq_string=None
-        if refseq_fname:
-            refseq = []
-            with open(refseq_fname, 'r') as ifile:
-                for line in ifile:
-                    if line.startswith(">"): continue
-                    refseq.append(line.strip())
-            refseq_string="".join(refseq)
-
-
-
-        ccp4 = os.environ.get('CCP4', None)
-        if ccp4 is None:
-            hmmbuild_bin  = which('hmmbuild')
-            hmmsearch_bin = which('hmmsearch')
-        else:
-            hmmbuild_bin  = "%(ccp4)s/libexec/hmmbuild"%locals()
-            hmmsearch_bin = "%(ccp4)s/libexec/hmmsearch"%locals()
-
-        with tempfile.TemporaryDirectory(prefix="guessmysequence_") as tmpdirname:
-            with open(os.path.join(tmpdirname, 'msa.fa'), 'w') as ofile:
-                ofile.write(msa_string)
-
-            cpu = int(os.environ['cpu'])
-            hmmer_script = HMMER_SH%locals()
-            print(hmmer_script)
-
-            ppipe = subprocess.Popen( hmmer_script,
-                                      shell=True,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE,
-                                      universal_newlines=True)
-
-            for stdout_line in iter(ppipe.stdout.readline, ""):
-                if verbose: print( stdout_line.strip('\n') )
-
-            retcode = subprocess.Popen.wait(ppipe)
-            matched_seqids = self._parse_hmmer_tblout(tblout_fname=os.path.join(tmpdirname, 'hmmsearch.log'))
-        if matched_seqids:
+        msa_seqs=msa_string.split('>')
+        seqs=[]
+        for line in msa_seqs:
+            splitted=line.split('\n')
+            if len(splitted)>1:
+                seqs.append(pyhmmer.easel.TextSequence(name=bytes(splitted[0],'utf-8'),sequence=splitted[1]))
+        
+        alphabet = pyhmmer.easel.Alphabet.amino()
+        msa=pyhmmer.easel.TextMSA(name=b'msa',sequences=seqs)
+        msa_d = msa.digitize(alphabet)
+        builder=pyhmmer.plan7.Builder(alphabet)
+        background=pyhmmer.plan7.Background(alphabet)
+        hmm,_,_=builder.build_msa(msa_d,background)
+        
+        with pyhmmer.easel.SequenceFile(db_fname,digital=True,alphabet=alphabet) as seq_file:
+            hits = next(pyhmmer.hmmer.hmmsearch(hmm,seq_file,cpus=0,E=1e11,domE=1e11,domZ=20600))
+        
+        if len(hits)>0:
             results = []
-            for v in sorted(matched_seqids, key=lambda x: x[1], reverse=False)[:tophits_sto]:
-                evalue_str = "|E-value=%0.2e"%v[1]
-                # (seq_id, E-value, sequence with e-value in a title line)
-                results.append((v[0],evalue_str))
-                # results.append( (v[0], v[1], self.parse_seqdb(db_fname, v[0], evalue=v[1], refseq_string=refseq_string)) )
+            for hit in hits:
+                results.append((str(hit.name,encoding='utf-8'),str(hit.evalue)))
             return results
         else:
             return None
