@@ -55,16 +55,16 @@ except ImportError:
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(root_folder)
-    os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
-    os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
+    #os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
+    #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
     dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
-    sys.path.append("/home/appuser/venv/lib/python3.9/lib-dynload")
-    sys.path.append("/home/appuser/venv/lib")
+    sys.path.append(dylib_folder.as_posix())
+    sys.path.append(f"{root_folder}/lib")
     os.system("rm /home/appuser/venv/lib/libstdc++.so.6")
     os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
-    os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
-    os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
-    os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
+    #os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
+    #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
+    #os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
     #st.info(dylib_folder)
     os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib"
     #st.info(os.environ["LD_LIBRARY_PATH"])
