@@ -781,18 +781,10 @@ def parse_file(outputFile, filepath):
             print(no_matches_found)
             return -1
         for line in file:
-            line = line.rstrip()
-            #list = line.split('|')
-            ##list[0:3] = ["|".join(list[0:3])]
-            ###list = line.split(' ')
-            ##list[0] = list[0].strip()
-            ##list[1] = list[1].removeprefix('E-value=')
-            ##list[1] = float(list[1])
-            #curr_id="|".join(list[:-1])
-            #curr_ev=float(list[-1].removeprefix('E-value='))
+            line = line.strip()
             list=line.split()
             curr_id=list[0]
-            curr_ev=float(list[-1])
+            curr_ev=float(list[-1].split("=")[-1])
             ids.append(curr_id)
             e_vals.append(curr_ev)
                         
