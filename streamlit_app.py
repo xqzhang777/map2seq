@@ -245,6 +245,10 @@ def main():
         pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
 
+        map_size, map_mean, model_com, model_mean, map_model_center_mean = map_model_correlation(mrc, pdb)
+        if model_mean<map_mean<map_model_center_mean:
+            st.warning(f"Your model appears to be misplaced in the map: the model is centered at x,y,z={model_com[0]:.1f},{model_com[1]:.1f},{model_com[2]:.1f} in a map of nx,ny,nz={map_size[0]},{map_size[1]},{map_size[2]} voxels, and the mean voxel values of your model position is {model_mean:.6g} while the map mean is {map_mean:.6g}. If the model is shifted to the map center, the mean voxel values would be {map_model_center_mean:.6g}")
+
         st.markdown("""---""")
 
         #db input
@@ -482,6 +486,7 @@ def main():
         
         st.markdown("Map Projections")
         plot_density_projection(mrc)
+        st.info(f"Model center={model_com[0]:.1f},{model_com[1]:.1f},{model_com[2]:.1f}  \nMap size={map_size[0]},{map_size[1]},{map_size[2]} voxels  \nModel mean voxel value={model_mean:.6g}  \nMap mean value={map_mean:.6g}")
 
     remove_old_pdbs(keep=10)
     remove_old_maps(keep=10)
@@ -561,6 +566,33 @@ def number_of_sequences(db_fasta):
     fa = pyfastx.Fasta(db_fasta)
     return len(fa)
 
+def map_model_correlation(mapFile, pdbFile):
+    import mrcfile
+    with mrcfile.open(mapFile) as mrc:
+        apix = np.array(mrc.voxel_size.tolist())
+        map_data = mrc.data
+    map_com = np.array(map_data.shape)//2
+    map_mean = np.mean(map_data)
+
+    from iotbx.data_manager import DataManager
+    dm = DataManager()
+    model = dm.get_model(pdbFile)
+    #sel =  model.selection("name CA")
+    #model = model.select(sel)
+    ca_coord = model.get_sites_cart().as_numpy_array().T
+    ca_coord /= apix[:, np.newaxis]
+    model_com = np.mean(ca_coord, axis=1)
+
+    from scipy.ndimage import map_coordinates
+    vals = map_coordinates(map_data, ca_coord, order=1)
+    model_mean = np.mean(vals)
+
+    ca_coord = ca_coord - model_com[:, np.newaxis] + map_com[:, np.newaxis]
+    vals = map_coordinates(map_data, ca_coord, order=1)
+    map_model_center_mean = np.mean(vals)
+
+    return map_data.shape, map_mean, model_com, model_mean, map_model_center_mean
+
 def get_direct_url(url):
     import re
     if url.startswith("https://drive.google.com/file/d/"):
@@ -605,6 +637,9 @@ def get_file_from_url(url):
             local_file_name.symlink_to(db_file)
     
     if not local_file_name.exists():
+        if Path(url).exists():  # local file
+            local_file_name.symlink_to(url)
+            return url
         url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
         ds = np.DataSource(None)
         if not ds.exists(url_final):
@@ -612,8 +647,11 @@ def get_file_from_url(url):
             st.stop()
         with ds.open(url_final) as fp:
             local_file_name = Path(tmpdir)/Path(fp.name).name
-            import shutil
-            shutil.move(fp.name, local_file_name)
+            if os.access(fp.name, os.W_OK):
+                import shutil
+                shutil.move(fp.name, local_file_name)
+            else:
+                local_file_name.symlink_to(fp.name)
 
     if local_file_name.suffix == ".gz":
         import gzip, shutil
