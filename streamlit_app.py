@@ -661,9 +661,8 @@ def get_file_from_url(url):
             else:
                 local_file_name.symlink_to(fp.name)
 
-    filename_final = gunzip(local_file_name)
-
-    return filename_final.as_posix()
+    filename_final = gunzip(str(local_file_name))
+    return filename_final
 
 def gunzip(gzip_file):
     if not gzip_file.endswith(".gz"): return gzip_file
