@@ -55,16 +55,16 @@ except ImportError:
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
             z.extractall(root_folder)
-    os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
-    os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
+    #os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
+    #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
     dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
-    sys.path.append("/home/appuser/venv/lib/python3.9/lib-dynload")
-    sys.path.append("/home/appuser/venv/lib")
+    sys.path.append(dylib_folder.as_posix())
+    sys.path.append(f"{root_folder}/lib")
     os.system("rm /home/appuser/venv/lib/libstdc++.so.6")
     os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
-    os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
-    os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
-    os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
+    #os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
+    #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
+    #os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
     #st.info(dylib_folder)
     os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib"
     #st.info(os.environ["LD_LIBRARY_PATH"])
@@ -321,7 +321,7 @@ def main():
             modelout = None
             res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
             if res is None:
-                st.error(f"Failed")
+                st.error(f"No matches found or program failed")
                 return
 
             xs, ys = res
@@ -729,19 +729,24 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir
 
     basename = f"map2seq_fms"
 
-    fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=np.iinfo(np.uint32).max)
+    hmm_res=fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=np.iinfo(np.uint32).max)
     
-    hmmer_out = "hmmer_output.txt"
-    num = parse_file(f"{outdir}{basename}.png", f"{outdir}{hmmer_out}")
-    if num == -1:
-        return None # failed
+    # Parse output file
+    #
+    #hmmer_out = "hmmer_output.txt"
+    #num = parse_file(f"{outdir}{basename}.png", f"{outdir}{hmmer_out}")
+    #if num == -1:
+    #    return None # failed
 
-    with open(os.path.join(outdir, f'{basename}.png_x.pkl'),'rb') as inf:
-        xs = pickle.load(inf)
-    with open(os.path.join(outdir, f'{basename}.png_y.pkl'),'rb') as inf:
-        ys = pickle.load(inf)
-
-    return (xs, ys)
+    #with open(os.path.join(outdir, f'{basename}.png_x.pkl'),'rb') as inf:
+    #    xs = pickle.load(inf)
+    #with open(os.path.join(outdir, f'{basename}.png_y.pkl'),'rb') as inf:
+    #    ys = pickle.load(inf)
+    #return (xs, ys)
+    
+    # Parse returned object
+    parsed_res=parse_pyhmmer_output(hmm_res)
+    return parsed_res
         
 def make_graph(ids, e_vals, outputFile):
     
@@ -798,6 +803,16 @@ def parse_file(outputFile, filepath):
                         
         make_graph(ids, e_vals, outputFile)
     return 1
+
+def parse_pyhmmer_output(pyhmmer_res):
+    if pyhmmer_res is None:
+        return None
+    ids=[]
+    e_vals=[]
+    for v in pyhmmer_res:
+        ids.append(v[0])
+        e_vals.append(float(v[1]))
+    return (ids,e_vals)
 
 def is_hosted():
     ret = Path("/home/appuser").exists()
