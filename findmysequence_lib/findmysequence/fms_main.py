@@ -70,7 +70,8 @@ class Fms_option:
         self.tmpdir=tmpdir
         self.outdir=outdir
         self.tophits=tophits
-        self.slide=True if HMMER_AVAILABLE is None else False
+        #self.slide=True if HMMER_AVAILABLE is None else False
+        self.slide=False
         self.selstr="all"
         self.rev=int(rev)
         self.flip=int(flip)
@@ -205,6 +206,7 @@ def guess(mapin         =   None,
         sys.stdout = stdout
         print("Finished")
     save_residue_score_dict(m2so.residue_scores_dicts,outdir)
+    return res
 
 
 def save_residue_score_dict(score_dict,outdir):
@@ -364,7 +366,7 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir
 #           debug        =   options.debug,
 #           tempdir       =  options.tempdir)
 
-    guess( mapin        =   options.mapin,
+    hmm_res=guess( mapin        =   options.mapin,
            mtzin        =   None,
            labin        =   None,
            modelin      =   options.modelin,
@@ -380,6 +382,7 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir
            outdir       =   options.outdir,
            rev          =   options.rev,
            flip         =   options.flip)
+    return hmm_res
 
 def reverse_msa(msa_string):
     lines=msa_string.split()
