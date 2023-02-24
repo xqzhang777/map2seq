@@ -120,14 +120,13 @@ def main():
             label = "Upload a map in MRC or CCP4 format"
             help = None
             fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="upload_map")
-            if fileobj is not None:
-                emd_id = extract_emd_id(fileobj.name)
-                is_emd = emd_id is not None
-                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+            if fileobj is None: return
+            emd_id = extract_emd_id(fileobj.name)
+            is_emd = emd_id is not None
+            mrc = tmpdir + "/" + fileobj.name
+            if not Path(mrc).exists():
+                with open(mrc, "wb") as f:
                     f.write(fileobj.getbuffer())
-                mrc = tmpdir + "/" + fileobj.name
-            else:
-                return
         elif input_mode_map == 1: # "url":
             emd_id_default = "emd-10499"
             url_default = get_emdb_map_url(emd_id_default)
@@ -177,9 +176,15 @@ def main():
             if mrc is None:
                 st.warning(f"Failed to download [EMD-{emd_id}]({url})")
                 return
+            is_emd = True
+        
+        if is_emd: 
+            emdb_ids_all, resolutions = get_emdb_ids()
             resolution = resolutions[emdb_ids_all.index(emd_id)]
             msg = f'[EMD-{emd_id}](https://www.ebi.ac.uk/emdb/entry/EMD-{emd_id}) | resolution={resolution}Å'
             st.markdown(msg)
+
+        mrc = gunzip(mrc)
 
         if mrc is None or not Path(mrc).exists():
             st.warning(f"Failed to load density map")
@@ -199,12 +204,11 @@ def main():
         if input_mode_model == 0: # "upload a PDB file":
             label = "Upload a PDB file"
             fileobj = st.file_uploader(label, type=['pdb'], help=None, key="upload_model")
-            if fileobj is not None:
-                with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
+            if fileobj is None: return
+            pdb = tmpdir + "/" + fileobj.name
+            if not Path(pdb).exists():
+                with open(pdb, "wb") as f:
                     f.write(fileobj.getbuffer())
-                pdb = tmpdir + "/" + fileobj.name
-            else:
-                return
         
         elif input_mode_model == 1: # "url":
             help = "An online url (http:// or ftp://) or a local file path (/path/to/your/model.pdb)"
@@ -237,6 +241,8 @@ def main():
                 st.markdown(msg)
             else:
                 return
+        
+        pdb = gunzip(pdb)
 
         if pdb is None or not Path(pdb).exists():
             st.warning(f"Failed to load the PDB model")
@@ -244,6 +250,10 @@ def main():
 
         pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
+
+        map_size, map_mean, model_com, model_mean, map_model_center_mean = map_model_correlation(mrc, pdb)
+        if model_mean<map_mean<map_model_center_mean:
+            st.warning(f"Your model appears to be misplaced in the map: the model is centered at x,y,z={model_com[0]:.1f},{model_com[1]:.1f},{model_com[2]:.1f} in a map of nx,ny,nz={map_size[0]},{map_size[1]},{map_size[2]} voxels, and the mean voxel values of your model position is {model_mean:.6g} while the map mean is {map_mean:.6g}. If the model is shifted to the map center, the mean voxel values would be {map_model_center_mean:.6g}")
 
         st.markdown("""---""")
 
@@ -258,12 +268,12 @@ def main():
 
         if input_mode_db == 0: # "upload":
             label = "Upload a fasta file (.fa, .fa.gz, .fasta, .fasta.gz)"
-            if fileobj is None: return
             fileobj = st.file_uploader(label, type=['fa', 'fasta', 'fa.gz', 'fasta.gz'], help=None, key="upload_db")
-
-            with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
-                f.write(fileobj.getbuffer())
+            if fileobj is None: return
             db = tmpdir + "/" + fileobj.name
+            if not Path(db).exists():
+                with open(db, "wb") as f:
+                    f.write(fileobj.getbuffer())
         else:
             if input_mode_db == 1: # "url":
                 help = "An online url (http:// or ftp://) or a local file path (/path/to/your/database.fa.gz)"
@@ -283,6 +293,8 @@ def main():
             with st.spinner(f'Downloading {url.strip()}'):
                 db = get_file_from_url(url.strip())
         
+        db = gunzip(db)
+
         if db is None or not Path(db).exists():
             st.warning(f"Failed to load the protein sequence database")
             return      
@@ -482,6 +494,7 @@ def main():
         
         st.markdown("Map Projections")
         plot_density_projection(mrc)
+        st.info(f"Model center={model_com[0]:.1f},{model_com[1]:.1f},{model_com[2]:.1f}  \nMap size={map_size[0]},{map_size[1]},{map_size[2]} voxels  \nModel mean voxel value={model_mean:.6g}  \nMap mean value={map_mean:.6g}")
 
     remove_old_pdbs(keep=10)
     remove_old_maps(keep=10)
@@ -553,13 +566,40 @@ def remove_old_maps(keep=0):
     if keep>0:
         map_files = sorted(map_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in map_files:
-        os.remove(os.path.join(tmpdir, f))
+        os.remove(f)
 
 @st.experimental_memo(persist=True, show_spinner=False)
 def number_of_sequences(db_fasta):
     import pyfastx
     fa = pyfastx.Fasta(db_fasta)
     return len(fa)
+
+def map_model_correlation(mapFile, pdbFile):
+    import mrcfile
+    with mrcfile.open(mapFile) as mrc:
+        apix = np.array(mrc.voxel_size.tolist())
+        map_data = mrc.data
+    map_com = np.array(map_data.shape)//2
+    map_mean = np.mean(map_data)
+
+    from iotbx.data_manager import DataManager
+    dm = DataManager()
+    model = dm.get_model(pdbFile)
+    #sel =  model.selection("name CA")
+    #model = model.select(sel)
+    ca_coord = model.get_sites_cart().as_numpy_array().T
+    ca_coord /= apix[:, np.newaxis]
+    model_com = np.mean(ca_coord, axis=1)
+
+    from scipy.ndimage import map_coordinates
+    vals = map_coordinates(map_data, ca_coord, order=1)
+    model_mean = np.mean(vals)
+
+    ca_coord = ca_coord - model_com[:, np.newaxis] + map_com[:, np.newaxis]
+    vals = map_coordinates(map_data, ca_coord, order=1)
+    map_model_center_mean = np.mean(vals)
+
+    return map_data.shape, map_mean, model_com, model_mean, map_model_center_mean
 
 def get_direct_url(url):
     import re
@@ -605,6 +645,9 @@ def get_file_from_url(url):
             local_file_name.symlink_to(db_file)
     
     if not local_file_name.exists():
+        if Path(url).exists():  # local file
+            local_file_name.symlink_to(url)
+            return url
         url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
         ds = np.DataSource(None)
         if not ds.exists(url_final):
@@ -612,15 +655,22 @@ def get_file_from_url(url):
             st.stop()
         with ds.open(url_final) as fp:
             local_file_name = Path(tmpdir)/Path(fp.name).name
-            import shutil
-            shutil.move(fp.name, local_file_name)
+            if os.access(fp.name, os.W_OK):
+                import shutil
+                shutil.move(fp.name, local_file_name)
+            else:
+                local_file_name.symlink_to(fp.name)
 
-    if local_file_name.suffix == ".gz":
-        import gzip, shutil
-        with gzip.open(local_file_name, 'r') as f_in, open(filename_final, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
+    filename_final = gunzip(str(local_file_name))
+    return filename_final
 
-    return filename_final.as_posix()
+def gunzip(gzip_file):
+    if not gzip_file.endswith(".gz"): return gzip_file
+    unzipped_file = gzip_file[:-3]
+    import gzip, shutil
+    with gzip.open(gzip_file, 'r') as f_in, open(unzipped_file, 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+    return unzipped_file
 
 def extract_emd_id(text):
     import re
@@ -665,7 +715,7 @@ def remove_old_pdbs(keep=0):
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
-        os.remove(os.path.join(tmpdir, f))
+        os.remove(f)
 
 @st.experimental_memo(max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
 def get_pdb_ids():
@@ -781,18 +831,10 @@ def parse_file(outputFile, filepath):
             print(no_matches_found)
             return -1
         for line in file:
-            line = line.rstrip()
-            #list = line.split('|')
-            ##list[0:3] = ["|".join(list[0:3])]
-            ###list = line.split(' ')
-            ##list[0] = list[0].strip()
-            ##list[1] = list[1].removeprefix('E-value=')
-            ##list[1] = float(list[1])
-            #curr_id="|".join(list[:-1])
-            #curr_ev=float(list[-1].removeprefix('E-value='))
+            line = line.strip()
             list=line.split()
             curr_id=list[0]
-            curr_ev=float(list[-1])
+            curr_ev=float(list[-1].split("=")[-1])
             ids.append(curr_id)
             e_vals.append(curr_ev)
                         
