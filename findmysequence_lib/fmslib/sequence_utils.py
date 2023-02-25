@@ -205,7 +205,8 @@ class model2sequence:
         hmm,_,_=builder.build_msa(msa_d,background)
         
         with pyhmmer.easel.SequenceFile(db_fname,digital=True,alphabet=alphabet) as seq_file:
-            hits = next(pyhmmer.hmmer.hmmsearch(hmm,seq_file,cpus=0,E=1e11,domE=1e11,domZ=20600))
+            cpu = int(os.environ['cpu'])
+            hits = next(pyhmmer.hmmer.hmmsearch(hmm,seq_file,cpus=cpu, F1=1e10, F2=1e10, F3=1e10, E=1e10, domE=1e10, incE=1e10, incdomE=1e10))
         
         if len(hits)>0:
             results = []

@@ -310,7 +310,7 @@ def main():
         st.markdown("""---""")
         run_button_clicked = st.button(label="Run")
 
-        st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to Xiaoqi Zhang (zhang4377 at purdue.edu)*")
+        st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to [map2seq@GitHub](https://github.com/jianglab/map2seq/issues)*")
 
     if (mrc_changed or pdb_changed or input_mode_db in [3, 4]) and not run_button_clicked: return
 
