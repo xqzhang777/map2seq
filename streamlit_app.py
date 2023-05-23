@@ -744,8 +744,12 @@ def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir
     #    ys = pickle.load(inf)
     #return (xs, ys)
     
-    # Parse returned object
-    parsed_res=parse_pyhmmer_output(hmm_res)
+    if seqin is None:
+        # Parse returned object
+        parsed_res=parse_pyhmmer_output(hmm_res)
+    else:
+        parsed_res=0
+	
     return parsed_res
         
 def make_graph(ids, e_vals, outputFile):
