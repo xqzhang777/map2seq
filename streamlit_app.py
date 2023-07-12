@@ -487,7 +487,7 @@ def main():
     remove_old_maps(keep=10)
     #remove_old_graph_log()
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
 #def plot_pdb_model(pdb):
 #    from stmol import showmol
 #    import py3Dmol
@@ -497,7 +497,7 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-#@st.experimental_memo(persist='disk', max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+#@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
 def plot_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r+')
     v_size=mrc_data.voxel_size
@@ -555,7 +555,7 @@ def remove_old_maps(keep=0):
     for f in map_files:
         os.remove(os.path.join(tmpdir, f))
 
-@st.experimental_memo(persist=True, show_spinner=False)
+@st.cache_data(show_spinner=False)
 def number_of_sequences(db_fasta):
     import pyfastx
     fa = pyfastx.Fasta(db_fasta)
@@ -633,7 +633,7 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-@st.experimental_memo(max_entries=1, ttl=60*60*24, show_spinner=False, suppress_st_warning=True)
+@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
 def get_emdb_ids():
     try:
         import pandas as pd
@@ -667,7 +667,7 @@ def remove_old_pdbs(keep=0):
     for f in pdb_files:
         os.remove(os.path.join(tmpdir, f))
 
-@st.experimental_memo(max_entries=1, ttl=60*60*24*7, show_spinner=False, suppress_st_warning=True)
+@st.cache_data(max_entries=1, ttl=60*60*24*7, show_spinner=False)
 def get_pdb_ids():
     try:
         url = "ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx"
@@ -715,7 +715,7 @@ def flip_map_model(map_name, pdb_name):
             o.write(line)
     return str(map_flip), str(pdb_flip)
 
-@st.experimental_memo(max_entries=10, ttl=60*60, show_spinner=False, suppress_st_warning=True)
+@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
 def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
@@ -826,7 +826,7 @@ def is_jianglab():
     ret = Path("/net/jiang").exists()
     return ret
 
-@st.cache(persist=True, show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def setup_anonymous_usage_report():
     try:
         import pathlib, stat
