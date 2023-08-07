@@ -28,7 +28,7 @@ if not os.path.isdir(tmpdir):
 from shutil import which
 #st.info(which("python"))
 
-st.write(sys.prefix)
+#st.write(sys.prefix)
 
 try:
     import cctbx
@@ -48,12 +48,12 @@ except ImportError:
     with ds.open(url_final) as fp:
         filename_final = fp.name
     filepath_final = Path(filename_final).resolve()
-    st.write(filepath_final)
+    #st.write(filepath_final)
     working_dir=Path.cwd()
-    st.write(working_dir)
+    #st.write(working_dir)
     #out_path=Path("/home/appuser/venv/")
     root_folder = Path(sys.executable).parent.parent
-    st.write(Path(sys.executable))
+    #st.write(Path(sys.executable))
     dctx=zstandard.ZstdDecompressor()
     with tempfile.TemporaryFile(suffix=".tar") as ofh:
         with filepath_final.open("rb") as ifh:
