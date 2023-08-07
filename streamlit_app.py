@@ -67,8 +67,10 @@ except ImportError:
     pkg_folder = working_dir/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages"
     sys.path.append(dylib_folder.as_posix())
     sys.path.append(pkg_folder.as_posix())
+    sys.path.append(pkg_folder.as_posix())
     #sys.path.append(f"{root_folder}/lib")
     sys.path.append(f"{working_dir}/lib")
+    sys.path.append(f"{working_dir}/share")
     #os.system("rm /home/appuser/venv/lib/libstdc++.so.6")
     #os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
     #os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
