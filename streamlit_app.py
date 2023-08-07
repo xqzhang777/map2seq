@@ -47,6 +47,8 @@ except ImportError:
         filename_final = fp.name
     filepath_final = Path(filename_final).resolve()
     st.write(filepath_final)
+    working_dir=Path.cwd()
+    st.write(working_dir)
     #out_path=Path("/home/appuser/venv/")
     root_folder = Path(sys.executable).parent.parent
     st.write(Path(sys.executable))
@@ -56,14 +58,17 @@ except ImportError:
             dctx.copy_stream(ifh,ofh)
         ofh.seek(0)
         with tarfile.open(fileobj=ofh) as z:
-            z.extractall(root_folder)
+            #z.extractall(root_folder)
+	    z.extractall(working_dir)
     #os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
     #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
-    dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
+    #dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
+    dylib_folder = working_dir/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
     sys.path.append(dylib_folder.as_posix())
-    sys.path.append(f"{root_folder}/lib")
-    os.system("rm /home/appuser/venv/lib/libstdc++.so.6")
-    os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
+    #sys.path.append(f"{root_folder}/lib")
+    sys.path.append(f"{working_dir}/lib")
+    #os.system("rm /home/appuser/venv/lib/libstdc++.so.6")
+    #os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
     #os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
     #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
     #os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
