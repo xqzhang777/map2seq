@@ -46,6 +46,7 @@ except ImportError:
     with ds.open(url_final) as fp:
         filename_final = fp.name
     filepath_final = Path(filename_final).resolve()
+    st.write(filepath_final)
     #out_path=Path("/home/appuser/venv/")
     root_folder = Path(sys.executable).parent.parent
     dctx=zstandard.ZstdDecompressor()
