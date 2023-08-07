@@ -49,6 +49,7 @@ except ImportError:
     st.write(filepath_final)
     #out_path=Path("/home/appuser/venv/")
     root_folder = Path(sys.executable).parent.parent
+    st.write(Path(sys.executable))
     dctx=zstandard.ZstdDecompressor()
     with tempfile.TemporaryFile(suffix=".tar") as ofh:
         with filepath_final.open("rb") as ifh:
