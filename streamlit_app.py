@@ -28,6 +28,7 @@ if not os.path.isdir(tmpdir):
 from shutil import which
 #st.info(which("python"))
 
+st.write(sys.prefix)
 
 try:
     import cctbx
