@@ -512,9 +512,8 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-#@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
 def plot_density_projection(mrc):
-    mrc_data = mrcfile.open(mrc, 'r+')
+    mrc_data = mrcfile.open(mrc, 'r')
     v_size=mrc_data.voxel_size
     nx=mrc_data.header['nx']
     ny=mrc_data.header['ny']
@@ -522,34 +521,37 @@ def plot_density_projection(mrc):
     apix=v_size['z']
     
     data=mrc_data.data
-    ret = data.sum(axis=0)
-    ret=normalize(ret)
-    st.image(ret)
 
-    ret = data.sum(axis=1)
-    ret=normalize(ret)
-    st.image(ret)    
+    if is_amyloid(data, apix): # only show central sections of ~4.75A in length
+        n_section = int(4.75/apix+0.5)
+        proj = data[nz//2-n_section//2:nz//2-n_section//2+n_section].sum(axis=0)
+    else:
+        proj = data.sum(axis=0)
+    proj=normalize(proj)
+    st.image(proj)
 
-    ret = data.sum(axis=2)
-    ret=normalize(ret)
-    st.image(ret)
-    
-    #mrc_data = mrcfile.open(mrc, 'r+')
-    #v_size=mrc_data.voxel_size
-    #nx=mrc_data.header['nx']
-    #ny=mrc_data.header['ny']
-    #nz=mrc_data.header['nz']
-    #apix=v_size['z']
-    
-    #data=mrc_data.data
-        
-    #X,Y,Z=np.mgrid[0:apix*nx:nx*1j,0:apix*ny:ny*1j,0:apix*nz:nz*1j]
+    proj = data.sum(axis=1)
+    proj=normalize(proj)
+    st.image(proj)    
 
-        
+    proj = data.sum(axis=2)
+    proj=normalize(proj)
+    st.image(proj)
+
     #import plotly.graph_objects as go
     ##mrc_fig=go.Figure(data=go.Volume(x=np.arange(0,nx*apix,apix),y=np.arange(0,ny*apix,apix),z=np.arange(0,nz*apix,apix),value=data,isomin=0.1,isomax=0.8,opacity=1,surface_count=200))
     #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
     #st.plotly_chart(mrc_fig,use_container_width=True)
+
+def is_amyloid(data, apix):
+    if apix > 2.35: return 0
+    nz = data.shape[0]
+    ft = np.fft.fft2(data.sum(axis=1))
+    ps_max = np.max(np.abs(ft), axis=1)
+    ps_4_75 = ps_max[ int(nz*apix/4.75+0.5) ]
+    ps_6 = ps_max[ int(nz*apix/6+0.5) ]
+    ret = ps_4_75/ps_6 > 5
+    return ret
 
 def normalize(data, percentile=(0, 100)):
     p0, p1 = percentile
