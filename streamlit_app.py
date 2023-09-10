@@ -334,7 +334,7 @@ def main():
             #remove_old_graph_log()
             seqin = None
             modelout = None
-            res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
+            res = map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             if res is None:
                 st.error(f"No matches found or program failed")
                 return
@@ -418,7 +418,7 @@ def main():
                 tmp.write(fa[xs[0]].seq)
             
             with st.spinner("Processing..."):
-                map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
+                map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             
             lines = []
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
@@ -682,7 +682,7 @@ def remove_old_pdbs(keep=0):
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
-        os.remove(os.path.join(tmpdir, f))
+        os.remove(f)
 
 @st.cache_data(max_entries=1, ttl=60*60*24*7, show_spinner=False)
 def get_pdb_ids():
@@ -733,7 +733,7 @@ def flip_map_model(map_name, pdb_name):
     return str(map_flip), str(pdb_flip)
 
 @st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
-def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir/"):
+def map2seq_run(map, pdb, db, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
     map = os.path.abspath(map)
