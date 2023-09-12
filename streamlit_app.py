@@ -164,6 +164,8 @@ def main():
                 return
             url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=10&sort=release_date%20desc"
             st.markdown(f'[All {len(emdb_ids_all):,} structures in EMDB]({url})')
+            
+            emd_id_default = "emd-23871"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
                 help = "Randomly select another structure in EMDB"
@@ -174,7 +176,6 @@ def main():
             else:
                 help = None
                 label = "Input an EMDB ID (emd-xxxxx):"
-                emd_id_default = "emd-23871"
                 emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
                 if not emd_id: return
                 emd_id = emd_id.lower().split("emd-")[-1]
@@ -202,6 +203,8 @@ def main():
 
         mrc_changed = st.session_state.get("mrc_last", mrc) != mrc
         st.session_state.mrc_last = mrc
+
+        fix_map_axes_order(mrc)
 
         st.markdown("""---""")
 
@@ -695,6 +698,19 @@ def get_pdb_ids():
         pdb_ids = None
     return pdb_ids
 #-------------------------------End Model Functions-------------------------------
+
+def fix_map_axes_order(map_name):
+    with mrcfile.open(map_name, mode='r', header_only=True) as mrc:
+        current_axes = (mrc.header.mapc, mrc.header.mapr, mrc.header.maps)
+        if current_axes == (1, 2, 3):
+            return
+    with mrcfile.open(map_name, mode='r+', header_only=False) as mrc:
+        current_axes = (mrc.header.mapc-1, mrc.header.mapr-1, mrc.header.maps-1)
+        new_axes = (0, 1, 2)
+        mrc.set_data( np.moveaxis(mrc.data, current_axes, new_axes) )
+        mrc.header.mapc = 1
+        mrc.header.mapr = 2
+        mrc.header.maps = 3
 
 def flip_map_model(map_name, pdb_name):
     map_flip = Path(map_name).with_suffix(".flip.mrc")
