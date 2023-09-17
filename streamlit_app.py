@@ -320,10 +320,11 @@ def main():
         if handedness_option in [1]: # flipped
             mrc, pdb = flip_map_model(mrc, pdb)
 
-        if is_hosted():
-            cpu = 1
-        else:
-            cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
+        #if is_hosted():
+        #    cpu = 1
+        #else:
+        #    cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
+        cpu = 1
 
         st.markdown("""---""")
         run_button_clicked = st.button(label="Run")
@@ -675,7 +676,7 @@ def get_emdb_map_url(emdid):
 
 def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
-	return f"{server}/{protid}.pdb.gz"
+	return f"{server}/{protid}.cif.gz"
 	
 #-------------------------------End Map Functions-------------------------------
 
