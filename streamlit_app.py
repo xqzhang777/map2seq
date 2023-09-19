@@ -339,9 +339,9 @@ def main():
             seqin = None
             modelout = None
 
-            mrc=FileName(mrc)
-            pdb=FileName(pdb)
-            db=FileName(db)
+            #mrc=FileName(mrc)
+            #pdb=FileName(pdb)
+            #db=FileName(db)
 
             res = map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             if res is None:
@@ -780,7 +780,7 @@ def flip_map_model(map_name, pdb_name):
     return str(map_flip), str(pdb_flip)
 
 #@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False, hash_funcs={FileName: lambda fn: fn.__hash__()})
-def map2seq_run(map: FileName, pdb: FileName, db: FileName, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
+def map2seq_run(map, pdb, db, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
     map = os.path.abspath(map)
