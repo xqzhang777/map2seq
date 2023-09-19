@@ -338,6 +338,11 @@ def main():
             #remove_old_graph_log()
             seqin = None
             modelout = None
+
+            mrc=FileName(mrc)
+            pdb=FileName(pdb)
+            db=FileName(db)
+
             res = map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             if res is None:
                 st.error(f"No matches found or program failed")
@@ -515,6 +520,31 @@ def main():
 #    s_view=py3Dmol.view(data=s,width=400,height=300)
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
+
+class FileName(str):
+    def __init__(self,file_name):
+        self.file_name=file_name
+    
+    def __str__(self):
+        return self.file_name
+    
+    def __hash__(self):
+        # https://stackoverflow.com/questions/22058048/hashing-a-file-in-python
+        import hashlib
+        try:
+            with open(self.file_name,'rb') as f:
+                BUF_SIZE = 65536
+                md5=hashlib.md5()
+                while True:
+                    data=f.read(BUF_SIZE)
+                    if not data:
+                        break
+                    md5.update(data)
+            return md5.hexdigest()
+        except:
+            print("Error hashing the file {0}".format(self.file_name))
+
+
 
 def plot_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r')
@@ -749,7 +779,7 @@ def flip_map_model(map_name, pdb_name):
             o.write(line)
     return str(map_flip), str(pdb_flip)
 
-#@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
+@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
 def map2seq_run(map, pdb, db, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
