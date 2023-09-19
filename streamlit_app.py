@@ -540,7 +540,7 @@ class FileName(str):
                     if not data:
                         break
                     md5.update(data)
-            return md5.hexdigest()
+            return int(md5.hexdigest(),16)
         except:
             print("Error hashing the file {0}".format(self.file_name))
 
