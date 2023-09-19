@@ -749,7 +749,7 @@ def flip_map_model(map_name, pdb_name):
             o.write(line)
     return str(map_flip), str(pdb_flip)
 
-@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
+#@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
 def map2seq_run(map, pdb, db, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
