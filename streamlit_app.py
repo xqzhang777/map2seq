@@ -521,7 +521,7 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-class FileName(str):
+class FileName():
     def __init__(self,file_name):
         self.file_name=file_name
     
