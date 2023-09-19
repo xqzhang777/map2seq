@@ -164,6 +164,8 @@ def main():
                 return
             url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=10&sort=release_date%20desc"
             st.markdown(f'[All {len(emdb_ids_all):,} structures in EMDB]({url})')
+            
+            emd_id_default = "emd-23871"
             do_random_embid = st.checkbox("Choose a random EMDB ID", value=False, key="random_embid")
             if do_random_embid:
                 help = "Randomly select another structure in EMDB"
@@ -174,7 +176,6 @@ def main():
             else:
                 help = None
                 label = "Input an EMDB ID (emd-xxxxx):"
-                emd_id_default = "emd-23871"
                 emd_id = st.text_input(label=label, value=emd_id_default, key='emd_id', help=help)
                 if not emd_id: return
                 emd_id = emd_id.lower().split("emd-")[-1]
@@ -202,6 +203,8 @@ def main():
 
         mrc_changed = st.session_state.get("mrc_last", mrc) != mrc
         st.session_state.mrc_last = mrc
+
+        fix_map_axes_order(mrc)
 
         st.markdown("""---""")
 
@@ -317,10 +320,11 @@ def main():
         if handedness_option in [1]: # flipped
             mrc, pdb = flip_map_model(mrc, pdb)
 
-        if is_hosted():
-            cpu = 1
-        else:
-            cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
+        #if is_hosted():
+        #    cpu = 1
+        #else:
+        #    cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
+        cpu = 1
 
         st.markdown("""---""")
         run_button_clicked = st.button(label="Run")
@@ -334,7 +338,7 @@ def main():
             #remove_old_graph_log()
             seqin = None
             modelout = None
-            res = map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
+            res = map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             if res is None:
                 st.error(f"No matches found or program failed")
                 return
@@ -418,7 +422,7 @@ def main():
                 tmp.write(fa[xs[0]].seq)
             
             with st.spinner("Processing..."):
-                map2seq_run(mrc, pdb, seqin, modelout, direction_option, handedness_option, db, cpu=cpu, outdir = tmpdir)
+                map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             
             lines = []
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
@@ -512,9 +516,8 @@ def main():
 #    s_view.setStyle({'cartoon':{'color':'spectrum'}})
 #    showmol(s_view)    
 
-#@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
 def plot_density_projection(mrc):
-    mrc_data = mrcfile.open(mrc, 'r+')
+    mrc_data = mrcfile.open(mrc, 'r')
     v_size=mrc_data.voxel_size
     nx=mrc_data.header['nx']
     ny=mrc_data.header['ny']
@@ -522,34 +525,37 @@ def plot_density_projection(mrc):
     apix=v_size['z']
     
     data=mrc_data.data
-    ret = data.sum(axis=0)
-    ret=normalize(ret)
-    st.image(ret)
 
-    ret = data.sum(axis=1)
-    ret=normalize(ret)
-    st.image(ret)    
+    if is_amyloid(data, apix): # only show central sections of ~4.75A in length
+        n_section = int(4.75/apix+0.5)
+        proj = data[nz//2-n_section//2:nz//2-n_section//2+n_section].sum(axis=0)
+    else:
+        proj = data.sum(axis=0)
+    proj=normalize(proj)
+    st.image(proj)
 
-    ret = data.sum(axis=2)
-    ret=normalize(ret)
-    st.image(ret)
-    
-    #mrc_data = mrcfile.open(mrc, 'r+')
-    #v_size=mrc_data.voxel_size
-    #nx=mrc_data.header['nx']
-    #ny=mrc_data.header['ny']
-    #nz=mrc_data.header['nz']
-    #apix=v_size['z']
-    
-    #data=mrc_data.data
-        
-    #X,Y,Z=np.mgrid[0:apix*nx:nx*1j,0:apix*ny:ny*1j,0:apix*nz:nz*1j]
+    proj = data.sum(axis=1)
+    proj=normalize(proj)
+    st.image(proj)    
 
-        
+    proj = data.sum(axis=2)
+    proj=normalize(proj)
+    st.image(proj)
+
     #import plotly.graph_objects as go
     ##mrc_fig=go.Figure(data=go.Volume(x=np.arange(0,nx*apix,apix),y=np.arange(0,ny*apix,apix),z=np.arange(0,nz*apix,apix),value=data,isomin=0.1,isomax=0.8,opacity=1,surface_count=200))
     #mrc_fig=go.Figure(data=go.Volume(x=X.flatten(),y=Y.flatten(),z=Z.flatten(),value=data.flatten(),isomin=0.1,isomax=0.8,opacity=0.1,surface_count=20))
     #st.plotly_chart(mrc_fig,use_container_width=True)
+
+def is_amyloid(data, apix):
+    if apix > 2.35: return 0
+    nz = data.shape[0]
+    ft = np.fft.fft2(data.sum(axis=1))
+    ps_max = np.max(np.abs(ft), axis=1)
+    ps_4_75 = ps_max[ int(nz*apix/4.75+0.5) ]
+    ps_6 = ps_max[ int(nz*apix/6+0.5) ]
+    ret = ps_4_75/ps_6 > 5
+    return ret
 
 def normalize(data, percentile=(0, 100)):
     p0, p1 = percentile
@@ -670,7 +676,7 @@ def get_emdb_map_url(emdid):
 
 def get_pdb_url(protid):
 	server = "https://files.rcsb.org/download"
-	return f"{server}/{protid}.pdb.gz"
+	return f"{server}/{protid}.cif.gz"
 	
 #-------------------------------End Map Functions-------------------------------
 
@@ -680,7 +686,7 @@ def remove_old_pdbs(keep=0):
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
-        os.remove(os.path.join(tmpdir, f))
+        os.remove(f)
 
 @st.cache_data(max_entries=1, ttl=60*60*24*7, show_spinner=False)
 def get_pdb_ids():
@@ -693,6 +699,19 @@ def get_pdb_ids():
         pdb_ids = None
     return pdb_ids
 #-------------------------------End Model Functions-------------------------------
+
+def fix_map_axes_order(map_name):
+    with mrcfile.open(map_name, mode='r', header_only=True) as mrc:
+        current_axes = (mrc.header.mapc, mrc.header.mapr, mrc.header.maps)
+        if current_axes == (1, 2, 3):
+            return
+    with mrcfile.open(map_name, mode='r+', header_only=False) as mrc:
+        current_axes = (mrc.header.mapc-1, mrc.header.mapr-1, mrc.header.maps-1)
+        new_axes = (0, 1, 2)
+        mrc.set_data( np.moveaxis(mrc.data, current_axes, new_axes) )
+        mrc.header.mapc = 1
+        mrc.header.mapr = 2
+        mrc.header.maps = 3
 
 def flip_map_model(map_name, pdb_name):
     map_flip = Path(map_name).with_suffix(".flip.mrc")
@@ -730,8 +749,8 @@ def flip_map_model(map_name, pdb_name):
             o.write(line)
     return str(map_flip), str(pdb_flip)
 
-@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
-def map2seq_run(map, pdb, seqin, modelout, rev, flip, db, cpu=2, outdir="tempDir/"):
+#@st.cache_data(max_entries=10, ttl=60*60, show_spinner=False)
+def map2seq_run(map, pdb, db, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
     map = os.path.abspath(map)
