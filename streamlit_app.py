@@ -604,7 +604,7 @@ def remove_old_maps(keep=0):
     if keep>0:
         map_files = sorted(map_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in map_files:
-        os.remove(os.path.join(tmpdir, f))
+        os.remove(f)
 
 @st.cache_data(show_spinner=False)
 def number_of_sequences(db_fasta):
@@ -670,6 +670,7 @@ def get_file_from_url(url):
         import gzip, shutil
         with gzip.open(local_file_name, 'r') as f_in, open(filename_final, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
+        local_file_name.unlink()
 
     return filename_final.as_posix()
 
