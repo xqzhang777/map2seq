@@ -699,7 +699,7 @@ def get_emdb_ids():
 
 def get_emdb_map_url(emdid):
     emdid_number = emdid.lower().split("emd-")[-1]
-    server = "https://ftp.wwpdb.org/pub"    # Rutgers University, USA
+    server = "https://files.wwpdb.org/pub"    # Rutgers University, USA
     #server = "https://ftp.ebi.ac.uk/pub/databases" # European Bioinformatics Institute, England
     #server = "http://ftp.pdbj.org/pub" # Osaka University, Japan
     url = f"{server}/emdb/structures/EMD-{emdid_number}/map/emd_{emdid_number}.map.gz"
