@@ -206,7 +206,7 @@ def main():
 
         fix_map_axes_order(mrc)
 
-        st.markdown("""---""")
+        st.divider()
 
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
@@ -263,7 +263,7 @@ def main():
         pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
 
-        st.markdown("""---""")
+        st.divider()
 
         #db input
         input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all curated proteins"}
@@ -309,6 +309,12 @@ def main():
             n = number_of_sequences(db)
             st.markdown(info.format(n=n))
 
+        st.divider()
+        
+        ala = st.checkbox("Mutate all residues to Alanine", value=True)
+        if ala:
+            pdb = convert_to_alanine(cif_file = pdb)
+
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
         direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, horizontal=True, help=help_direction, key="direction_option")
@@ -326,7 +332,8 @@ def main():
         #    cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
         cpu = 1
 
-        st.markdown("""---""")
+        st.divider()
+        
         run_button_clicked = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to [map2seq@GitHub](https://github.com/jianglab/map2seq/issues)*")
@@ -712,6 +719,31 @@ def get_pdb_url(protid):
 #-------------------------------End Map Functions-------------------------------
 
 #-------------------------------Model Functions-------------------------------
+def convert_to_alanine(cif_file):
+    import iotbx.pdb
+    aa_resnames = iotbx.pdb.amino_acid_codes.one_letter_given_three_letter
+    ala_atom_names = set([" N  ", " CA ", " C  ", " O  ", " CB "])
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    for model in hierarchy.models():
+        for chain in model.chains():
+            for rg in chain.residue_groups():
+                #rg.change_residue_name(new_residue_name="ALA")
+                def have_amino_acid():
+                    for ag in rg.atom_groups():
+                        if (ag.resname in aa_resnames):
+                            return True
+                    return False
+                if have_amino_acid():
+                    for ag in rg.atom_groups():
+                        ag.resname = "ALA"
+                        for atom in ag.atoms():
+                            if (atom.name not in ala_atom_names):
+                                ag.remove_atom(atom=atom)
+    output_cif = Path(cif_file).with_suffix(".ala.cif").as_posix()
+    hierarchy.write_mmcif_file(file_name=output_cif)
+    return output_cif
+
 def remove_old_pdbs(keep=0):
     pdb_files = [os.path.join(tmpdir, item) for item in os.listdir(tmpdir) if item.endswith(".pdb") or item.endswith(".pdb.gz")]
     if keep>0:
