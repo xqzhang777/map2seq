@@ -462,9 +462,10 @@ def main():
             lines2 = []
             for li in range(len(lines)):
                 if lines[li].find("p-value") != -1:
-                    line_tmp = ["|"] * max(len(lines[li+1]), len(lines[li+2]))
+                    line_tmp = [" "] * max(len(lines[li+1]), len(lines[li+2]))
                     for i in range( min(len(lines[li+1]), len(lines[li+2])) ):
-                        if lines[li+1][i] == lines[li+2][i]: line_tmp[i] = " "
+                        if lines[li+1][i].isalpha() and lines[li+2][i].isalpha():
+                            line_tmp[i] = "|" if lines[li+1][i] == lines[li+2][i] else "X"
                     lines2 += [lines[li], lines[li+1], ''.join(line_tmp), lines[li+2], lines[li+3], "\n"]
 
             st.text("\n".join(lines2[:-1]))
