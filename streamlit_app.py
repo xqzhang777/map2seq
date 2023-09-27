@@ -263,6 +263,23 @@ def main():
         pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
 
+        valid_chain_ids = sorted(get_chain_ids(cif_file=pdb))
+        if len(valid_chain_ids)<1:
+            st.warning(f"No protein chain in the structure")
+            return
+
+        if len(valid_chain_ids)>1:
+            chain_ids = sorted(st.multiselect('Choose one or more chains:', options=valid_chain_ids, default=[valid_chain_ids[0]], key="chain_ids"))
+        else:
+            chain_ids = valid_chain_ids
+
+        if len(chain_ids)<1:
+            st.warning("Please select at least one chain")
+            return
+        
+        if len(chain_ids) < len(valid_chain_ids):
+            pdb = extract_chains(cif_file=pdb, chain_ids=chain_ids)
+
         st.divider()
 
         #db input
@@ -692,7 +709,7 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
+@st.cache_data(max_entries=1, ttl=60*60*24, persist="disk", show_spinner=False)
 def get_emdb_ids():
     try:
         import pandas as pd
@@ -744,8 +761,31 @@ def convert_to_alanine(cif_file):
     hierarchy.write_mmcif_file(file_name=output_cif)
     return output_cif
 
+def extract_chains(cif_file, chain_ids):
+    import iotbx.pdb
+    new_hierarchy = iotbx.pdb.hierarchy.root()
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    for model in hierarchy.models():
+        new_model = iotbx.pdb.hierarchy.model(id=model.id)
+        new_hierarchy.append_model(new_model)
+        for chain in model.chains():
+            if chain.id in chain_ids:
+                new_model.append_chain(chain.detached_copy())
+    output_cif = Path(cif_file).with_suffix(f".chain-{'-'.join(chain_ids)}.cif").as_posix()
+    new_hierarchy.write_mmcif_file(file_name=output_cif)
+    return output_cif
+
+def get_chain_ids(cif_file):
+    import iotbx.pdb
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    ids = hierarchy.chain_ids(unique_only=True)
+    return ids
+
 def remove_old_pdbs(keep=0):
-    pdb_files = [os.path.join(tmpdir, item) for item in os.listdir(tmpdir) if item.endswith(".pdb") or item.endswith(".pdb.gz")]
+    import glob
+    pdb_files = [item for item in glob.glob(f"{tmpdir}/*.cif")]
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
