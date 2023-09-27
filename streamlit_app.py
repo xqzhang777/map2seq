@@ -458,7 +458,16 @@ def main():
                 for line in tmp.readlines()[:-2]:
                     if "==>" in line or "Empty" in line or "WARNING" in line: continue
                     lines.append(line.rstrip())
-            st.text("\n".join(lines))
+
+            lines2 = []
+            for li in range(len(lines)):
+                if lines[li].find("p-value") != -1:
+                    line_tmp = ["|"] * max(len(lines[li+1]), len(lines[li+2]))
+                    for i in range( min(len(lines[li+1]), len(lines[li+2])) ):
+                        if lines[li+1][i] == lines[li+2][i]: line_tmp[i] = " "
+                    lines2 += [lines[li], lines[li+1], ''.join(line_tmp), lines[li+2], lines[li+3], "\n"]
+
+            st.text("\n".join(lines2[:-1]))
                         
             with open(modelout,"r") as tmp:
                 out_texts="".join(tmp.readlines())
@@ -709,7 +718,7 @@ def extract_emd_id(text):
         emd_id = None
     return emd_id
 
-@st.cache_data(max_entries=1, ttl=60*60*24, persist="disk", show_spinner=False)
+@st.cache_data(max_entries=1, ttl=60*60*24, show_spinner=False)
 def get_emdb_ids():
     try:
         import pandas as pd
