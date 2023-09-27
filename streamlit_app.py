@@ -269,7 +269,7 @@ def main():
             return
 
         if len(valid_chain_ids)>1:
-            chain_ids = sorted(st.multiselect('Choose one or more chains:', options=valid_chain_ids, default=[valid_chain_ids[0]], key="chain_ids"))
+            chain_ids = sorted(st.multiselect('Choose one or more chains:', options=["All chains"]+valid_chain_ids, default=["All chains"], key="chain_ids"))
         else:
             chain_ids = valid_chain_ids
 
@@ -277,7 +277,7 @@ def main():
             st.warning("Please select at least one chain")
             return
         
-        if len(chain_ids) < len(valid_chain_ids):
+        if "All chains" not in chain_ids and len(chain_ids) < len(valid_chain_ids):
             pdb = extract_chains(cif_file=pdb, chain_ids=chain_ids)
 
         st.divider()
@@ -798,7 +798,7 @@ def get_chain_ids(cif_file):
 
 def remove_old_pdbs(keep=0):
     import glob
-    pdb_files = [item for item in glob.glob(f"{tmpdir}/*.cif")]
+    pdb_files = [item for item in glob.glob(f"{tmpdir}/*.cif") + glob.glob(f"{tmpdir}/*.cif.gz")]
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
