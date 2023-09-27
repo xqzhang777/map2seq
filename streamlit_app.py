@@ -780,8 +780,11 @@ def get_chain_ids(cif_file):
     import iotbx.pdb
     pdb_obj = iotbx.pdb.input(file_name=cif_file)
     hierarchy = pdb_obj.construct_hierarchy()
-    ids = hierarchy.chain_ids(unique_only=True)
-    return ids
+    chain_ids = set()
+    for model in hierarchy.models():
+        for chain in model.chains():
+            chain_ids.add( chain.id )
+    return chain_ids
 
 def remove_old_pdbs(keep=0):
     import glob
