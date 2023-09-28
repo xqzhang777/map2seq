@@ -11,3 +11,4 @@ torch==2.0.1
 boost==0.1
 hmmer==0.2.4
 pyhmmer==0.8.2
+streamlit_molstar==0.4.6

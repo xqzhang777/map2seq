@@ -538,8 +538,11 @@ def main():
         #st.markdown("PDB Model Overview")
         #plot_pdb_model(pdb)
         
-        st.markdown("Map Projections")
-        plot_density_projection(mrc)
+        display = st.radio("Display map in", ["2D projections", "3D"], index=0, horizontal=True, key="display")
+        if display == "2D projections":
+            display_density_projection(mrc)
+        else:
+            display_map_model(mrc, pdb, height="600px")
 
     remove_old_pdbs(keep=10)
     remove_old_maps(keep=10)
@@ -578,9 +581,17 @@ class FileName(str):
         except:
             print("Error hashing the file {0}".format(self.file_name))
 
+def display_map_model(mrc, pdb, height="600px"):
+    from streamlit_molstar.auto import st_molstar_auto
+    if not mrc.endswith(".mrc"):
+        p = Path(mrc)
+        p_symlink = p.with_suffix(".mrc")
+        if not p_symlink.exists():
+            p_symlink.symlink_to(p.name)
+    files = [p_symlink.as_posix(), cif_to_pdb(pdb)]
+    st_molstar_auto(files, key="molstar", height=height)
 
-
-def plot_density_projection(mrc):
+def display_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r')
     v_size=mrc_data.voxel_size
     nx=mrc_data.header['nx']
@@ -618,7 +629,7 @@ def is_amyloid(data, apix):
     ps_max = np.max(np.abs(ft), axis=1)
     ps_4_75 = ps_max[ int(nz*apix/4.75+0.5) ]
     ps_6 = ps_max[ int(nz*apix/6+0.5) ]
-    ret = ps_4_75/ps_6 > 5
+    ret = ps_4_75/ps_6 > 3
     return ret
 
 def normalize(data, percentile=(0, 100)):
@@ -767,9 +778,9 @@ def convert_to_alanine(cif_file):
                         for atom in ag.atoms():
                             if (atom.name not in ala_atom_names):
                                 ag.remove_atom(atom=atom)
-    output_cif = Path(cif_file).with_suffix(".ala.cif").as_posix()
-    hierarchy.write_mmcif_file(file_name=output_cif)
-    return output_cif
+    output_pdb = Path(cif_file).with_suffix(".ala.pdb").as_posix()
+    hierarchy.write_pdb_file(file_name=output_pdb)
+    return output_pdb
 
 def extract_chains(cif_file, chain_ids):
     import iotbx.pdb
@@ -782,9 +793,9 @@ def extract_chains(cif_file, chain_ids):
         for chain in model.chains():
             if chain.id in chain_ids:
                 new_model.append_chain(chain.detached_copy())
-    output_cif = Path(cif_file).with_suffix(f".chain-{'-'.join(chain_ids)}.cif").as_posix()
-    new_hierarchy.write_mmcif_file(file_name=output_cif)
-    return output_cif
+    output_pdb = Path(cif_file).with_suffix(f".chain-{'-'.join(chain_ids)}.pdb").as_posix()
+    new_hierarchy.write_pdb_file(file_name=output_pdb)
+    return output_pdb
 
 def get_chain_ids(cif_file):
     import iotbx.pdb
@@ -796,9 +807,18 @@ def get_chain_ids(cif_file):
             chain_ids.add( chain.id )
     return chain_ids
 
+def cif_to_pdb(cif_file):
+    if cif_file.endswith(".pdb"): return cif_file
+    import iotbx.pdb
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    output_pdb = Path(cif_file).with_suffix(".pdb").as_posix()
+    hierarchy.write_pdb_file(file_name=output_pdb)
+    return output_pdb
+
 def remove_old_pdbs(keep=0):
     import glob
-    pdb_files = [item for item in glob.glob(f"{tmpdir}/*.cif") + glob.glob(f"{tmpdir}/*.cif.gz")]
+    pdb_files = [item for item in  glob.glob(f"{tmpdir}/*.pdb") + glob.glob(f"{tmpdir}/*.cif") + glob.glob(f"{tmpdir}/*.cif.gz")]
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
