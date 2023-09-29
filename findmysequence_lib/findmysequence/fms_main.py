@@ -71,7 +71,7 @@ class Fms_option:
         self.outdir=outdir
         self.tophits=tophits
         #self.slide=True if HMMER_AVAILABLE is None else False
-        self.slide=False
+        self.slide=slide
         self.selstr="all"
         self.rev=int(rev)
         self.flip=int(flip)
