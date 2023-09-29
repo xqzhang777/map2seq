@@ -61,7 +61,7 @@ fms_header="""
 """%(version)
 
 class Fms_option:
-    def __init__(self,mapin,modelin,seqin, modelout, slide, db,tmpdir,outdir,rev,flip,tophits=3):
+    def __init__(self,mapin,modelin,seqin, modelout, sld, db,tmpdir,outdir,rev,flip,tophits=3):
         self.mapin=mapin
         self.modelin=modelin
         self.seqin=seqin
@@ -71,7 +71,7 @@ class Fms_option:
         self.outdir=outdir
         self.tophits=tophits
         #self.slide=True if HMMER_AVAILABLE is None else False
-        self.slide=slide
+        self.slide=sld
         self.selstr="all"
         self.rev=int(rev)
         self.flip=int(flip)
@@ -296,7 +296,7 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, slide=False, db
 #        print
 #        return 1
     
-    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, slide=slide, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
+    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, sld=slide, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
 
 #    if options.modelin is None:
 
