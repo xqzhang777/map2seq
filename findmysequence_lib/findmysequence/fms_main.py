@@ -250,7 +250,7 @@ def assign_sequence(mapin         =   None,
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir=None, outdir=None, tophits=None, rev=0, flip=0):
+def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, slide=False, db=None, tmpdir=None, outdir=None, tophits=None, rev=0, flip=0):
 
 #    (parser, options) = parse_args()
 
@@ -296,7 +296,7 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, db=None, tmpdir
 #        print
 #        return 1
     
-    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
+    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, slide=slide, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
 
 #    if options.modelin is None:
 
