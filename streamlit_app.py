@@ -328,6 +328,12 @@ def main():
 
         st.divider()
         
+        slide = False
+        slide_options = {0:"HMM search", 1:"Slide window"}
+        slide_option = st.radio(label="Sequence search mode:", options=list(slide_options.keys()), format_func=lambda i:slide_options[i], index=0, horizontal=True, help=None, key="slide_option")
+        if slide_option in [1]:
+            slide = True
+        
         ala = st.checkbox("Mutate all residues to Alanine", value=True)
         if ala:
             pdb = convert_to_alanine(cif_file = pdb)
@@ -367,7 +373,7 @@ def main():
             pdb=FileName(pdb)
             db=FileName(db)
 
-            res = map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
+            res = map2seq_run(mrc, pdb, db, seqin, modelout, slide, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             if res is None:
                 st.error(f"No matches found or program failed")
                 return
@@ -886,7 +892,7 @@ def flip_map_model(map_name, pdb_name):
     return str(map_flip), str(pdb_flip)
 
 @st.cache_data(max_entries=10, ttl=60*60, show_spinner=False, hash_funcs={FileName: lambda fn: fn.__hash__()})
-def map2seq_run(map: FileName, pdb: FileName, db: FileName, seqin=None, modelout=None, rev=False, flip=False, cpu=1, outdir="tempDir/"):
+def map2seq_run(map: FileName, pdb: FileName, db: FileName, seqin=None, modelout=None, slide=False, rev=False, flip=False, cpu=1, outdir="tempDir/"):
     os.environ['cpu'] = f"{cpu}"
 
     map = os.path.abspath(map)
@@ -899,7 +905,7 @@ def map2seq_run(map: FileName, pdb: FileName, db: FileName, seqin=None, modelout
 
     basename = f"map2seq_fms"
 
-    hmm_res=fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=np.iinfo(np.uint32).max)
+    hmm_res=fms_main.fms_run(mapin=map, modelin=pdb, seqin=seqin, modelout=modelout, slide=slide, db=db, tmpdir=outdir, outdir=outdir, rev=rev, flip=flip, tophits=np.iinfo(np.uint32).max)
     
     # Parse output file
     #
