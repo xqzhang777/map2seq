@@ -295,8 +295,8 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, slide=False, db
 #        parser.print_help()
 #        print
 #        return 1
-    
-    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip, sld=slide)
+    sld123123=slide
+    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip, sld=sld123123)
 
 #    if options.modelin is None:
 
