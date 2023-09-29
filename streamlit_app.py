@@ -263,7 +263,9 @@ def main():
         pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
 
-        valid_chain_ids = sorted(get_chain_ids(cif_file=pdb))
+        pdb = cif_to_pdb(pdb)
+
+        valid_chain_ids = sorted(get_chain_ids(pdb_file=pdb))
         if len(valid_chain_ids)<1:
             st.warning(f"No protein chain in the structure")
             return
@@ -278,7 +280,7 @@ def main():
             return
         
         if "All chains" not in chain_ids and len(chain_ids) < len(valid_chain_ids):
-            pdb = extract_chains(cif_file=pdb, chain_ids=chain_ids)
+            pdb = extract_chains(pdb_file=pdb, chain_ids=chain_ids)
 
         st.divider()
 
@@ -330,7 +332,7 @@ def main():
         
         ala = st.checkbox("Mutate all residues to Alanine", value=True)
         if ala:
-            pdb = convert_to_alanine(cif_file = pdb)
+            pdb = convert_to_alanine(pdb_file = pdb)
 
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
@@ -492,8 +494,6 @@ def main():
         aa_list=list(score_dict_raw.columns)
             
         score_dict=pd.DataFrame(score_dict_raw.stack(),columns=["score"]).reset_index()
-        
-        
         
         colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
         mapper = LinearColorMapper(palette=colors, low=0, high=1)
@@ -757,11 +757,11 @@ def get_pdb_url(protid):
 #-------------------------------End Map Functions-------------------------------
 
 #-------------------------------Model Functions-------------------------------
-def convert_to_alanine(cif_file):
+def convert_to_alanine(pdb_file):
     import iotbx.pdb
     aa_resnames = iotbx.pdb.amino_acid_codes.one_letter_given_three_letter
     ala_atom_names = set([" N  ", " CA ", " C  ", " O  ", " CB "])
-    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    pdb_obj = iotbx.pdb.input(file_name=pdb_file)
     hierarchy = pdb_obj.construct_hierarchy()
     for model in hierarchy.models():
         for chain in model.chains():
@@ -778,14 +778,14 @@ def convert_to_alanine(cif_file):
                         for atom in ag.atoms():
                             if (atom.name not in ala_atom_names):
                                 ag.remove_atom(atom=atom)
-    output_pdb = Path(cif_file).with_suffix(".ala.pdb").as_posix()
+    output_pdb = Path(pdb_file).with_suffix(".ala.pdb").as_posix()
     hierarchy.write_pdb_file(file_name=output_pdb)
     return output_pdb
 
-def extract_chains(cif_file, chain_ids):
+def extract_chains(pdb_file, chain_ids):
     import iotbx.pdb
     new_hierarchy = iotbx.pdb.hierarchy.root()
-    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    pdb_obj = iotbx.pdb.input(file_name=pdb_file)
     hierarchy = pdb_obj.construct_hierarchy()
     for model in hierarchy.models():
         new_model = iotbx.pdb.hierarchy.model(id=model.id)
@@ -793,13 +793,13 @@ def extract_chains(cif_file, chain_ids):
         for chain in model.chains():
             if chain.id in chain_ids:
                 new_model.append_chain(chain.detached_copy())
-    output_pdb = Path(cif_file).with_suffix(f".chain-{'-'.join(chain_ids)}.pdb").as_posix()
+    output_pdb = Path(pdb_file).with_suffix(f".chain-{'-'.join(chain_ids)}.pdb").as_posix()
     new_hierarchy.write_pdb_file(file_name=output_pdb)
     return output_pdb
 
-def get_chain_ids(cif_file):
+def get_chain_ids(pdb_file):
     import iotbx.pdb
-    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    pdb_obj = iotbx.pdb.input(file_name=pdb_file)
     hierarchy = pdb_obj.construct_hierarchy()
     chain_ids = set()
     for model in hierarchy.models():
@@ -809,11 +809,12 @@ def get_chain_ids(cif_file):
 
 def cif_to_pdb(cif_file):
     if cif_file.endswith(".pdb"): return cif_file
+    output_pdb = Path(cif_file).with_suffix(".pdb")
+    if output_pdb.exists(): return output_pdb.as_posix()
     import iotbx.pdb
     pdb_obj = iotbx.pdb.input(file_name=cif_file)
     hierarchy = pdb_obj.construct_hierarchy()
-    output_pdb = Path(cif_file).with_suffix(".pdb").as_posix()
-    hierarchy.write_pdb_file(file_name=output_pdb)
+    hierarchy.write_pdb_file(file_name=output_pdb.as_posix())
     return output_pdb
 
 def remove_old_pdbs(keep=0):
