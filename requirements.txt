@@ -5,9 +5,10 @@ pandas==2.0.3
 h5py==3.9.0
 pyfastx==1.1.0
 mrcfile==1.4.3
-streamlit==1.24.1
+streamlit==1.27.0
 zstandard==0.21.0
 torch==2.0.1
 boost==0.1
 hmmer==0.2.4
 pyhmmer==0.8.2
+streamlit_molstar==0.4.6

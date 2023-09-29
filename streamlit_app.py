@@ -206,7 +206,7 @@ def main():
 
         fix_map_axes_order(mrc)
 
-        st.markdown("""---""")
+        st.divider()
 
         #pdb input
         input_modes_model = {0:"upload", 1:"url", 2:"PDB ID"}
@@ -263,7 +263,24 @@ def main():
         pdb_changed = st.session_state.get("pdb_last", pdb) != pdb
         st.session_state.pdb_last = pdb
 
-        st.markdown("""---""")
+        valid_chain_ids = sorted(get_chain_ids(cif_file=pdb))
+        if len(valid_chain_ids)<1:
+            st.warning(f"No protein chain in the structure")
+            return
+
+        if len(valid_chain_ids)>1:
+            chain_ids = sorted(st.multiselect('Choose one or more chains:', options=["All chains"]+valid_chain_ids, default=["All chains"], key="chain_ids"))
+        else:
+            chain_ids = valid_chain_ids
+
+        if len(chain_ids)<1:
+            st.warning("Please select at least one chain")
+            return
+        
+        if "All chains" not in chain_ids and len(chain_ids) < len(valid_chain_ids):
+            pdb = extract_chains(cif_file=pdb, chain_ids=chain_ids)
+
+        st.divider()
 
         #db input
         input_modes_db = {0:"upload", 1:"url", 2:"human proteins", 3:"all curated proteins"}
@@ -309,6 +326,12 @@ def main():
             n = number_of_sequences(db)
             st.markdown(info.format(n=n))
 
+        st.divider()
+        
+        ala = st.checkbox("Mutate all residues to Alanine", value=True)
+        if ala:
+            pdb = convert_to_alanine(cif_file = pdb)
+
         direction_options = {0:"original", 1:"reversed"}
         help_direction=None
         direction_option = st.radio(label="Protein sequence direction:", options=list(direction_options.keys()), format_func=lambda i:direction_options[i], index=0, horizontal=True, help=help_direction, key="direction_option")
@@ -326,7 +349,8 @@ def main():
         #    cpu = st.number_input("How many CPUs to use:", min_value=1, max_value=os.cpu_count(), value=2, step=1, help=f"a number in [1, {os.cpu_count()}]", key="cpu")
         cpu = 1
 
-        st.markdown("""---""")
+        st.divider()
+        
         run_button_clicked = st.button(label="Run")
 
         st.markdown("*Developed by the [Jiang Lab@Purdue University](https://jiang.bio.purdue.edu/map2seq). Report problems to [map2seq@GitHub](https://github.com/jianglab/map2seq/issues)*")
@@ -434,7 +458,17 @@ def main():
                 for line in tmp.readlines()[:-2]:
                     if "==>" in line or "Empty" in line or "WARNING" in line: continue
                     lines.append(line.rstrip())
-            st.text("\n".join(lines))
+
+            lines2 = []
+            for li in range(len(lines)):
+                if lines[li].find("p-value") != -1:
+                    line_tmp = [" "] * max(len(lines[li+1]), len(lines[li+2]))
+                    for i in range( min(len(lines[li+1]), len(lines[li+2])) ):
+                        if lines[li+1][i].isalpha() and lines[li+2][i].isalpha():
+                            line_tmp[i] = "|" if lines[li+1][i] == lines[li+2][i] else "X"
+                    lines2 += [lines[li], lines[li+1], ''.join(line_tmp), lines[li+2], lines[li+3], "\n"]
+
+            st.text("\n".join(lines2[:-1]))
                         
             with open(modelout,"r") as tmp:
                 out_texts="".join(tmp.readlines())
@@ -504,8 +538,11 @@ def main():
         #st.markdown("PDB Model Overview")
         #plot_pdb_model(pdb)
         
-        st.markdown("Map Projections")
-        plot_density_projection(mrc)
+        display = st.radio("Display map in", ["2D projections", "3D"], index=0, horizontal=True, key="display")
+        if display == "2D projections":
+            display_density_projection(mrc)
+        else:
+            display_map_model(mrc, pdb, height="600px")
 
     remove_old_pdbs(keep=10)
     remove_old_maps(keep=10)
@@ -544,9 +581,17 @@ class FileName(str):
         except:
             print("Error hashing the file {0}".format(self.file_name))
 
+def display_map_model(mrc, pdb, height="600px"):
+    from streamlit_molstar.auto import st_molstar_auto
+    if not mrc.endswith(".mrc"):
+        p = Path(mrc)
+        p_symlink = p.with_suffix(".mrc")
+        if not p_symlink.exists():
+            p_symlink.symlink_to(p.name)
+    files = [p_symlink.as_posix(), cif_to_pdb(pdb)]
+    st_molstar_auto(files, key="molstar", height=height)
 
-
-def plot_density_projection(mrc):
+def display_density_projection(mrc):
     mrc_data = mrcfile.open(mrc, 'r')
     v_size=mrc_data.voxel_size
     nx=mrc_data.header['nx']
@@ -584,7 +629,7 @@ def is_amyloid(data, apix):
     ps_max = np.max(np.abs(ft), axis=1)
     ps_4_75 = ps_max[ int(nz*apix/4.75+0.5) ]
     ps_6 = ps_max[ int(nz*apix/6+0.5) ]
-    ret = ps_4_75/ps_6 > 5
+    ret = ps_4_75/ps_6 > 3
     return ret
 
 def normalize(data, percentile=(0, 100)):
@@ -604,7 +649,7 @@ def remove_old_maps(keep=0):
     if keep>0:
         map_files = sorted(map_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in map_files:
-        os.remove(os.path.join(tmpdir, f))
+        os.remove(f)
 
 @st.cache_data(show_spinner=False)
 def number_of_sequences(db_fasta):
@@ -670,6 +715,7 @@ def get_file_from_url(url):
         import gzip, shutil
         with gzip.open(local_file_name, 'r') as f_in, open(filename_final, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
+        local_file_name.unlink()
 
     return filename_final.as_posix()
 
@@ -698,7 +744,7 @@ def get_emdb_ids():
 
 def get_emdb_map_url(emdid):
     emdid_number = emdid.lower().split("emd-")[-1]
-    server = "https://ftp.wwpdb.org/pub"    # Rutgers University, USA
+    server = "https://files.wwpdb.org/pub"    # Rutgers University, USA
     #server = "https://ftp.ebi.ac.uk/pub/databases" # European Bioinformatics Institute, England
     #server = "http://ftp.pdbj.org/pub" # Osaka University, Japan
     url = f"{server}/emdb/structures/EMD-{emdid_number}/map/emd_{emdid_number}.map.gz"
@@ -711,8 +757,68 @@ def get_pdb_url(protid):
 #-------------------------------End Map Functions-------------------------------
 
 #-------------------------------Model Functions-------------------------------
+def convert_to_alanine(cif_file):
+    import iotbx.pdb
+    aa_resnames = iotbx.pdb.amino_acid_codes.one_letter_given_three_letter
+    ala_atom_names = set([" N  ", " CA ", " C  ", " O  ", " CB "])
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    for model in hierarchy.models():
+        for chain in model.chains():
+            for rg in chain.residue_groups():
+                #rg.change_residue_name(new_residue_name="ALA")
+                def have_amino_acid():
+                    for ag in rg.atom_groups():
+                        if (ag.resname in aa_resnames):
+                            return True
+                    return False
+                if have_amino_acid():
+                    for ag in rg.atom_groups():
+                        ag.resname = "ALA"
+                        for atom in ag.atoms():
+                            if (atom.name not in ala_atom_names):
+                                ag.remove_atom(atom=atom)
+    output_pdb = Path(cif_file).with_suffix(".ala.pdb").as_posix()
+    hierarchy.write_pdb_file(file_name=output_pdb)
+    return output_pdb
+
+def extract_chains(cif_file, chain_ids):
+    import iotbx.pdb
+    new_hierarchy = iotbx.pdb.hierarchy.root()
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    for model in hierarchy.models():
+        new_model = iotbx.pdb.hierarchy.model(id=model.id)
+        new_hierarchy.append_model(new_model)
+        for chain in model.chains():
+            if chain.id in chain_ids:
+                new_model.append_chain(chain.detached_copy())
+    output_pdb = Path(cif_file).with_suffix(f".chain-{'-'.join(chain_ids)}.pdb").as_posix()
+    new_hierarchy.write_pdb_file(file_name=output_pdb)
+    return output_pdb
+
+def get_chain_ids(cif_file):
+    import iotbx.pdb
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    chain_ids = set()
+    for model in hierarchy.models():
+        for chain in model.chains():
+            chain_ids.add( chain.id )
+    return chain_ids
+
+def cif_to_pdb(cif_file):
+    if cif_file.endswith(".pdb"): return cif_file
+    import iotbx.pdb
+    pdb_obj = iotbx.pdb.input(file_name=cif_file)
+    hierarchy = pdb_obj.construct_hierarchy()
+    output_pdb = Path(cif_file).with_suffix(".pdb").as_posix()
+    hierarchy.write_pdb_file(file_name=output_pdb)
+    return output_pdb
+
 def remove_old_pdbs(keep=0):
-    pdb_files = [os.path.join(tmpdir, item) for item in os.listdir(tmpdir) if item.endswith(".pdb") or item.endswith(".pdb.gz")]
+    import glob
+    pdb_files = [item for item in  glob.glob(f"{tmpdir}/*.pdb") + glob.glob(f"{tmpdir}/*.cif") + glob.glob(f"{tmpdir}/*.cif.gz")]
     if keep>0:
         pdb_files = sorted(pdb_files, key=lambda f: os.path.getmtime(f))[:-keep]
     for f in pdb_files:
