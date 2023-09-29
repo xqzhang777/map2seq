@@ -61,7 +61,7 @@ fms_header="""
 """%(version)
 
 class Fms_option:
-    def __init__(self,mapin,modelin,seqin, modelout, db,tmpdir,outdir,rev,flip,tophits=3):
+    def __init__(self,mapin,modelin,seqin, modelout, slide, db,tmpdir,outdir,rev,flip,tophits=3):
         self.mapin=mapin
         self.modelin=modelin
         self.seqin=seqin
