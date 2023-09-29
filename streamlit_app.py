@@ -216,7 +216,7 @@ def main():
 
         if input_mode_model == 0: # "upload a PDB file":
             label = "Upload a PDB file"
-            fileobj = st.file_uploader(label, type=['pdb'], help=None, key="upload_model")
+            fileobj = st.file_uploader(label, type=['pdb','cif'], help=None, key="upload_model")
             if fileobj is not None:
                 with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                     f.write(fileobj.getbuffer())
