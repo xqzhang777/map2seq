@@ -61,7 +61,7 @@ fms_header="""
 """%(version)
 
 class Fms_option:
-    def __init__(self,mapin,modelin,seqin, modelout, sld, db,tmpdir,outdir,rev,flip,tophits=3):
+    def __init__(self,mapin,modelin,seqin, modelout, db,tmpdir,outdir,rev,flip,tophits=3, **kwargs):
         self.mapin=mapin
         self.modelin=modelin
         self.seqin=seqin
@@ -296,7 +296,7 @@ def fms_run(mapin=None, modelin=None, seqin=None, modelout=None, slide=False, db
 #        print
 #        return 1
     
-    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, sld=slide, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip)
+    options=Fms_option(mapin=mapin, modelin=modelin, seqin=seqin, modelout=modelout, db=db, tmpdir=tmpdir, outdir=outdir, tophits=tophits,rev=rev,flip=flip, sld=slide)
 
 #    if options.modelin is None:
 
