@@ -457,7 +457,7 @@ def main():
                 tmp.write(fa[xs[0]].seq)
             
             with st.spinner("Processing..."):
-                map2seq_run(mrc, pdb, db, seqin, modelout, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
+                map2seq_run(mrc, pdb, db, seqin, modelout, slide, direction_option, handedness_option, cpu=cpu, outdir = tmpdir)
             
             lines = []
             with open(tmpdir+"/seq_align_output.txt","r") as tmp:
