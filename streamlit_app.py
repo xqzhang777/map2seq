@@ -811,10 +811,11 @@ def cif_to_pdb(cif_file):
     if cif_file.endswith(".pdb"): return cif_file
     output_pdb = Path(cif_file).with_suffix(".pdb")
     if output_pdb.exists(): return output_pdb.as_posix()
+    output_pdb = output_pdb.as_posix()
     import iotbx.pdb
     pdb_obj = iotbx.pdb.input(file_name=cif_file)
     hierarchy = pdb_obj.construct_hierarchy()
-    hierarchy.write_pdb_file(file_name=output_pdb.as_posix())
+    hierarchy.write_pdb_file(file_name=output_pdb)
     return output_pdb
 
 def remove_old_pdbs(keep=0):
