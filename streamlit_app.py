@@ -701,15 +701,18 @@ def get_file_from_url(url):
             local_file_name.symlink_to(db_file)
     
     if not local_file_name.exists():
-        url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
-        ds = np.DataSource(None)
-        if not ds.exists(url_final):
-            st.error(f"ERROR: {url} could not be downloaded. If this url points to a cloud drive file, make sure the link is a direct download link instead of a link for preview")
-            st.stop()
-        with ds.open(url_final) as fp:
-            local_file_name = Path(tmpdir)/Path(fp.name).name
-            import shutil
-            shutil.move(fp.name, local_file_name)
+        if Path(url).exists():
+            local_file_name.symlink_to(url)
+        else:
+            url_final = get_direct_url(url)    # convert cloud drive indirect url to direct url
+            ds = np.DataSource(None)
+            if not ds.exists(url_final):
+                st.error(f"ERROR: {url} could not be downloaded. If this url points to a cloud drive file, make sure the link is a direct download link instead of a link for preview")
+                st.stop()
+            with ds.open(url_final) as fp:
+                local_file_name = Path(tmpdir)/Path(fp.name).name
+                import shutil
+                shutil.move(fp.name, local_file_name)
 
     if local_file_name.suffix == ".gz":
         import gzip, shutil
