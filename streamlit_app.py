@@ -443,7 +443,7 @@ def main():
 
     with col2:
         tophit = xs[0]
-        if st.button(label=f"Align top hit {tophit}", key="align_top_hit"):
+        if has_good_scores or st.button(label=f"Align top hit {tophit}", key="align_top_hit"):
             import pyfastx
             fa = pyfastx.Fasta(db)
             seqin = tmpdir+"/tmp.fasta"
