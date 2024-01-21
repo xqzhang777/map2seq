@@ -128,13 +128,13 @@ def main():
     with col1:
 
         mrc = None
-        input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"}
-        help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
+        input_modes_map = {0:"upload", 1:"url", 2:"emd-xxxxx"} 
+        help_map = "Only maps in MRC (*\*.mrc*) or CCP4 (*\*.map, \*.ccp4*) format are supported. Compressed maps (*\*.gz*) will be automatically decompressed"
         input_mode_map = st.radio(label="How to obtain the input map:", options=list(input_modes_map.keys()), format_func=lambda i:input_modes_map[i], index=2, horizontal=True, help=help_map, key="input_mode_map")
         if input_mode_map == 0: # "upload a MRC file":
             label = "Upload a map in MRC or CCP4 format"
             help = None
-            fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz'], help=help, key="upload_map")
+            fileobj = st.file_uploader(label, type=['mrc', 'map', 'map.gz', 'ccp4'], help=help, key="upload_map")
             if fileobj is not None:
                 emd_id = extract_emd_id(fileobj.name)
                 is_emd = emd_id is not None
@@ -216,7 +216,7 @@ def main():
 
         if input_mode_model == 0: # "upload a PDB file":
             label = "Upload a PDB file"
-            fileobj = st.file_uploader(label, type=['pdb'], help=None, key="upload_model")
+            fileobj = st.file_uploader(label, type=['pdb', 'cif'], help=None, key="upload_model")
             if fileobj is not None:
                 with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                     f.write(fileobj.getbuffer())
@@ -295,8 +295,8 @@ def main():
 
         if input_mode_db == 0: # "upload":
             label = "Upload a fasta file (.fa, .fa.gz, .fasta, .fasta.gz)"
-            if fileobj is None: return
             fileobj = st.file_uploader(label, type=['fa', 'fasta', 'fa.gz', 'fasta.gz'], help=None, key="upload_db")
+            if fileobj is None: return
 
             with open(os.path.join(tmpdir, fileobj.name), "wb") as f:
                 f.write(fileobj.getbuffer())
@@ -423,7 +423,7 @@ def main():
         
         has_good_scores = df_top.iloc[:, 1].astype(float).min()<score_threshold
         def highlight_bad_score_rows(x, score_threshold=score_threshold):
-            if x[1] > score_threshold:
+            if x.iloc[1] > score_threshold:
                 return ['background-color: red']*4
             else:
                 return ['background-color: white']*4 
