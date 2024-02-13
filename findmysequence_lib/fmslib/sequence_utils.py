@@ -205,7 +205,8 @@ class model2sequence:
         hmm,_,_=builder.build_msa(msa_d,background)
         
         with pyhmmer.easel.SequenceFile(db_fname,digital=True,alphabet=alphabet) as seq_file:
-            hits = next(pyhmmer.hmmer.hmmsearch(hmm,seq_file,cpus=0,E=1e11,domE=1e11,domZ=20600))
+            cpu = int(os.environ['cpu'])
+            hits = next(pyhmmer.hmmer.hmmsearch(hmm,seq_file,cpus=cpu, F1=1e10, F2=1e10, F3=1e10, E=1e10, domE=1e10, incE=1e10, incdomE=1e10))
         
         if len(hits)>0:
             results = []
@@ -259,9 +260,9 @@ class model2sequence:
             _rnd_resi = np.random.randint(_resis, _resie-_rnd_len)
             selstr = "chain %s and resi %i:%i" % (_chid, _rnd_resi, _rnd_resi+_rnd_len)
 
-        print()
-        print( " ==> Selection string: %s" % selstr )
-        print()
+        #print()
+        #print( " ==> Selection string: %s" % selstr )
+        #print()
 
 
         sel_cache = ph.atom_selection_cache()
@@ -273,7 +274,7 @@ class model2sequence:
         msa_array = []
         for ch in self.ph_selected.chains():
 
-            print( " ==> Processing chain %s " % ch.id )
+            #print( " ==> Processing chain %s " % ch.id )
 
             for conf in ch.conformers():
                 #if 'HOH' in [_r.resname.strip() for _r in ch.residues()]: continue
@@ -283,7 +284,7 @@ class model2sequence:
                 if not conf.altloc in ['', 'A']: continue
 
                 for resi,res in enumerate(conf.residues()[:]):
-                    if resi%10==0: print( "     %5i/%i" % (resi, len(conf.residues())) )
+                    #if resi%10==0: print( "     %5i/%i" % (resi, len(conf.residues())) )
 
                     scores_dict = self.nn_model_obj.predict(res)
                     if scores_dict is None:
