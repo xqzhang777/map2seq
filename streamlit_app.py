@@ -723,9 +723,12 @@ def get_file_from_url(url):
 
     if local_file_name.suffix == ".gz":
         import gzip, shutil
-        with gzip.open(local_file_name, 'r') as f_in, open(filename_final, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-        local_file_name.unlink()
+        try:
+            with gzip.open(local_file_name, 'r') as f_in, open(filename_final, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+            local_file_name.unlink()
+        except:
+            st.error(f"Error loading file from {url}. Please try manually downloading it.")
 
     return filename_final.as_posix()
 
