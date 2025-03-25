@@ -163,7 +163,7 @@ def main():
             if not emdb_ids_all:
                 st.warning("failed to obtained a list of structures in EMDB")
                 return
-            url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=10&sort=release_date%20desc"
+            url = "https://www.ebi.ac.uk/emdb/search/*%20?rows=100&sort=release_date%20desc"
             st.markdown(f'[All {len(emdb_ids_all):,} structures in EMDB]({url})')
             
             emd_id_default = "emd-23871"
@@ -747,7 +747,7 @@ def extract_emd_id(text):
 def get_emdb_ids():
     try:
         import pandas as pd
-        entries = pd.read_csv("https://www.ebi.ac.uk/emdb/api/search/current_status:%22REL%22%20?wt=csv&download=true&fl=emdb_id,resolution")
+        entries = pd.read_csv("https://www.ebi.ac.uk/emdb/api/search/current_status:%22REL%22%20?rows=1000000&wt=csv&download=true&fl=emdb_id,resolution")
         emdb_ids = list(entries.iloc[:,0].str.split('-', expand=True).iloc[:, 1].values)
         resolutions = entries.iloc[:,1].values
     except:
