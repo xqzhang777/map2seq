@@ -1,4 +1,5 @@
-bokeh==2.4.3
+bokeh
+streamlit_bokeh
 boost==0.1
 h5py==3.10.0
 hmmer==0.2.4

@@ -103,6 +103,7 @@ except ImportError:
 
 import numpy as np
 import pandas as pd
+from streamlit_bokeh import streamlit_bokeh
 from bokeh.plotting import ColumnDataSource, figure
 from bokeh.models import Label, BasicTicker, ColorBar, LinearColorMapper, PrintfTickFormatter
 
@@ -400,7 +401,8 @@ def main():
         p.xaxis.major_label_text_font_size = "16pt"
         p.yaxis.major_label_text_font_size = "16pt"
         
-        st.bokeh_chart(p, use_container_width=True)
+        #st.bokeh_chart(p, use_container_width=True)
+        streamlit_bokeh(p, use_container_width=True)
                 
     with col2:
         df = pd.DataFrame({"E-val (log10)":np.log10(ys).T, "Protein":np.array(xs).T})
