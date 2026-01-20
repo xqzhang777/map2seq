@@ -40,7 +40,8 @@ except ImportError:
     import numpy as np
    
     #st.info("downloading cctbx-base")
-    ds = np.DataSource(tmpdir)
+    #ds = np.DataSource(tmpdir)
+    ds = np.lib.npyio.DataSource(tmpdir)
     #url_final = "https://drive.google.com/uc?export=download&id=1pWpLoyUOXqTbktqOJ24X5bdXa8u7lb0Y"
     url_final="https://app.box.com/shared/static/1g86uapr33273a4vlvgkfzfq2swgemuh.zst"
     #url_final="https://drive.google.com/uc?export=download&id=1pMarQnGuABG9MRp9DW0TFY_hStakNF4S"
