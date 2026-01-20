@@ -386,7 +386,7 @@ def main():
                 
         source = ColumnDataSource(data=dict(x=range(1,len(xs)+1),y=ys,ID=xs))
         top_source = ColumnDataSource(data=dict(x=[1],y=[ys[0]],ID=[xs[0]]))
-        label = Label(x=1, y=ys[0], text=f'Best match: {xs[0]}', x_offset=10, y_offset=-5, text_font_size='16px', render_mode='canvas')
+        label = Label(x=1, y=ys[0], text=f'Best match: {xs[0]}', x_offset=10, y_offset=-5, text_font_size='16px')
 
         TOOLTIPS = [('Rank','@x'),('Protein','@ID'),('E-val','@y')]
         p = figure(tooltips=TOOLTIPS, y_axis_type='log', title='')
