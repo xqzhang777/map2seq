@@ -391,7 +391,7 @@ def main():
         TOOLTIPS = [('Rank','@x'),('Protein','@ID'),('E-val','@y')]
         p = figure(tooltips=TOOLTIPS, y_axis_type='log', title='')
         p.circle('x','y',source=source)
-        p.circle('x','y',source=top_source, size=10,line_color='red',fill_color='red')
+        p.circle('x','y',source=top_source,radius=0.1,size=10,line_color='red',fill_color='red')
         p.yaxis.axis_label = 'E-values'
         p.xaxis.axis_label = 'Rank Order'
         p.y_range.flipped = True
