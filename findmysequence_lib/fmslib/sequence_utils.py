@@ -211,7 +211,7 @@ class model2sequence:
         if len(hits)>0:
             results = []
             for hit in hits:
-                results.append((str(hit.name,encoding='utf-8'),str(hit.evalue)))
+                results.append((hit.name, str(hit.evalue))) 
             return results
         else:
             return None
