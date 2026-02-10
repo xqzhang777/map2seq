@@ -468,7 +468,7 @@ def main():
                      label_standoff=6, border_line_color=None)
         hm.add_layout(color_bar, 'right')
         
-        hm
+        streamlit_bokeh(hm)
         
     
     with col3:
