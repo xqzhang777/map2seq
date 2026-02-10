@@ -374,7 +374,7 @@ class model2sequence:
         n = max(1, int(n/10))
         if n>1:
             logn = np.log(n)
-            b_n = np.sqrt(2.0*logn)*(1.0 - 0.25*np.log(np.math.pi*logn)/logn)
+            b_n = np.sqrt(2.0*logn)*(1.0 - 0.25*np.log(np.pi*logn)/logn)
             a_n = b_n + 1.0/np.sqrt(2.0*logn)
             #G=1.0-np.exp(-np.exp(a_n*(b_n-z)-0.5*(b_n-z)**2.0))
             #nuerically unstable, check e.g.
