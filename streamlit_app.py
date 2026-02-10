@@ -24,81 +24,9 @@ tmpdir = "map2seq_out"
 if not os.path.isdir(tmpdir):
     os.mkdir(tmpdir)
 
-#st.info(os.environ["LD_LIBRARY_PATH"])
 from shutil import which
-#st.info(which("python"))
 
-#st.write(sys.prefix)
-
-try:
-    import cctbx
-    #raise ImportError
-except ImportError:
-    import zstandard
-    import tempfile
-    import tarfile
-    import numpy as np
-   
-    #st.info("downloading cctbx-base")
-    ds = np.lib.npyio.DataSource(tmpdir)
-    #url_final = "https://drive.google.com/uc?export=download&id=1pWpLoyUOXqTbktqOJ24X5bdXa8u7lb0Y"
-    url_final="https://app.box.com/shared/static/1g86uapr33273a4vlvgkfzfq2swgemuh.zst"
-    #url_final="https://drive.google.com/uc?export=download&id=1pMarQnGuABG9MRp9DW0TFY_hStakNF4S"
-    if not ds.exists(url_final):
-        print("download error")
-    with ds.open(url_final) as fp:
-        filename_final = fp.name
-    filepath_final = Path(filename_final).resolve()
-    #st.write(filepath_final)
-    working_dir=Path.cwd()
-    #st.write(working_dir)
-    #out_path=Path("/home/appuser/venv/")
-    root_folder = Path(sys.executable).parent.parent
-    #st.write(Path(sys.executable))
-    dctx=zstandard.ZstdDecompressor()
-    with tempfile.TemporaryFile(suffix=".tar") as ofh:
-        with filepath_final.open("rb") as ifh:
-            dctx.copy_stream(ifh,ofh)
-        ofh.seek(0)
-        with tarfile.open(fileobj=ofh) as z:
-            #z.extractall(root_folder)
-            z.extractall(working_dir)
-    #os.system("ls /home/appuser/venv/lib/python3.9/lib-dynload")
-    #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/boost_python_meta_ext.so")
-    #dylib_folder = root_folder/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
-    dylib_folder = working_dir/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/lib-dynload"
-    pkg_folder = working_dir/f"lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages"
-    sys.path.append(dylib_folder.as_posix())
-    sys.path.append(pkg_folder.as_posix())
-    sys.path.append(pkg_folder.as_posix())
-    #sys.path.append(f"{root_folder}/lib")
-    sys.path.append(f"{working_dir}/lib")
-    sys.path.append(f"{working_dir}/share")
-    sys.path.append(f"{working_dir}/bin")
-    sys.path.append(f"{working_dir}/include")
-    #os.system("rm /home/appuser/venv/lib/libstdc++.so.6")
-    #os.system("ln -s /home/appuser/venv/lib/libstdc++.so.6.0.30 /home/appuser/venv/lib/libstdc++.so.6")
-    #os.system("strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX")
-    #os.system("ldd /home/appuser/venv/lib/python3.9/lib-dynload/cctbx_xray_ext.so")
-    #os.system("strings /home/appuser/venv/lib/libstdc++.so.6 | grep GLIBCXX")
-    #st.info(dylib_folder)
-    os.environ["LD_LIBRARY_PATH"] = f"{dylib_folder.as_posix()}:{root_folder}/lib"
-    #st.info(os.environ["LD_LIBRARY_PATH"])
-
-
-
-#st.info(list(Path("/home/appuser/venv/").rglob("*tbx*")))
-#import cctbx
-
-
-#if Path("/home/appuser").exists():
-#    # essential to avoid cctbx import errors
-#    target = Path("/home/appuser/venv/share/cctbx")
-#    if not target.exists():
-#        target.symlink_to("/home/appuser/.conda/share/cctbx")
-#
-#    sys.path += ["/home/appuser/venv/lib/python3.9/lib-dynload"]
-#    os.environ["PATH"] += os.pathsep + "/home/appuser/.conda/bin"
+import cctbx
 
 
 import numpy as np
@@ -384,7 +312,7 @@ def main():
 
             xs, ys = res
                 
-        source = ColumnDataSource(data=dict(x=range(1,len(xs)+1),y=ys,ID=xs))
+        source = ColumnDataSource(data=dict(x=list(range(1,len(xs)+1)),y=ys,ID=xs))
         top_source = ColumnDataSource(data=dict(x=[1],y=[ys[0]],ID=[xs[0]]))
         label = Label(x=1, y=ys[0], text=f'Best match: {xs[0]}', x_offset=10, y_offset=-5, text_font_size='16px')
 
